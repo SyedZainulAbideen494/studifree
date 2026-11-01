@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { extractJson } from '../../utils/json'
 import { executeAI } from '../ai/requestManager'
+import { buildRegionalContextInstruction } from '../location'
 
 export type ExplainMode = 'beginner' | 'analogy' | 'step-by-step' | 'visual' | 'practical' | 'exam' | 'formula' | 'compare'
 
@@ -45,10 +46,13 @@ export async function explain(apiKey: string, params: {
   compareWith?: string
   followup?: string
   images?: { base64: string; mimeType: string }[]
+  /** Coarse region only, supplied by an explicit per-request opt-in. */
+  region?: { country: string; region?: string }
 }): Promise<ExplainResult> {
   const prompt = [
     `You are a patient, encouraging teacher. Mode: ${modeInstructions[params.mode]}`,
     `Concept: ${params.concept}`,
+    params.region ? buildRegionalContextInstruction(params.region) : '',
     params.source ? `Source material (may be truncated): ${params.source.slice(0, 8000)}` : '',
     params.previousExplanation ? `Previous explanation (do not repeat): ${params.previousExplanation.slice(0, 1500)}` : '',
     params.incorrectResponse ? `Learner's incorrect response: ${params.incorrectResponse}` : '',

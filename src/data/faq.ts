@@ -112,6 +112,13 @@ export const faqItems: FaqItem[] = [
       'Yes. Manual learning functionality and other local features can still be used where supported. AI-powered generation requires an API key.',
   },
   {
+    id: 'ai-location',
+    category: 'ai-api-keys',
+    question: 'Does AI use my location?',
+    answer:
+      'Not automatically. If you allow location personalisation, the AI teacher can use only your general country and region, and only when you switch on “Use regional context” for that request. Precise coordinates are never sent to the AI provider. You can use every AI feature with the switch left off.',
+  },
+  {
     id: 'change-model',
     category: 'ai-api-keys',
     question: 'Can I change my AI model?',
@@ -164,14 +171,21 @@ export const faqItems: FaqItem[] = [
     category: 'privacy-data',
     question: 'Where is my study data stored?',
     answer:
-      "Supported learning data is stored locally in your browser using the application's local storage system.",
+      "Supported learning data is stored locally in your browser using the application's local storage system. If you allow location personalisation, only a general country and region are stored alongside it. Precise coordinates are never saved.",
   },
   {
     id: 'collect-location',
     category: 'privacy-data',
     question: 'Does Studifree collect my location?',
     answer:
-      'Precise device location is only requested once and only when you explicitly choose to share it. If you decline, no location is collected. The deployed site may also send a basic visitor notification containing your IP address and browser details; see the Privacy Policy for details.',
+      'Only if you choose to allow it. Studifree asks once for optional location personalisation. If you allow it and your browser grants permission, your coordinates are used to look up a general country and region. Precise coordinates are not stored in your browser and are not sent to the AI provider; only the country and region are saved locally. If you decline, no location is read. Precise coordinates are included in visitor analytics only if you separately switch that on in Settings. See the Privacy Policy for details.',
+  },
+  {
+    id: 'disable-location',
+    category: 'privacy-data',
+    question: 'Can I disable location personalisation?',
+    answer:
+      'Yes. Open Settings → Location personalisation to disable or reset the choice. You can also revoke the browser’s location permission in your browser’s site settings. Disabling it never blocks Studifree or any learning feature.',
   },
   {
     id: 'key-secure',

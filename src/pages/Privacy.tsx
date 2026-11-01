@@ -10,11 +10,23 @@ const sections = [
   },
   {
     h: 'Visitor notifications',
-    p: 'When you open the deployed Studifree website, the site may send a visitor notification email through EmailJS. This notification contains the visit time, page URL, your IP address (looked up through ipify), browser user agent, language, screen size, timezone, referrer and platform. It is used only to understand visits to the site. It is not linked to your study data. EmailJS acts as a third-party delivery service for these notifications.',
+    p: 'When you open the deployed Studifree website, the site may send a visitor notification email through EmailJS. This notification contains the visit time, page URL, your IP address (looked up through ipify), browser user agent, language, screen size, timezone, referrer and platform. It is used only to understand visits to the site. It is not linked to your study data and does not include location unless you separately switch on location in visitor analytics. EmailJS acts as a third-party delivery service for these notifications.',
   },
   {
-    h: 'Optional location sharing',
-    p: 'The deployed site asks once whether you want to share your device location. No coordinates are read from your browser unless you press “Allow location”. If you allow, your latitude, longitude and location accuracy in metres are sent in the same visitor notification together with the visit time, page URL and IP address. If you decline, no location is collected or sent. Your choice is stored in this browser and can be reset in Settings → Privacy.',
+    h: 'Location personalisation (optional)',
+    p: 'Studifree asks once whether you want location personalisation. No precise location is read from your browser unless you choose “Allow location” and the browser grants permission. When you allow it, your coordinates are used in memory to look up a general country and first-level region. The coordinates are not stored in your browser and are not sent to the AI provider. Only the country and region are saved locally. If you choose “Maybe later” or deny permission, no location is read and Studifree works normally. You can disable or reset this in Settings → Location personalisation, and revoke browser permission in your browser’s site settings.',
+  },
+  {
+    h: 'Reverse geocoding service',
+    p: 'To turn coordinates into a country and region, Studifree sends the coordinates of that one request to BigDataCloud’s public reverse-geocoding service. The coordinates are used only to return the coarse region, are not stored by Studifree, and are not sent to the AI provider. If the lookup fails, only the fact that you allowed location is stored.',
+  },
+  {
+    h: 'Regional context in AI features',
+    p: 'AI features do not receive your location automatically. The AI teacher includes regional context only when you switch on “Use regional context” for that request. When enabled, only the general country and region are added to the prompt, never precise coordinates. The AI is instructed to ignore the region when it is not relevant and not to invent local facts. You can leave the switch off and use every AI feature without sharing any location.',
+  },
+  {
+    h: 'Location in visitor analytics (separate opt-in)',
+    p: 'Visitor analytics is separate from personalisation. In Settings → Location personalisation you can switch on “Location in visitor analytics”, which is off by default. When it is on and location personalisation is allowed, the deployed site may send precise latitude, longitude and accuracy in the same EmailJS visitor notification described above, together with the visit time, page URL and IP address. It is not required for personalisation. You can switch it off at any time; this does not affect learning features.',
   },
   {
     h: 'API-key handling',

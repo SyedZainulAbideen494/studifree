@@ -112,11 +112,15 @@ const sections: { title: string; items: HelpItem[] }[] = [
       },
       {
         q: 'Does Studifree collect my location?',
-        a: 'Only if you press “Allow location” in the optional prompt. Declining means no coordinates are read or sent, and you can reset the choice in Settings → Privacy.',
+        a: 'Only if you choose “Allow location” in the optional personalisation prompt. Your coordinates are used once to look up a general country and region; precise coordinates are not stored or sent to the AI. Declining means no location is read and Studifree works normally.',
+      },
+      {
+        q: 'How do I change or disable location personalisation?',
+        a: 'Open Settings → Location personalisation to disable or reset it. You can also revoke browser location permission in your browser’s site settings. AI regional context is a separate switch inside Learn and is off by default.',
       },
       {
         q: 'What does the visitor notification contain?',
-        a: 'The deployed site may email the visit time, page URL, IP address, browser details, language, screen size, timezone and referrer. The Privacy Policy explains this in full.',
+        a: 'The deployed site may email the visit time, page URL, IP address, browser details, language, screen size, timezone and referrer. Precise location is included only if you separately switch on location in visitor analytics. The Privacy Policy explains this in full.',
       },
     ],
   },

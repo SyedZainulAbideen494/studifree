@@ -5,11 +5,12 @@ interface Props {
   checked: boolean
   onChange: (v: boolean) => void
   label?: string
+  ariaLabel?: string
   id?: string
   disabled?: boolean
 }
 
-export const Switch: React.FC<Props> = ({ checked, onChange, label, id, disabled }) => {
+export const Switch: React.FC<Props> = ({ checked, onChange, label, ariaLabel, id, disabled }) => {
   const sid = id || `sw-${Math.random().toString(36).slice(2)}`
   return (
     <label htmlFor={sid} className="inline-flex items-center gap-3 cursor-pointer select-none">
@@ -17,7 +18,7 @@ export const Switch: React.FC<Props> = ({ checked, onChange, label, id, disabled
         id={sid}
         role="switch"
         aria-checked={checked}
-        aria-label={label}
+        aria-label={ariaLabel ?? label}
         disabled={disabled}
         onClick={() => !disabled && onChange(!checked)}
         className={clsx(

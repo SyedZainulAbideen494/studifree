@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Sun, Monitor, Sparkles, Download, Upload, Trash2, RotateCcw, MapPin, ShieldCheck } from 'lucide-react'
+import { Moon, Sun, Monitor, Sparkles, Download, Upload, Trash2, RotateCcw, MapPin, ShieldCheck, Globe2, Send } from 'lucide-react'
 import { Button } from '../components/UI/Button'
 import { Input } from '../components/UI/Input'
 import { Card } from '../components/UI/Card'
@@ -9,11 +9,20 @@ import { SparkleToggle } from '../components/Effects/SparkleToggle'
 import { useAppStore } from '../store/useAppStore'
 import { db } from '../db'
 import { useAiAvailability } from '../hooks/useAiAvailability'
+import { notify } from '../store/useAiEventsStore'
 import {
-  clearLocationConsent,
-  getLocationConsent,
-  LOCATION_CONSENT_RESET_EVENT,
-} from '../services/visitorTracking'
+  clearLocationPreference,
+  declineLocation,
+  describeRegion,
+  getAnalyticsLocationConsent,
+  getCurrentCoordinates,
+  getLocationPreference,
+  grantLocation,
+  resolveRegionalProfile,
+  setAnalyticsLocationConsent,
+  LOCATION_PREFERENCE_CHANGED_EVENT,
+} from '../services/location'
+import { sendLocationEmail } from '../services/visitorTracking'
 
 export default function Settings() {
   const navigate = useNavigate()
@@ -22,10 +31,100 @@ export default function Settings() {
   const setTheme = useAppStore((s) => s.setTheme)
   const toggleEffects = useAppStore((s) => s.toggleEffects)
   const ai = useAiAvailability()
-  const [locationChoice, setLocationChoice] = useState(getLocationConsent)
+  const [locationPref, setLocationPref] = useState(getLocationPreference)
+  const [analyticsLocation, setAnalyticsLocation] = useState(getAnalyticsLocationConsent)
+  const [analyticsBusy, setAnalyticsBusy] = useState(false)
+  const [regionBusy, setRegionBusy] = useState(false)
   const [work, setWork] = useState(settings.pomodoroWork)
   const [brk, setBrk] = useState(settings.pomodoroBreak)
   const [goal, setGoal] = useState(settings.studyGoalMinutes)
+
+  useEffect(() => {
+    const sync = () => {
+      setLocationPref(getLocationPreference())
+      setAnalyticsLocation(getAnalyticsLocationConsent())
+    }
+    window.addEventListener(LOCATION_PREFERENCE_CHANGED_EVENT, sync)
+    window.addEventListener('storage', sync)
+    return () => {
+      window.removeEventListener(LOCATION_PREFERENCE_CHANGED_EVENT, sync)
+      window.removeEventListener('storage', sync)
+    }
+  }, [])
+
+  const locationGranted = locationPref?.status === 'granted'
+  const regionLabel = describeRegion(locationPref?.profile)
+  const locationStatusLabel = locationGranted
+    ? regionLabel
+      ? `On · ${regionLabel}`
+      : 'On · region not detected'
+    : locationPref?.status === 'declined'
+      ? 'Off'
+      : 'Not set'
+
+  const disablePersonalisation = () => {
+    declineLocation()
+    setLocationPref(getLocationPreference())
+  }
+
+  const askAgain = () => {
+    clearLocationPreference()
+    setLocationPref(null)
+  }
+
+  const sendAnalyticsLocation = async () => {
+    if (analyticsBusy) return
+    setAnalyticsBusy(true)
+    try {
+      const coords = await getCurrentCoordinates()
+      const sent = await sendLocationEmail({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        accuracy: coords.accuracy,
+      })
+      notify(
+        sent ? 'success' : 'warning',
+        sent ? 'Location sent' : 'Location not sent',
+        sent
+          ? 'Your coordinates were included in the anonymous visitor notification.'
+          : 'The notification could not be sent. This does not affect Studifree.',
+      )
+    } catch {
+      notify(
+        'warning',
+        'Location unavailable',
+        'Your browser did not provide a location. Studifree continues to work normally.',
+      )
+    } finally {
+      setAnalyticsBusy(false)
+    }
+  }
+
+  const refreshRegion = async () => {
+    if (regionBusy) return
+    setRegionBusy(true)
+    try {
+      const coords = await getCurrentCoordinates()
+      const profile = await resolveRegionalProfile(coords)
+      grantLocation(profile)
+      setLocationPref(getLocationPreference())
+      notify(
+        profile ? 'success' : 'warning',
+        profile ? 'Region updated' : 'Region not detected',
+        profile
+          ? `Regional context now uses ${describeRegion(profile)} when a feature needs it.`
+          : 'We could not determine your region just now. Your location choice is unchanged.',
+      )
+    } catch {
+      notify(
+        'warning',
+        'Location unavailable',
+        'Your browser did not provide a location. Studifree continues to work normally.',
+      )
+    } finally {
+      setRegionBusy(false)
+    }
+  }
 
   const exportData = async () => {
     const data = {
@@ -146,42 +245,84 @@ export default function Settings() {
       </Card>
 
       <Card>
-        <h2 className="font-semibold text-ink mb-3">Privacy & consent</h2>
         <div className="flex items-start gap-3">
           <div className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center shrink-0">
-            <MapPin className="w-4 h-4 text-ink" />
+            <Globe2 className="w-4 h-4 text-ink" />
           </div>
-          <div className="flex-1">
-            <p className="text-sm text-ink">
-              Location sharing:{' '}
-              <span className="text-muted">
-                {locationChoice === 'granted'
-                  ? 'allowed'
-                  : locationChoice === 'declined'
-                    ? 'not shared'
-                    : 'not asked yet'}
-              </span>
-            </p>
+          <div className="flex-1 min-w-0">
+            <h2 className="font-semibold text-ink">Location personalisation</h2>
+            <p className="text-sm text-ink mt-1">{locationStatusLabel}</p>
             <p className="text-xs text-muted mt-1 leading-relaxed">
-              Location is only requested after you press Allow. Declining never limits access to Studifree.
+              Only your country or region is stored, never precise coordinates. Location is used only when a
+              feature can benefit, and regional context in AI is off by default for each request.
+            </p>
+            <p className="text-xs text-faint mt-2 leading-relaxed">
+              To revoke browser permission completely, use your browser&apos;s site settings for this website.
             </p>
           </div>
         </div>
+
         <div className="flex flex-wrap gap-2 mt-3">
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => {
-              clearLocationConsent()
-              setLocationChoice(null)
-              window.dispatchEvent(new Event(LOCATION_CONSENT_RESET_EVENT))
-            }}
-          >
-            {locationChoice === 'granted' ? 'Withdraw and ask again' : 'Reset location choice'}
+          {locationGranted && (
+            <>
+              <Button size="sm" variant="secondary" onClick={disablePersonalisation}>
+                Disable personalisation
+              </Button>
+              <Button size="sm" variant="ghost" onClick={refreshRegion} loading={regionBusy}>
+                <Globe2 className="w-4 h-4" />
+                {regionLabel ? 'Refresh region' : 'Detect region'}
+              </Button>
+            </>
+          )}
+          <Button size="sm" variant="ghost" onClick={askAgain}>
+            <MapPin className="w-4 h-4" /> Ask me again
           </Button>
           <Button size="sm" variant="ghost" onClick={() => navigate('/privacy')}>
             <ShieldCheck className="w-4 h-4" /> Privacy policy
           </Button>
+        </div>
+
+        <div className="mt-4 pt-4 border-t border-line">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm text-ink">Location in visitor analytics</p>
+              <p className="text-xs text-muted mt-0.5 leading-relaxed">
+                Separate from personalisation and off by default. When on, this visit&apos;s precise
+                coordinates can be included in the anonymous visitor notification.
+              </p>
+              {!locationGranted && (
+                <p className="text-xs text-faint mt-1">
+                  Allow location personalisation first. Visitor analytics never reads location on its own.
+                </p>
+              )}
+            </div>
+            <Switch
+              checked={analyticsLocation}
+              ariaLabel="Include location in visitor analytics"
+              disabled={!locationGranted && !analyticsLocation}
+              onChange={(value) => {
+                setAnalyticsLocationConsent(value)
+                setAnalyticsLocation(value)
+              }}
+            />
+          </div>
+
+          {locationGranted && analyticsLocation && (
+            <Button
+              size="sm"
+              variant="secondary"
+              className="mt-3"
+              onClick={sendAnalyticsLocation}
+              loading={analyticsBusy}
+            >
+              {analyticsBusy ? (
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+              Send this visit&apos;s location
+            </Button>
+          )}
         </div>
       </Card>
 

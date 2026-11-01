@@ -1,23 +1,54 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { MapPin, ShieldCheck, X, Loader2 } from 'lucide-react'
-import { Button } from '../UI/Button'
 import {
-  getLocationConsent,
-  sendLocationEmail,
-  setLocationConsent,
-  isTrackingAllowed,
-  LOCATION_CONSENT_RESET_EVENT,
-} from '../../services/visitorTracking'
+  BookOpen,
+  Globe2,
+  Loader2,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+  X,
+} from 'lucide-react'
+import { Button } from '../UI/Button'
+import { notify } from '../../store/useAiEventsStore'
+import {
+  declineLocation,
+  describeRegion,
+  getAnalyticsLocationConsent,
+  getCurrentCoordinates,
+  getLocationPreference,
+  grantLocation,
+  resolveRegionalProfile,
+  LOCATION_PREFERENCE_CHANGED_EVENT,
+} from '../../services/location'
+import { isTrackingAllowed, sendLocationEmail } from '../../services/visitorTracking'
 
 const PROMPT_DELAY_MS = 1400
 
+const benefits = [
+  {
+    icon: BookOpen,
+    title: 'Regional learning resources',
+    body: 'Local examples and education information when they are genuinely useful.',
+  },
+  {
+    icon: MapPin,
+    title: 'Curriculum context',
+    body: 'Country-specific conventions and study guidance where relevant.',
+  },
+  {
+    icon: Sparkles,
+    title: 'Better AI context',
+    body: 'Optional regional context for questions that need local understanding.',
+  },
+]
+
 /**
- * Optional, consent-first location sharing.
+ * Optional, consent-first location personalisation.
  *
  * Nothing is requested from the browser until the visitor presses
- * "Allow location". Declining is remembered and the website continues
- * exactly as before.
+ * "Allow location". Declining is remembered, and Studifree continues to
+ * work exactly as before.
  */
 export const LocationConsentGate: React.FC = () => {
   const reducedMotion = useReducedMotion()
@@ -26,31 +57,28 @@ export const LocationConsentGate: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const allowRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
-  const prompted = useRef(false)
 
   useEffect(() => {
-    if (prompted.current) return
-    prompted.current = true
     if (typeof window === 'undefined') return
     if (!isTrackingAllowed(window.location.hostname, window.location.pathname)) return
     if (!('geolocation' in navigator)) return
-    if (getLocationConsent() !== null) return
+    if (getLocationPreference() !== null) return
 
     const timer = window.setTimeout(() => setOpen(true), PROMPT_DELAY_MS)
     return () => window.clearTimeout(timer)
   }, [])
 
   useEffect(() => {
-    const onReset = () => {
-      if (getLocationConsent() === null) setOpen(true)
+    const onChanged = () => {
+      if (getLocationPreference() === null) setOpen(true)
     }
-    window.addEventListener(LOCATION_CONSENT_RESET_EVENT, onReset)
-    return () => window.removeEventListener(LOCATION_CONSENT_RESET_EVENT, onReset)
+    window.addEventListener(LOCATION_PREFERENCE_CHANGED_EVENT, onChanged)
+    return () => window.removeEventListener(LOCATION_PREFERENCE_CHANGED_EVENT, onChanged)
   }, [])
 
   function decline() {
     if (busy) return
-    setLocationConsent('declined')
+    declineLocation()
     setOpen(false)
     setBusy(false)
     setError(null)
@@ -85,33 +113,44 @@ export const LocationConsentGate: React.FC = () => {
     }
   }, [open, busy])
 
-  const allow = () => {
+  const allow = async () => {
     if (busy) return
     setError(null)
     setBusy(true)
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocationConsent('granted')
-        setBusy(false)
-        setOpen(false)
-        // Send in the background; the app never waits on EmailJS.
+    try {
+      const coords = await getCurrentCoordinates()
+      const profile = await resolveRegionalProfile(coords)
+      grantLocation(profile)
+
+      // Separate visitor-analytics preference, off by default. Personalisation
+      // consent alone never sends coordinates anywhere.
+      if (getAnalyticsLocationConsent()) {
         void sendLocationEmail({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          accuracy: coords.accuracy,
         })
-      },
-      (geoError) => {
-        setBusy(false)
-        setLocationConsent('declined')
-        if (geoError.code === geoError.PERMISSION_DENIED) {
-          setOpen(false)
-          return
-        }
-        setError('Location is unavailable right now. You can continue without sharing.')
-      },
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 },
-    )
+      }
+
+      setBusy(false)
+      setOpen(false)
+      notify(
+        'success',
+        'Location personalisation on',
+        profile
+          ? `Regional context is available for ${describeRegion(profile)} when a feature can use it.`
+          : 'Location is allowed, but we could not determine your region just now. You can retry in Settings.',
+      )
+    } catch (err: any) {
+      setBusy(false)
+      if (err?.code === 1) {
+        // Browser permission denied. Continue normally and do not re-prompt.
+        declineLocation()
+        setOpen(false)
+        return
+      }
+      setError('We could not get your location. You can try again, or continue without sharing.')
+    }
   }
 
   return (
@@ -129,6 +168,7 @@ export const LocationConsentGate: React.FC = () => {
             onClick={() => !busy && decline()}
             aria-hidden="true"
           />
+
           <motion.div
             ref={panelRef}
             role="dialog"
@@ -139,7 +179,7 @@ export const LocationConsentGate: React.FC = () => {
             animate={reducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
             exit={reducedMotion ? { opacity: 0 } : { y: 18, opacity: 0, scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-            className="relative w-full max-w-md rounded-3xl glass border border-line-strong shadow-float p-6 sm:p-7"
+            className="relative w-full max-w-lg max-h-[92dvh] overflow-y-auto rounded-3xl glass border border-line-strong shadow-float p-6 sm:p-8"
           >
             <button
               onClick={() => !busy && decline()}
@@ -149,48 +189,86 @@ export const LocationConsentGate: React.FC = () => {
               <X className="w-4 h-4" />
             </button>
 
-            <div className="w-12 h-12 rounded-2xl bg-accent-soft border border-line flex items-center justify-center mb-4">
-              <MapPin className="w-6 h-6 text-ink" />
+            <div className="flex flex-col items-center text-center">
+              <div className="relative w-20 h-20 mb-5" aria-hidden="true">
+                <span className="absolute inset-0 rounded-full border border-line" />
+                <span className="absolute inset-[7px] rounded-full border border-line" />
+                <span className="absolute inset-0 rounded-full bg-accent-soft blur-xl" />
+                <span className="relative w-20 h-20 rounded-full glass border border-line-strong flex items-center justify-center">
+                  <Globe2 className="w-8 h-8 text-ink" />
+                </span>
+              </div>
+
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-inset px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-muted">
+                Optional
+              </span>
+
+              <h2
+                id="location-consent-title"
+                className="mt-3 text-[22px] sm:text-2xl font-semibold text-ink tracking-tight leading-tight"
+              >
+                Make your learning experience more relevant.
+              </h2>
+
+              <div
+                id="location-consent-description"
+                className="mt-3 space-y-2.5 text-sm text-muted leading-relaxed max-w-md"
+              >
+                <p>
+                  Allow Studifree to access your location to help personalise your experience. Location can
+                  help us provide more relevant regional learning resources, local examples,
+                  location-specific information and recommendations when they&apos;re useful.
+                </p>
+                <p>
+                  Your location may also help us tailor certain AI-powered responses to your region when the
+                  question requires local context.
+                </p>
+                <p>
+                  It&apos;s completely optional. You can continue using Studifree without sharing your
+                  location.
+                </p>
+              </div>
             </div>
 
-            <h2 id="location-consent-title" className="text-xl font-semibold text-ink tracking-tight">
-              Share your location?
-            </h2>
-            <p id="location-consent-description" className="text-sm text-muted mt-2 leading-relaxed">
-              This is completely optional. Studifree can include your approximate location in a visitor
-              notification so the site owner knows where learners are joining from.
-            </p>
-
-            <div className="mt-4 rounded-2xl bg-inset border border-line p-3.5 space-y-2 text-xs text-muted leading-relaxed">
-              <p>
-                <span className="text-ink font-medium">What is shared:</span> latitude, longitude, accuracy in
-                metres, visit time and page URL, together with your IP address and browser details.
-              </p>
-              <p>
-                <span className="text-ink font-medium">What is not:</span> nothing is stored in your study data,
-                and no location is collected unless you press Allow.
-              </p>
+            <div className="mt-5 grid gap-2 sm:grid-cols-3">
+              {benefits.map((benefit) => (
+                <div
+                  key={benefit.title}
+                  className="rounded-2xl border border-line bg-surface/70 p-3 text-left"
+                >
+                  <benefit.icon className="w-4 h-4 text-ink" aria-hidden="true" />
+                  <p className="text-xs font-medium text-ink mt-2">{benefit.title}</p>
+                  <p className="text-[11px] text-faint mt-0.5 leading-relaxed">{benefit.body}</p>
+                </div>
+              ))}
             </div>
 
-            {error && <p className="text-xs text-ink mt-3">{error}</p>}
+            {error && (
+              <p className="text-xs text-ink mt-3 rounded-xl border border-line bg-inset px-3 py-2">
+                {error}
+              </p>
+            )}
 
             <div className="mt-5 space-y-2">
               <Button ref={allowRef} onClick={allow} disabled={busy} className="w-full">
                 {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
-                {busy ? 'Requesting location…' : 'Allow location'}
+                {busy ? 'Finding your region…' : 'Allow location'}
               </Button>
               <Button variant="secondary" onClick={decline} disabled={busy} className="w-full">
-                Continue without sharing
+                Maybe later
               </Button>
             </div>
 
-            <div className="flex items-start gap-2 mt-4 text-[11px] text-faint leading-relaxed">
-              <ShieldCheck className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+            <div className="flex items-start justify-center gap-2 mt-4 text-[11px] text-faint leading-relaxed text-center">
+              <ShieldCheck className="w-3.5 h-3.5 shrink-0 mt-0.5" aria-hidden="true" />
               <span>
-                You can change this choice at any time in Settings → Privacy. Declining never limits access to
-                Studifree.
+                Your precise location is only accessed after you give permission through your browser.
               </span>
             </div>
+
+            <p className="text-[11px] text-faint text-center mt-2">
+              Only a general country or region is stored. You can change this any time in Settings.
+            </p>
           </motion.div>
         </motion.div>
       )}

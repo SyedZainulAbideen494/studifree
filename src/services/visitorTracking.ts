@@ -1,4 +1,5 @@
 import emailjs from "@emailjs/browser";
+import { getAnalyticsLocationConsent, getLocationStatus } from "./location";
 
 const SERVICE_ID = "service_zijppum";
 const TEMPLATE_ID = "template_bfaicga";
@@ -99,41 +100,8 @@ export function initVisitorTracking(): void {
 }
 
 /* ------------------------------------------------------------------ */
-/* Optional location sharing                                           */
+/* Optional location analytics (separate explicit consent)             */
 /* ------------------------------------------------------------------ */
-
-export type LocationConsent = "granted" | "declined";
-
-const LOCATION_CONSENT_KEY = "studifree:location-consent";
-
-/** Window event dispatched when the learner resets their choice in Settings. */
-export const LOCATION_CONSENT_RESET_EVENT = "studifree:location-consent-reset";
-
-export function getLocationConsent(): LocationConsent | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const value = localStorage.getItem(LOCATION_CONSENT_KEY);
-    return value === "granted" || value === "declined" ? value : null;
-  } catch {
-    return null;
-  }
-}
-
-export function setLocationConsent(value: LocationConsent): void {
-  try {
-    localStorage.setItem(LOCATION_CONSENT_KEY, value);
-  } catch {
-    /* ignore */
-  }
-}
-
-export function clearLocationConsent(): void {
-  try {
-    localStorage.removeItem(LOCATION_CONSENT_KEY);
-  } catch {
-    /* ignore */
-  }
-}
 
 /** Collect the shared visitor fields once, without sending anything. */
 export async function collectVisitorInfo(): Promise<VisitorInfo> {
@@ -159,15 +127,19 @@ export async function collectVisitorInfo(): Promise<VisitorInfo> {
 }
 
 /**
- * Separate notification sent only after the visitor explicitly clicks
- * "Allow location". Never call this without consent.
+ * Separate notification for visitor analytics. This is never sent just
+ * because location personalisation was granted: the visitor must also have
+ * switched on the distinct analytics preference in Settings.
  */
 export async function sendLocationEmail(coords: {
   latitude: number;
   longitude: number;
   accuracy: number;
 }): Promise<boolean> {
-  if (getLocationConsent() !== "granted") return false;
+  if (!getAnalyticsLocationConsent()) return false;
+  // Two independent choices must both be on: personalisation was allowed and
+  // the visitor separately opted into including a location in analytics.
+  if (getLocationStatus() !== "granted") return false;
 
   try {
     const info = await collectVisitorInfo();
@@ -180,7 +152,7 @@ export async function sendLocationEmail(coords: {
         latitude: coords.latitude.toFixed(5),
         longitude: coords.longitude.toFixed(5),
         location_accuracy: `${Math.round(coords.accuracy)} m`,
-        consent: "Granted — explicit consent",
+        consent: "Granted — separate visitor-analytics consent",
       },
       PUBLIC_KEY,
     );

@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
-import { Loader2, Sparkles, BookOpen, Layers, ClipboardCheck, Save, Download, HelpCircle } from 'lucide-react'
+import { Loader2, Sparkles, BookOpen, Layers, ClipboardCheck, Save, Download, HelpCircle, Globe2 } from 'lucide-react'
 import { Button } from '../components/UI/Button'
 import { Input } from '../components/UI/Input'
 import { Textarea } from '../components/UI/Input'
@@ -13,6 +13,7 @@ import { Card } from '../components/UI/Card'
 import { Tabs } from '../components/UI/Tabs'
 import { Dialog } from '../components/UI/Dialog'
 import { EmptyState } from '../components/UI/EmptyState'
+import { Switch } from '../components/UI/Switch'
 import { useAppStore } from '../store/useAppStore'
 import { db } from '../db'
 import { uid } from '../utils/id'
@@ -21,6 +22,8 @@ import { explain, ExplainMode, ExplainResult } from '../services/gemini/explain'
 import { exportLessonPdf } from '../utils/exportPdf'
 import { AiRequired } from '../components/AI/NoApiKeyPrompt'
 import { useAiAvailability } from '../hooks/useAiAvailability'
+import { useRegionalProfile } from '../hooks/useRegionalProfile'
+import { describeRegion } from '../services/location'
 import { isNoApiKeyError } from '../services/ai/requestManager'
 import type { Lesson, TeachingStyle } from '../types'
 
@@ -51,7 +54,9 @@ export default function Learn() {
   const [currentLessonId, setCurrentLessonId] = useState<string | null>(params.get('lesson'))
   const [helpOpen, setHelpOpen] = useState(false)
   const [previous, setPrevious] = useState<string | null>(null)
+  const [useRegionalContext, setUseRegionalContext] = useState(false)
   const ai = useAiAvailability()
+  const region = useRegionalProfile()
 
   useEffect(() => {
     const lessonId = params.get('lesson')
@@ -80,6 +85,7 @@ export default function Learn() {
         compareWith: style === 'compare' ? compareWith : undefined,
         followup,
         previousExplanation: previous ?? undefined,
+        region: useRegionalContext && region ? { country: region.country, region: region.region } : undefined,
       })
       setResult(r)
       setPrevious(r.definition)
@@ -190,6 +196,29 @@ export default function Learn() {
         {style === 'compare' && (
           <div className="mt-3">
             <Input label="Compare with" value={compareWith} onChange={(e) => setCompareWith(e.target.value)} placeholder="Another concept" />
+          </div>
+        )}
+
+        {region && (
+          <div className="mt-4 rounded-2xl border border-line bg-inset p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2.5 min-w-0">
+                <Globe2 className="w-4 h-4 text-ink shrink-0 mt-0.5" aria-hidden="true" />
+                <div className="min-w-0">
+                  <p className="text-sm text-ink">Use regional context</p>
+                  <p className="text-xs text-muted mt-0.5 leading-relaxed">
+                    When it is relevant, the teacher may use local examples or curriculum context for{' '}
+                    {describeRegion(region)}. Only your country and region are shared, never precise
+                    coordinates.
+                  </p>
+                </div>
+              </div>
+              <Switch
+                checked={useRegionalContext}
+                onChange={setUseRegionalContext}
+                ariaLabel="Use regional context in AI explanations"
+              />
+            </div>
           </div>
         )}
         <div className="flex flex-wrap gap-2 mt-4">

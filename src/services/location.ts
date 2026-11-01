@@ -1,0 +1,279 @@
+/**
+ * Location personalisation.
+ *
+ * Privacy rules this module enforces:
+ * - Coordinates are never persisted. Only a coarse country/region is stored.
+ * - The region is only surfaced to features when the visitor has granted
+ *   personalisation, and AI features must opt in per request.
+ * - Visitor-analytics location sharing is a separate, explicitly stored
+ *   preference and is never implied by personalisation consent.
+ */
+
+export type LocationStatus = 'granted' | 'declined'
+
+export interface RegionalProfile {
+  country: string
+  countryCode?: string
+  /** First-level administrative region, for example a state or county. */
+  region?: string
+  updatedAt: number
+}
+
+export interface LocationPreference {
+  status: LocationStatus
+  profile?: RegionalProfile
+  updatedAt: number
+}
+
+export const LOCATION_PREFERENCE_KEY = 'studifree:location-preference'
+export const LOCATION_PREFERENCE_CHANGED_EVENT = 'studifree:location-preference-changed'
+
+const LEGACY_CONSENT_KEY = 'studifree:location-consent'
+const ANALYTICS_CONSENT_KEY = 'studifree:location-analytics-consent'
+
+/**
+ * Keep only the coarse fields we actually use. Any latitude/longitude or
+ * other extra fields in imported or legacy data are intentionally dropped.
+ */
+export function normalizeRegionalProfile(input: unknown): RegionalProfile | undefined {
+  if (!input || typeof input !== 'object') return undefined
+  const raw = input as Record<string, unknown>
+  const country = typeof raw.country === 'string' ? raw.country.trim() : ''
+  if (!country) return undefined
+  const region = typeof raw.region === 'string' ? raw.region.trim() : ''
+  const countryCode = typeof raw.countryCode === 'string' ? raw.countryCode.trim() : ''
+  const updatedAt = typeof raw.updatedAt === 'number' ? raw.updatedAt : Date.now()
+  return {
+    country,
+    region: region || undefined,
+    countryCode: countryCode || undefined,
+    updatedAt,
+  }
+}
+
+function dispatchChanged(): void {
+  if (typeof window === 'undefined') return
+  window.dispatchEvent(new Event(LOCATION_PREFERENCE_CHANGED_EVENT))
+}
+
+export function getLocationPreference(): LocationPreference | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(LOCATION_PREFERENCE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw) as Record<string, unknown>
+      if (parsed?.status === 'granted' || parsed?.status === 'declined') {
+        return {
+          status: parsed.status,
+          profile: parsed.status === 'granted' ? normalizeRegionalProfile(parsed.profile) : undefined,
+          updatedAt: typeof parsed.updatedAt === 'number' ? parsed.updatedAt : Date.now(),
+        }
+      }
+    }
+
+    // Migrate the previous location flag. The old consent covered a different
+    // purpose (visitor analytics), so a previous "granted" is cleared and the
+    // new personalisation choice is asked once. A decline is still respected.
+    const legacy = localStorage.getItem(LEGACY_CONSENT_KEY)
+    if (legacy === 'declined') {
+      const migrated: LocationPreference = { status: 'declined', updatedAt: Date.now() }
+      try {
+        localStorage.setItem(LOCATION_PREFERENCE_KEY, JSON.stringify(migrated))
+        localStorage.removeItem(LEGACY_CONSENT_KEY)
+      } catch {
+        /* ignore */
+      }
+      return migrated
+    }
+    if (legacy === 'granted') {
+      try {
+        localStorage.removeItem(LEGACY_CONSENT_KEY)
+      } catch {
+        /* ignore */
+      }
+      return null
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
+export function getLocationStatus(): LocationStatus | null {
+  return getLocationPreference()?.status ?? null
+}
+
+/** The coarse region, only while personalisation is granted. */
+export function getRegionalProfile(): RegionalProfile | null {
+  const preference = getLocationPreference()
+  if (!preference || preference.status !== 'granted') return null
+  return preference.profile ?? null
+}
+
+function savePreference(preference: LocationPreference): void {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(LOCATION_PREFERENCE_KEY, JSON.stringify(preference))
+  } catch {
+    /* ignore */
+  }
+  dispatchChanged()
+}
+
+export function grantLocation(profile?: RegionalProfile): void {
+  savePreference({
+    status: 'granted',
+    profile: profile ? normalizeRegionalProfile(profile) : undefined,
+    updatedAt: Date.now(),
+  })
+}
+
+export function declineLocation(): void {
+  savePreference({ status: 'declined', updatedAt: Date.now() })
+}
+
+export function clearLocationPreference(): void {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.removeItem(LOCATION_PREFERENCE_KEY)
+    localStorage.removeItem(LEGACY_CONSENT_KEY)
+  } catch {
+    /* ignore */
+  }
+  dispatchChanged()
+}
+
+/* ------------------------------------------------------------------ */
+/* Separate visitor-analytics preference                               */
+/* ------------------------------------------------------------------ */
+
+export function getAnalyticsLocationConsent(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return localStorage.getItem(ANALYTICS_CONSENT_KEY) === 'granted'
+  } catch {
+    return false
+  }
+}
+
+export function setAnalyticsLocationConsent(granted: boolean): void {
+  if (typeof window === 'undefined') return
+  try {
+    if (granted) localStorage.setItem(ANALYTICS_CONSENT_KEY, 'granted')
+    else localStorage.removeItem(ANALYTICS_CONSENT_KEY)
+  } catch {
+    /* ignore */
+  }
+  dispatchChanged()
+}
+
+/* ------------------------------------------------------------------ */
+/* Browser permission and coarse region lookup                         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Ask the browser for coordinates. This must only be called after an explicit
+ * user action such as pressing "Allow location".
+ *
+ * High accuracy is deliberately off: a country/region only needs a rough fix,
+ * so the least precise result the browser is happy to provide is enough.
+ */
+export function getCurrentCoordinates(): Promise<GeolocationCoordinates> {
+  return new Promise((resolve, reject) => {
+    if (typeof navigator === 'undefined' || !('geolocation' in navigator)) {
+      reject(new Error('Location is not supported in this browser.'))
+      return
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => resolve(position.coords),
+      (error) => reject(error),
+      { enableHighAccuracy: false, timeout: 12000, maximumAge: 5 * 60 * 1000 },
+    )
+  })
+}
+
+interface ReverseGeocodeResponse {
+  countryName?: unknown
+  countryCode?: unknown
+  principalSubdivision?: unknown
+}
+
+/**
+ * Convert coordinates into a coarse region using BigDataCloud's public
+ * reverse-geocode endpoint. Coordinates are sent to that service only, are
+ * held in memory for this request, and are never stored or sent to the AI.
+ */
+export async function reverseGeocode(
+  latitude: number,
+  longitude: number,
+): Promise<RegionalProfile | undefined> {
+  const controller = new AbortController()
+  const timeout = window.setTimeout(() => controller.abort(), 9000)
+  try {
+    const url =
+      'https://api.bigdatacloud.net/data/reverse-geocode-client' +
+      `?latitude=${encodeURIComponent(latitude)}` +
+      `&longitude=${encodeURIComponent(longitude)}` +
+      '&localityLanguage=en'
+    const response = await fetch(url, { signal: controller.signal })
+    if (!response.ok) return undefined
+    const data = (await response.json()) as ReverseGeocodeResponse
+    return normalizeRegionalProfile({
+      country: data.countryName,
+      countryCode: data.countryCode,
+      region: data.principalSubdivision,
+    })
+  } catch {
+    return undefined
+  } finally {
+    window.clearTimeout(timeout)
+  }
+}
+
+/** Resolve a browser position into the coarse region we keep. */
+export async function resolveRegionalProfile(
+  coords: GeolocationCoordinates,
+): Promise<RegionalProfile | undefined> {
+  return reverseGeocode(coords.latitude, coords.longitude)
+}
+
+/* ------------------------------------------------------------------ */
+/* Presentation helpers                                                */
+/* ------------------------------------------------------------------ */
+
+/** Human-readable region, for example "Lagos, Nigeria". */
+export function describeRegion(
+  profile?: Pick<RegionalProfile, 'country' | 'region'> | null,
+): string {
+  if (!profile?.country) return ''
+  const parts: string[] = []
+  for (const part of [profile.region, profile.country]) {
+    const value = part?.trim()
+    if (value && !parts.includes(value)) parts.push(value)
+  }
+  return parts.join(', ')
+}
+
+export interface RegionalContext {
+  country: string
+  region?: string
+  countryCode?: string
+}
+
+/**
+ * Prompt fragment for AI features that explicitly opt into regional context.
+ * It asks the model to ignore the region when it is irrelevant and never
+ * supplies precise coordinates.
+ */
+export function buildRegionalContextInstruction(
+  context?: Pick<RegionalProfile, 'country' | 'region'> | null,
+): string {
+  const label = describeRegion(context)
+  if (!label) return ''
+  return [
+    `Optional regional context: the learner is in ${label}.`,
+    'Use this only if the concept or follow-up genuinely benefits from local, regional or country-specific context, such as local examples or national curriculum conventions.',
+    'If it is not relevant, ignore this instruction completely.',
+    "Do not assume the learner's school, examination board or curriculum, and do not invent local facts, statistics or requirements.",
+  ].join(' ')
+}
