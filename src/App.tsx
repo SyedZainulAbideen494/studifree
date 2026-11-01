@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { BottomNav } from './components/Navigation/BottomNav'
 import { Skeleton } from './components/UI/Skeleton'
 import { Toasts } from './components/Notifications/Toasts'
@@ -22,6 +22,7 @@ const AiSetup = lazy(() => import('./pages/AiSetup'))
 const Flashcards = lazy(() => import('./pages/Flashcards'))
 const QuizStudio = lazy(() => import('./pages/QuizStudio'))
 const Onboarding = lazy(() => import('./pages/Onboarding'))
+const LandingPage = lazy(() => import('./pages/LandingPage'))
 
 function Fallback() {
   return (
@@ -33,7 +34,26 @@ function Fallback() {
   )
 }
 
+/**
+ * The public landing page renders before the application shell. It has its
+ * own navigation and must not inherit the AI banner, bottom bar, consent gate
+ * or app padding.
+ */
+function LandingFallback() {
+  return <div style={{ minHeight: '100vh', background: '#050505' }} aria-hidden="true" />
+}
+
 export default function App() {
+  const location = useLocation()
+
+  if (location.pathname === '/landing' || location.pathname === '/landing/') {
+    return (
+      <Suspense fallback={<LandingFallback />}>
+        <LandingPage />
+      </Suspense>
+    )
+  }
+
   return (
     <div className="min-h-full pb-28">
       <AiKeyBanner />

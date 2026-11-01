@@ -15,6 +15,7 @@ import {
   declineLocation,
   describeRegion,
   getAnalyticsLocationConsent,
+  getBrowserLocationPermission,
   getCurrentCoordinates,
   getLocationPreference,
   grantLocation,
@@ -64,13 +65,37 @@ export const LocationConsentGate: React.FC = () => {
     if (!('geolocation' in navigator)) return
     if (getLocationPreference() !== null) return
 
-    const timer = window.setTimeout(() => setOpen(true), PROMPT_DELAY_MS)
-    return () => window.clearTimeout(timer)
+    let cancelled = false
+    let timer: number | undefined
+
+    // Check the browser permission first. If the visitor has already blocked
+    // this site in their browser, respect that decision and do not show a
+    // Studifree prompt that could not succeed.
+    void getBrowserLocationPermission().then((permission) => {
+      if (cancelled) return
+      if (permission === 'denied') {
+        declineLocation()
+        return
+      }
+      timer = window.setTimeout(() => setOpen(true), PROMPT_DELAY_MS)
+    })
+
+    return () => {
+      cancelled = true
+      if (timer) window.clearTimeout(timer)
+    }
   }, [])
 
   useEffect(() => {
     const onChanged = () => {
-      if (getLocationPreference() === null) setOpen(true)
+      if (getLocationPreference() !== null) return
+      void getBrowserLocationPermission().then((permission) => {
+        if (permission === 'denied') {
+          declineLocation()
+          return
+        }
+        setOpen(true)
+      })
     }
     window.addEventListener(LOCATION_PREFERENCE_CHANGED_EVENT, onChanged)
     return () => window.removeEventListener(LOCATION_PREFERENCE_CHANGED_EVENT, onChanged)
@@ -267,7 +292,8 @@ export const LocationConsentGate: React.FC = () => {
             </div>
 
             <p className="text-[11px] text-faint text-center mt-2">
-              Only a general country or region is stored. You can change this any time in Settings.
+              Asked once per browser. Only a general country or region is stored, and you can change or clear
+              this any time in Settings.
             </p>
           </motion.div>
         </motion.div>

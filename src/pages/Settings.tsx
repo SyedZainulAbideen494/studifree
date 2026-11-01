@@ -11,16 +11,19 @@ import { db } from '../db'
 import { useAiAvailability } from '../hooks/useAiAvailability'
 import { notify } from '../store/useAiEventsStore'
 import {
-  clearLocationPreference,
+  clearLocationConsent,
+  clearRegionalProfile,
   declineLocation,
   describeRegion,
   getAnalyticsLocationConsent,
   getCurrentCoordinates,
   getLocationPreference,
-  grantLocation,
   resolveRegionalProfile,
   setAnalyticsLocationConsent,
+  updateRegionalProfile,
+  watchBrowserLocationPermission,
   LOCATION_PREFERENCE_CHANGED_EVENT,
+  type BrowserLocationPermission,
 } from '../services/location'
 import { sendLocationEmail } from '../services/visitorTracking'
 
@@ -32,6 +35,7 @@ export default function Settings() {
   const toggleEffects = useAppStore((s) => s.toggleEffects)
   const ai = useAiAvailability()
   const [locationPref, setLocationPref] = useState(getLocationPreference)
+  const [browserPermission, setBrowserPermission] = useState<BrowserLocationPermission>('unsupported')
   const [analyticsLocation, setAnalyticsLocation] = useState(getAnalyticsLocationConsent)
   const [analyticsBusy, setAnalyticsBusy] = useState(false)
   const [regionBusy, setRegionBusy] = useState(false)
@@ -46,9 +50,11 @@ export default function Settings() {
     }
     window.addEventListener(LOCATION_PREFERENCE_CHANGED_EVENT, sync)
     window.addEventListener('storage', sync)
+    const unsubscribePermission = watchBrowserLocationPermission(setBrowserPermission)
     return () => {
       window.removeEventListener(LOCATION_PREFERENCE_CHANGED_EVENT, sync)
       window.removeEventListener('storage', sync)
+      unsubscribePermission()
     }
   }, [])
 
@@ -62,14 +68,39 @@ export default function Settings() {
       ? 'Off'
       : 'Not set'
 
+  const browserPermissionLabel =
+    browserPermission === 'granted'
+      ? 'Allowed'
+      : browserPermission === 'denied'
+        ? 'Blocked in browser'
+        : browserPermission === 'prompt'
+          ? 'Ask when needed'
+          : 'Not supported in this browser'
+
   const disablePersonalisation = () => {
     declineLocation()
     setLocationPref(getLocationPreference())
   }
 
-  const askAgain = () => {
-    clearLocationPreference()
+  const changePreference = () => {
+    clearLocationConsent()
     setLocationPref(null)
+    notify(
+      'info',
+      'Location preference cleared',
+      'You can make a new choice the next time the location prompt appears.',
+    )
+  }
+
+  const clearSavedLocation = () => {
+    clearRegionalProfile()
+    setLocationPref(getLocationPreference())
+    notify(
+      'success',
+      'Saved region cleared',
+      'Your stored country or region was removed. Location personalisation remains ' +
+        (locationGranted ? 'on without a region.' : 'off.'),
+    )
   }
 
   const sendAnalyticsLocation = async () => {
@@ -102,11 +133,19 @@ export default function Settings() {
 
   const refreshRegion = async () => {
     if (regionBusy) return
+    if (browserPermission === 'denied') {
+      notify(
+        'warning',
+        'Browser location is blocked',
+        'Allow location for this site in your browser settings before refreshing the region.',
+      )
+      return
+    }
     setRegionBusy(true)
     try {
       const coords = await getCurrentCoordinates()
       const profile = await resolveRegionalProfile(coords)
-      grantLocation(profile)
+      updateRegionalProfile(profile)
       setLocationPref(getLocationPreference())
       notify(
         profile ? 'success' : 'warning',
@@ -267,9 +306,32 @@ export default function Settings() {
               Only your country or region is stored, never precise coordinates. Location is used only when a
               feature can benefit, and regional context in AI is off by default for each request.
             </p>
+            <dl className="mt-3 grid gap-1.5 text-xs">
+              <div className="flex items-center justify-between gap-3">
+                <dt className="text-muted">Studifree preference</dt>
+                <dd className="text-ink text-right">
+                  {locationPref?.status === 'granted'
+                    ? 'Granted'
+                    : locationPref?.status === 'declined'
+                      ? 'Declined'
+                      : 'Not chosen'}
+                </dd>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <dt className="text-muted">Browser permission</dt>
+                <dd className="text-ink text-right">{browserPermissionLabel}</dd>
+              </div>
+            </dl>
             <p className="text-xs text-faint mt-2 leading-relaxed">
-              To revoke browser permission completely, use your browser&apos;s site settings for this website.
+              Studifree asks once per browser. To revoke the browser&apos;s own permission completely, use your
+              browser&apos;s site settings for this website.
             </p>
+            {browserPermission === 'denied' && (
+              <p className="text-xs text-ink mt-2 rounded-xl border border-line bg-inset px-3 py-2 leading-relaxed">
+                Your browser is blocking location for this site. Studifree will not request coordinates. You can
+                clear any saved region below, or allow location in your browser settings and then refresh.
+              </p>
+            )}
           </div>
         </div>
 
@@ -277,16 +339,27 @@ export default function Settings() {
           {locationGranted && (
             <>
               <Button size="sm" variant="secondary" onClick={disablePersonalisation}>
-                Disable personalisation
+                Turn off personalisation
               </Button>
-              <Button size="sm" variant="ghost" onClick={refreshRegion} loading={regionBusy}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={refreshRegion}
+                loading={regionBusy}
+                disabled={browserPermission === 'denied'}
+              >
                 <Globe2 className="w-4 h-4" />
                 {regionLabel ? 'Refresh region' : 'Detect region'}
               </Button>
             </>
           )}
-          <Button size="sm" variant="ghost" onClick={askAgain}>
-            <MapPin className="w-4 h-4" /> Ask me again
+          {locationPref?.profile && (
+            <Button size="sm" variant="ghost" onClick={clearSavedLocation}>
+              <Trash2 className="w-4 h-4" /> Clear saved region
+            </Button>
+          )}
+          <Button size="sm" variant="ghost" onClick={changePreference}>
+            <MapPin className="w-4 h-4" /> {locationPref ? 'Change preference' : 'Choose preference'}
           </Button>
           <Button size="sm" variant="ghost" onClick={() => navigate('/privacy')}>
             <ShieldCheck className="w-4 h-4" /> Privacy policy
@@ -325,6 +398,7 @@ export default function Settings() {
               className="mt-3"
               onClick={sendAnalyticsLocation}
               loading={analyticsBusy}
+              disabled={browserPermission === 'denied'}
             >
               {analyticsBusy ? (
                 <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
