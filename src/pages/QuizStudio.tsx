@@ -13,6 +13,8 @@ import { db } from '../db'
 import { recordAttempt } from '../learning/engine'
 import { uid } from '../utils/id'
 import { generateQuiz } from '../services/gemini/quiz'
+import { AiRequired } from '../components/AI/NoApiKeyPrompt'
+import { isNoApiKeyError } from '../services/ai/requestManager'
 import type { Quiz, QuizQuestion, QuizResult } from '../types'
 
 const counts = [5, 10, 15, 20, 30, 50]
@@ -52,11 +54,12 @@ export default function QuizStudio() {
   }, [startedAt, submitted, mode])
 
   const generate = async () => {
-    if (!settings.ai?.apiKey) { setGenError('Set up an AI key first.'); return }
+    const apiKey = settings.ai?.apiKey
+    if (!apiKey) { setGenError('Add your Gemini API key in AI Setup to generate a quiz.'); return }
     if (!topic.trim() && !sourceText.trim()) { setGenError('Enter a topic or source text.'); return }
     setGenLoading(true); setGenError(null)
     try {
-      const raw = await generateQuiz(settings.ai.apiKey, {
+      const raw = await generateQuiz(apiKey, {
         topic: topic.trim() || undefined,
         sourceText: sourceText.trim() || undefined,
         count,
@@ -81,7 +84,7 @@ export default function QuizStudio() {
       setResult(null)
       setStartedAt(Date.now())
     } catch (e: any) {
-      setGenError(e?.message ?? String(e))
+      setGenError(isNoApiKeyError(e) ? 'Add your Gemini API key in AI Setup to generate a quiz.' : e?.message ?? String(e))
     } finally {
       setGenLoading(false)
     }
@@ -125,41 +128,43 @@ export default function QuizStudio() {
       </div>
 
       {!quiz && (
-        <Card>
-          <div className="space-y-3">
-            <Input label="Topic" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Topic for quiz" />
-            <Textarea label="Source text (optional)" value={sourceText} onChange={(e) => setSourceText(e.target.value)} placeholder="Paste text to base questions on" />
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm text-muted mb-1.5">Questions</label>
-                <select value={count} onChange={(e) => setCount(Number(e.target.value))} className="w-full px-4 py-2.5 rounded-2xl bg-inset border border-line text-ink">
-                  {counts.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
+        <AiRequired feature="AI quiz generation">
+          <Card>
+            <div className="space-y-3">
+              <Input label="Topic" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Topic for quiz" />
+              <Textarea label="Source text (optional)" value={sourceText} onChange={(e) => setSourceText(e.target.value)} placeholder="Paste text to base questions on" />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm text-muted mb-1.5">Questions</label>
+                  <select value={count} onChange={(e) => setCount(Number(e.target.value))} className="w-full px-4 py-2.5 rounded-2xl bg-inset border border-line text-ink">
+                    {counts.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-muted mb-1.5">Difficulty</label>
+                  <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className="w-full px-4 py-2.5 rounded-2xl bg-inset border border-line text-ink">
+                    {['easy', 'medium', 'hard', 'mixed'].map((d) => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
               </div>
               <div>
-                <label className="block text-sm text-muted mb-1.5">Difficulty</label>
-                <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className="w-full px-4 py-2.5 rounded-2xl bg-inset border border-line text-ink">
-                  {['easy', 'medium', 'hard', 'mixed'].map((d) => <option key={d} value={d}>{d}</option>)}
-                </select>
+                <label className="block text-sm text-muted mb-1.5">Mode</label>
+                <div className="flex flex-wrap gap-2">
+                  {(['practice', 'exam', 'timed', 'untimed'] as const).map((m) => (
+                    <button key={m} onClick={() => setMode(m)} className={`px-3 py-1.5 rounded-xl text-sm border ${mode === m ? 'bg-accent text-accent-ink border-accent' : 'bg-surface text-muted border-line'}`}>{m}</button>
+                  ))}
+                </div>
               </div>
+              {mode === 'timed' && (
+                <Input label="Time limit (seconds)" type="number" value={timeLimit} onChange={(e) => setTimeLimit(Number(e.target.value))} />
+              )}
+              <Button onClick={generate} disabled={genLoading}>
+                {genLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />} Generate quiz
+              </Button>
+              {genError && <p className="text-sm text-ink">{genError}</p>}
             </div>
-            <div>
-              <label className="block text-sm text-muted mb-1.5">Mode</label>
-              <div className="flex flex-wrap gap-2">
-                {(['practice', 'exam', 'timed', 'untimed'] as const).map((m) => (
-                  <button key={m} onClick={() => setMode(m)} className={`px-3 py-1.5 rounded-xl text-sm border ${mode === m ? 'bg-accent text-accent-ink border-accent' : 'bg-surface text-muted border-line'}`}>{m}</button>
-                ))}
-              </div>
-            </div>
-            {mode === 'timed' && (
-              <Input label="Time limit (seconds)" type="number" value={timeLimit} onChange={(e) => setTimeLimit(Number(e.target.value))} />
-            )}
-            <Button onClick={generate} disabled={genLoading}>
-              {genLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />} Generate quiz
-            </Button>
-            {genError && <p className="text-sm text-ink">{genError}</p>}
-          </div>
-        </Card>
+          </Card>
+        </AiRequired>
       )}
 
       {quiz && !submitted && (

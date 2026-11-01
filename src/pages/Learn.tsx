@@ -19,6 +19,9 @@ import { uid } from '../utils/id'
 import { extractPdf, pagesToText } from '../utils/pdf'
 import { explain, ExplainMode, ExplainResult } from '../services/gemini/explain'
 import { exportLessonPdf } from '../utils/exportPdf'
+import { AiRequired } from '../components/AI/NoApiKeyPrompt'
+import { useAiAvailability } from '../hooks/useAiAvailability'
+import { isNoApiKeyError } from '../services/ai/requestManager'
 import type { Lesson, TeachingStyle } from '../types'
 
 const styles: { id: TeachingStyle; label: string }[] = [
@@ -48,6 +51,7 @@ export default function Learn() {
   const [currentLessonId, setCurrentLessonId] = useState<string | null>(params.get('lesson'))
   const [helpOpen, setHelpOpen] = useState(false)
   const [previous, setPrevious] = useState<string | null>(null)
+  const ai = useAiAvailability()
 
   useEffect(() => {
     const lessonId = params.get('lesson')
@@ -64,10 +68,11 @@ export default function Learn() {
 
   const runExplain = async (followup?: string) => {
     if (!topic.trim()) { setError('Enter a topic first.'); return }
-    if (!settings.ai?.apiKey) { setError('Please set up an AI key in AI Setup.'); return }
+    const apiKey = settings.ai?.apiKey
+    if (!apiKey) { setError('Add your Gemini API key in AI Setup to use AI teaching.'); return }
     setLoading(true); setError(null)
     try {
-      const r = await explain(settings.ai.apiKey, {
+      const r = await explain(apiKey, {
         concept: topic.trim() || 'the uploaded material',
         mode: style as any,
         source: sourceText || undefined,
@@ -79,7 +84,7 @@ export default function Learn() {
       setResult(r)
       setPrevious(r.definition)
     } catch (e: any) {
-      setError(e?.message ?? String(e))
+      setError(isNoApiKeyError(e) ? 'Add your Gemini API key in AI Setup to use AI teaching.' : e?.message ?? String(e))
     } finally {
       setLoading(false)
     }
@@ -135,6 +140,7 @@ export default function Learn() {
         <Button variant="ghost" size="sm" onClick={() => setHelpOpen(true)}><HelpCircle className="w-4 h-4" /> Help</Button>
       </div>
 
+      <AiRequired feature="AI teaching explanations">
       <Card>
         <Input label="Topic" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="What do you want to learn?" />
         <div className="mt-3">
@@ -196,6 +202,7 @@ export default function Learn() {
         </div>
         {error && <p className="text-sm text-ink mt-3">{error}</p>}
       </Card>
+      </AiRequired>
 
       {loading && (
         <Card><div className="flex items-center gap-3 text-muted"><Loader2 className="w-5 h-5 animate-spin" /> Thinking…</div></Card>
@@ -257,7 +264,7 @@ export default function Learn() {
         </Card>
       )}
 
-      {!result && !loading && (
+      {!result && !loading && !ai.requiresSetup && (
         <EmptyState icon={Sparkles} title="Ready to learn" description="Enter a topic and choose a style, then press Explain." />
       )}
 

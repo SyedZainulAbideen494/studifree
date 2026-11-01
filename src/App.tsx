@@ -2,6 +2,10 @@ import React, { Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { BottomNav } from './components/Navigation/BottomNav'
 import { Skeleton } from './components/UI/Skeleton'
+import { Toasts } from './components/Notifications/Toasts'
+import { AiKeyBanner } from './components/AI/AiKeyBanner'
+import { AiSetupModal } from './components/AI/AiSetupModal'
+import { LocationConsentGate } from './components/Consent/LocationConsent'
 
 const Home = lazy(() => import('./pages/Home'))
 const Learn = lazy(() => import('./pages/Learn'))
@@ -17,7 +21,6 @@ const Terms = lazy(() => import('./pages/Legal'))
 const AiSetup = lazy(() => import('./pages/AiSetup'))
 const Flashcards = lazy(() => import('./pages/Flashcards'))
 const QuizStudio = lazy(() => import('./pages/QuizStudio'))
-const Lab = lazy(() => import('./pages/Lab'))
 const Onboarding = lazy(() => import('./pages/Onboarding'))
 
 function Fallback() {
@@ -33,6 +36,7 @@ function Fallback() {
 export default function App() {
   return (
     <div className="min-h-full pb-28">
+      <AiKeyBanner />
       <Suspense fallback={<Fallback />}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -49,11 +53,13 @@ export default function App() {
           <Route path="/ai-setup" element={<AiSetup />} />
           <Route path="/flashcards" element={<Flashcards />} />
           <Route path="/quiz" element={<QuizStudio />} />
-          <Route path="/lab" element={<Lab />} />
           <Route path="/onboarding" element={<Onboarding />} />
         </Routes>
       </Suspense>
       <BottomNav />
+      <Toasts />
+      <AiSetupModal />
+      <LocationConsentGate />
     </div>
   )
 }

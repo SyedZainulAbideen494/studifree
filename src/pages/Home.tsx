@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Sparkles, BookOpen, Layers, ClipboardCheck, FlaskConical, ArrowRight, Flame, Target, Clock, Plus } from 'lucide-react'
+import { Sparkles, BookOpen, Layers, ClipboardCheck, ArrowRight, Flame, Target, Clock, Plus } from 'lucide-react'
 import { Button } from '../components/UI/Button'
 import { Card } from '../components/UI/Card'
 import { EmptyState } from '../components/UI/EmptyState'
@@ -71,12 +71,11 @@ export default function Home() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
         {[
           { label: 'Explain something', icon: BookOpen, to: '/learn' },
           { label: 'Create flashcards', icon: Layers, to: '/flashcards' },
           { label: 'Generate a quiz', icon: ClipboardCheck, to: '/quiz' },
-          { label: 'Open Interactive Lab', icon: FlaskConical, to: '/lab' },
         ].map((q) => (
           <button
             key={q.label}

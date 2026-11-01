@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Sun, Monitor, Sparkles, Download, Upload, Trash2, RotateCcw } from 'lucide-react'
+import { Moon, Sun, Monitor, Sparkles, Download, Upload, Trash2, RotateCcw, MapPin, ShieldCheck } from 'lucide-react'
 import { Button } from '../components/UI/Button'
 import { Input } from '../components/UI/Input'
 import { Card } from '../components/UI/Card'
@@ -8,6 +8,12 @@ import { Switch } from '../components/UI/Switch'
 import { SparkleToggle } from '../components/Effects/SparkleToggle'
 import { useAppStore } from '../store/useAppStore'
 import { db } from '../db'
+import { useAiAvailability } from '../hooks/useAiAvailability'
+import {
+  clearLocationConsent,
+  getLocationConsent,
+  LOCATION_CONSENT_RESET_EVENT,
+} from '../services/visitorTracking'
 
 export default function Settings() {
   const navigate = useNavigate()
@@ -15,6 +21,8 @@ export default function Settings() {
   const update = useAppStore((s) => s.updateSettings)
   const setTheme = useAppStore((s) => s.setTheme)
   const toggleEffects = useAppStore((s) => s.toggleEffects)
+  const ai = useAiAvailability()
+  const [locationChoice, setLocationChoice] = useState(getLocationConsent)
   const [work, setWork] = useState(settings.pomodoroWork)
   const [brk, setBrk] = useState(settings.pomodoroBreak)
   const [goal, setGoal] = useState(settings.studyGoalMinutes)
@@ -115,7 +123,66 @@ export default function Settings() {
 
       <Card>
         <h2 className="font-semibold text-ink mb-3">AI</h2>
+        <div className="flex items-start gap-2 mb-3">
+          <span
+            className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
+              ai.status === 'connected' || ai.status === 'unverified'
+                ? 'bg-ink'
+                : ai.status === 'failed' || ai.status === 'invalid-model'
+                  ? 'bg-line-strong border border-line-strong'
+                  : 'bg-faint'
+            }`}
+            aria-hidden="true"
+          />
+          <div className="min-w-0">
+            <p className="text-sm text-ink">{ai.message}</p>
+            {ai.model && <p className="text-xs text-faint mt-0.5 break-all">{ai.model}</p>}
+            {ai.status === 'failed' && ai.detail && (
+              <p className="text-xs text-faint mt-1 break-words">{ai.detail}</p>
+            )}
+          </div>
+        </div>
         <Button onClick={() => navigate('/ai-setup')}>Open AI Setup</Button>
+      </Card>
+
+      <Card>
+        <h2 className="font-semibold text-ink mb-3">Privacy & consent</h2>
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center shrink-0">
+            <MapPin className="w-4 h-4 text-ink" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm text-ink">
+              Location sharing:{' '}
+              <span className="text-muted">
+                {locationChoice === 'granted'
+                  ? 'allowed'
+                  : locationChoice === 'declined'
+                    ? 'not shared'
+                    : 'not asked yet'}
+              </span>
+            </p>
+            <p className="text-xs text-muted mt-1 leading-relaxed">
+              Location is only requested after you press Allow. Declining never limits access to Studifree.
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2 mt-3">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => {
+              clearLocationConsent()
+              setLocationChoice(null)
+              window.dispatchEvent(new Event(LOCATION_CONSENT_RESET_EVENT))
+            }}
+          >
+            {locationChoice === 'granted' ? 'Withdraw and ask again' : 'Reset location choice'}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => navigate('/privacy')}>
+            <ShieldCheck className="w-4 h-4" /> Privacy policy
+          </Button>
+        </div>
       </Card>
 
       <Card>

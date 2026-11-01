@@ -1,5 +1,5 @@
-import { modelManager } from './modelManager'
 import { extractJson } from '../../utils/json'
+import { executeAI } from '../ai/requestManager'
 
 export interface GenCard {
   front: string
@@ -21,6 +21,8 @@ export interface GenParams {
   pdfText?: string
   model?: string
 }
+
+interface CardsPayload { cards: any[] }
 
 export async function generateCards(p: GenParams): Promise<GenCard[]> {
   if (!p.apiKey) throw new Error('API key missing')
@@ -46,12 +48,26 @@ export async function generateCards(p: GenParams): Promise<GenCard[]> {
   const parts: any[] = [{ text: prompt }]
   if (p.images) for (const img of p.images) parts.push({ inlineData: { data: img.base64, mimeType: img.mimeType } })
 
-  const { text } = await modelManager.generate('flashcards', p.apiKey, {
-    contents: [{ role: 'user', parts }],
-    config: { responseMimeType: 'application/json', temperature: 0.4 },
-  })
-  if (!text.trim()) throw new Error('Empty response')
-  const parsed = extractJson(text)
+  const res = await executeAI(
+    {
+      id: `flashcards:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`,
+      task: 'flashcards',
+      contents: [{ role: 'user', parts }],
+      config: { responseMimeType: 'application/json', temperature: 0.4 },
+      images: p.images,
+      preferredModel: p.model,
+    },
+    p.apiKey,
+    {
+      validate: (text): CardsPayload => {
+        const parsed = extractJson(text)
+        if (!Array.isArray(parsed?.cards) || parsed.cards.length === 0) throw new Error('Missing cards array')
+        return parsed
+      },
+    },
+  )
+
+  const parsed = extractJson(res.text)
   const cards = Array.isArray(parsed?.cards) ? parsed.cards : []
   const valid: GenCard[] = []
   for (const c of cards) {

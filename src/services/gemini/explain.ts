@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { modelManager } from './modelManager'
 import { extractJson } from '../../utils/json'
+import { executeAI } from '../ai/requestManager'
 
 export type ExplainMode = 'beginner' | 'analogy' | 'step-by-step' | 'visual' | 'practical' | 'exam' | 'formula' | 'compare'
 
@@ -46,7 +46,7 @@ export async function explain(apiKey: string, params: {
   followup?: string
   images?: { base64: string; mimeType: string }[]
 }): Promise<ExplainResult> {
-  const parts = [
+  const prompt = [
     `You are a patient, encouraging teacher. Mode: ${modeInstructions[params.mode]}`,
     `Concept: ${params.concept}`,
     params.source ? `Source material (may be truncated): ${params.source.slice(0, 8000)}` : '',
@@ -67,15 +67,22 @@ export async function explain(apiKey: string, params: {
 Use Markdown inside content (bold, lists, code, math with $...$). Structure: Simple Definition, Understand It From Zero, How It Works, Visual/Physical Explanation, Real-world Example, Technical Details, Formula and Variables, Common Misconceptions, Exam Points, Memory Trick, Quick Knowledge Check. Omit irrelevant sections. Explain simply, one idea at a time. Preserve source terminology. Do not claim certainty where unsure.`,
   ].filter(Boolean).join('\n\n')
 
-  const msgParts: any[] = [{ text: parts }]
+  const parts: any[] = [{ text: prompt }]
   if (params.images) {
-    for (const img of params.images) msgParts.push({ inlineData: { data: img.base64, mimeType: img.mimeType } })
+    for (const img of params.images) parts.push({ inlineData: { data: img.base64, mimeType: img.mimeType } })
   }
-  const { text } = await modelManager.generate('explain', apiKey, {
-    contents: [{ role: 'user', parts: msgParts }],
-    config: { responseMimeType: 'application/json', temperature: 0.4 },
-  })
-  const parsed = extractJson(text)
-  const validated = Schema.parse(parsed)
-  return validated as ExplainResult
+
+  const res = await executeAI(
+    {
+      id: `explain:${Date.now()}:${Math.random().toString(36).slice(2, 7)}`,
+      task: params.mode === 'exam' || params.mode === 'formula' ? 'explain' : 'explain',
+      contents: [{ role: 'user', parts }],
+      config: { responseMimeType: 'application/json', temperature: 0.4 },
+      images: params.images,
+      preferredModel: undefined,
+    },
+    apiKey,
+    { validate: (text) => Schema.parse(extractJson(text)) },
+  )
+  return Schema.parse(extractJson(res.text)) as ExplainResult
 }

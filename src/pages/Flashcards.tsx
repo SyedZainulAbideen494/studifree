@@ -13,6 +13,8 @@ import { useAppStore } from '../store/useAppStore'
 import { db } from '../db'
 import { uid } from '../utils/id'
 import { generateCards } from '../services/gemini/generate'
+import { AiRequired } from '../components/AI/NoApiKeyPrompt'
+import { isNoApiKeyError } from '../services/ai/requestManager'
 import type { Deck, Flashcard } from '../types'
 
 const SR_DEFAULT = { ease: 2.5, interval: 0, repetitions: 0 }
@@ -104,12 +106,13 @@ export default function Flashcards() {
   }
 
   const generate = async () => {
-    if (!settings.ai?.apiKey) { setGenError('Set up an AI key first.'); return }
+    const apiKey = settings.ai?.apiKey
+    if (!apiKey) { setGenError('Add your Gemini API key in AI Setup to generate flashcards.'); return }
     if (!genTopic.trim()) { setGenError('Enter a topic.'); return }
     if (!selectedDeckId) { setGenError('Create or select a deck first.'); return }
     setGenLoading(true); setGenError(null)
     try {
-      const gen = await generateCards({ apiKey: settings.ai.apiKey, topic: genTopic.trim(), count: genCount, difficulty: 'mixed' })
+      const gen = await generateCards({ apiKey, topic: genTopic.trim(), count: genCount, difficulty: 'mixed' })
       const now = Date.now()
       const newCards: Flashcard[] = gen.map((g) => ({
         id: uid('card'), deckId: selectedDeckId, front: g.front, back: g.back, tags: [], createdAt: now,
@@ -123,7 +126,7 @@ export default function Flashcards() {
       setCards(cs)
       setGenTopic('')
     } catch (e: any) {
-      setGenError(e?.message ?? String(e))
+      setGenError(isNoApiKeyError(e) ? 'Add your Gemini API key in AI Setup to generate flashcards.' : e?.message ?? String(e))
     } finally {
       setGenLoading(false)
     }
@@ -166,6 +169,7 @@ export default function Flashcards() {
           </div>
         </div>
 
+        <AiRequired feature="AI flashcard generation">
         <Card>
           <h2 className="font-semibold text-ink mb-3">Generate with AI</h2>
           <div className="space-y-3">
@@ -184,6 +188,7 @@ export default function Flashcards() {
             {genError && <p className="text-sm text-ink">{genError}</p>}
           </div>
         </Card>
+        </AiRequired>
 
         <Card>
           <h2 className="font-semibold text-ink mb-3">Add card manually</h2>
