@@ -22,7 +22,7 @@ export const Switch: React.FC<Props> = ({ checked, onChange, label, ariaLabel, i
         disabled={disabled}
         onClick={() => !disabled && onChange(!checked)}
         className={clsx(
-          'relative w-11 h-6 rounded-full transition-colors duration-200 focus-visible:outline-none',
+          'relative w-11 h-6 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-strong focus-visible:ring-offset-2 focus-visible:ring-offset-canvas',
           checked ? 'bg-accent' : 'bg-inset border border-line',
           disabled && 'opacity-50 cursor-not-allowed',
         )}

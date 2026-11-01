@@ -22,7 +22,7 @@ export const Tabs: React.FC<Props> = ({ tabs, value, onChange, children }) => {
             key={t.id}
             onClick={() => setActive(t.id)}
             className={clsx(
-              'px-3 py-1.5 rounded-xl text-sm font-medium transition flex items-center gap-1.5',
+              'px-3 py-1.5 rounded-xl text-sm font-medium transition flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-strong',
               active === t.id ? 'bg-surface text-ink shadow-soft' : 'text-muted hover:text-ink',
             )}
           >

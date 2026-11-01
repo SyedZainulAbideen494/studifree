@@ -5,6 +5,7 @@ import { Button } from '../UI/Button'
 import { useNavigate } from 'react-router-dom'
 import { useAiAvailability } from '../../hooks/useAiAvailability'
 import { useAiUiStore } from '../../store/useAiUiStore'
+import { aiLinks } from '../../data/aiLinks'
 
 interface Props {
   feature?: string
@@ -33,19 +34,19 @@ export const NoApiKeyPrompt: React.FC<Props> = ({
       <div className="flex items-start gap-3">
         <div className="w-10 h-10 rounded-2xl bg-accent-soft flex items-center justify-center shrink-0">
           {needsAttention ? (
-            <AlertTriangle className="w-5 h-5 text-ink" />
+            <AlertTriangle className="w-5 h-5 text-ink" aria-hidden="true" />
           ) : (
-            <Sparkles className="w-5 h-5 text-ink" />
+            <Sparkles className="w-5 h-5 text-ink" aria-hidden="true" />
           )}
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="font-semibold text-ink mb-1">
-            {needsAttention ? 'Your AI key needs attention' : 'Your AI learning assistant is waiting.'}
+            {needsAttention ? 'Your AI key needs attention' : 'Your own AI is one step away.'}
           </h2>
           <p className="text-sm text-muted leading-relaxed mb-3">
             {needsAttention
               ? ai.message
-              : `Add your Gemini API key to start generating ${feature}. It takes about a minute, and manual study tools keep working without it.`}
+              : `Connect your own Gemini API key to use ${feature}. Setup takes approximately 1–2 minutes, and manual study tools keep working without it.`}
           </p>
 
           {needsAttention && ai.detail && (
@@ -57,31 +58,36 @@ export const NoApiKeyPrompt: React.FC<Props> = ({
               <li>
                 Open{' '}
                 <a
-                  href="https://aistudio.google.com/app/apikey"
+                  href={aiLinks.apiKey}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="text-ink underline inline-flex items-center gap-1"
                 >
-                  Google AI Studio <ExternalLink className="w-3.5 h-3.5" />
+                  Google AI Studio <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span className="sr-only"> (opens in a new tab)</span>
                 </a>{' '}
-                and sign in with a Google account.
+                and sign in with your Google account.
               </li>
-              <li>Press <span className="text-ink">Create API key</span> and copy it.</li>
-              <li>Return to Studifree, open <span className="text-ink">AI Setup</span>, paste the key and save.</li>
-              <li>Press <span className="text-ink">Test connection</span>. If it works, come back and try again.</li>
+              <li>
+                Click <span className="text-ink">Create API key</span> and copy the key.
+              </li>
+              <li>
+                Return here, open <span className="text-ink">AI Setup</span>, paste the key and press{' '}
+                <span className="text-ink">Connect my AI</span>.
+              </li>
             </ol>
           )}
 
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => navigate('/ai-setup')}>
-              <Key className="w-4 h-4" /> Set up AI
+              <Key className="w-4 h-4" aria-hidden="true" /> Connect my AI
             </Button>
             <Button variant="secondary" onClick={openGuide}>
               Why do I need this?
             </Button>
             {onDismiss && (
               <Button variant="ghost" onClick={onDismiss}>
-                Not now
+                I&apos;ll do this later
               </Button>
             )}
           </div>
@@ -89,17 +95,17 @@ export const NoApiKeyPrompt: React.FC<Props> = ({
           {!compact && (
             <>
               <div className="flex items-start gap-2 mt-4 text-xs text-faint">
-                <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" />
+                <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
                 <span>
-                  Your key is stored locally in this browser. Anyone with access to this browser profile can read
-                  it, so avoid shared devices. You can remove it anytime in AI Setup. Google may apply its own
-                  quotas or charges.
+                  Your key is stored locally in this browser and is tested before it is saved. Anyone
+                  with access to this browser profile can read it, so avoid shared devices. Google may
+                  apply its own quotas or charges.
                 </span>
               </div>
 
               <p className="text-xs text-faint mt-2">
-                You can still study without AI: create manual flashcards, build manual quizzes, use the focus timer
-                and keep notes locally.
+                You can still study without AI: create manual flashcards, build manual quizzes, use the
+                focus timer and keep notes locally.
               </p>
             </>
           )}

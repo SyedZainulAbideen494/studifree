@@ -69,13 +69,13 @@ class ModelRegistry {
     return !this.lastRefresh || Date.now() - this.lastRefresh > CACHE_TTL
   }
 
-  async refresh(apiKey: string, force = false): Promise<DiscoveryResult> {
+  async refresh(apiKey: string, force = false, signal?: AbortSignal): Promise<DiscoveryResult> {
     if (!force && !this.isStale() && this.models.length) {
       return { models: this.models, refreshedAt: this.lastRefresh }
     }
     this.lastError = null
     try {
-      const result = await discoverGeminiModels(apiKey)
+      const result = await discoverGeminiModels(apiKey, signal)
       this.models = result.models
       this.lastRefresh = result.refreshedAt
       this.saveCache()

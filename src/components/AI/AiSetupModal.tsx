@@ -20,12 +20,13 @@ import {
 } from 'lucide-react'
 import { Button } from '../UI/Button'
 import { useAiUiStore } from '../../store/useAiUiStore'
+import { aiLinks } from '../../data/aiLinks'
 
-const AI_STUDIO_KEY_URL = 'https://aistudio.google.com/app/apikey'
-const AI_STUDIO_URL = 'https://aistudio.google.com/'
-const GEMINI_DOCS_URL = 'https://ai.google.dev/gemini-api/docs'
-const GEMINI_PRICING_URL = 'https://ai.google.dev/gemini-api/docs/pricing'
-const GEMINI_MODELS_URL = 'https://ai.google.dev/gemini-api/docs/models'
+const AI_STUDIO_KEY_URL = aiLinks.apiKey
+const AI_STUDIO_URL = aiLinks.studio
+const GEMINI_DOCS_URL = aiLinks.docs
+const GEMINI_PRICING_URL = aiLinks.pricing
+const GEMINI_MODELS_URL = aiLinks.models
 
 const features = [
   {
@@ -79,13 +80,21 @@ const features = [
 ]
 
 const steps = [
-  { title: 'Visit Google AI Studio', body: 'Open the official API key page in a new tab.', icon: ExternalLink },
-  { title: 'Sign in with your Google account', body: 'Use the account you want the API usage to belong to.', icon: GraduationCap },
-  { title: 'Create a new API key', body: 'Press “Create API key” and choose or create a Google Cloud project if asked.', icon: Key },
-  { title: 'Copy the generated key', body: 'The key starts with “AIza…”. Keep it private and never share it.', icon: Check },
-  { title: 'Return to Studifree', body: 'Open Settings, then AI Setup (the address is /ai-setup).', icon: Sparkles },
-  { title: 'Select Google Gemini and paste the key', body: 'Paste it into the API key field and press Save key.', icon: Lock },
-  { title: 'Press Test connection', body: 'A successful test confirms the key and model work. Then start learning.', icon: ShieldCheck },
+  {
+    title: 'Open Google AI Studio',
+    body: 'Visit the official API key page in a new tab and sign in with your Google account.',
+    icon: ExternalLink,
+  },
+  {
+    title: 'Create your API key',
+    body: 'Press “Create API key” and choose or create a Google Cloud project if prompted.',
+    icon: Key,
+  },
+  {
+    title: 'Connect it in Studifree',
+    body: 'Copy the key, return to AI Setup, paste it and press Connect my AI. We test it before saving.',
+    icon: ShieldCheck,
+  },
 ]
 
 export const AiSetupModal: React.FC = () => {

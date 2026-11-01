@@ -82,12 +82,12 @@ export const AiKeyBanner: React.FC = () => {
             <div className="flex items-start gap-2">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-ink">
-                  {invalid ? 'Your AI key needs attention' : 'Unlock AI-powered learning'}
+                  {invalid ? 'Your AI key needs attention' : 'Your own AI is one step away'}
                 </p>
                 <p className="text-xs text-muted mt-0.5 leading-relaxed">
                   {invalid
                     ? ai.message
-                    : 'Add your Gemini API key to use AI features such as personalised explanations, AI-generated flashcards, quizzes, lesson summaries and more.'}
+                    : 'Connect your own Gemini API key to turn topics into explanations, notes, flashcards and quizzes. Setup takes approximately 1–2 minutes.'}
                 </p>
                 {invalid && ai.detail && (
                   <p className="text-[11px] text-faint mt-1 break-words">{ai.detail}</p>
@@ -104,10 +104,10 @@ export const AiKeyBanner: React.FC = () => {
 
             <div className="flex flex-wrap items-center gap-2 mt-2.5">
               <Button size="sm" onClick={() => navigate('/ai-setup')}>
-                {invalid ? 'Review AI setup' : 'Set up AI'}
+                {invalid ? 'Review AI setup' : 'Connect my AI'}
               </Button>
               <Button size="sm" variant="ghost" onClick={openSetupGuide}>
-                Learn how it works <ArrowRight className="w-3.5 h-3.5" />
+                Why do I need one? <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
               </Button>
             </div>
           </div>

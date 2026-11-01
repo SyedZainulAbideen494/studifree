@@ -221,7 +221,7 @@ export default function Settings() {
       </Card>
 
       <Card>
-        <h2 className="font-semibold text-ink mb-3">AI</h2>
+        <h2 className="font-semibold text-ink mb-3">AI learning assistant</h2>
         <div className="flex items-start gap-2 mb-3">
           <span
             className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
@@ -239,9 +239,20 @@ export default function Settings() {
             {ai.status === 'failed' && ai.detail && (
               <p className="text-xs text-faint mt-1 break-words">{ai.detail}</p>
             )}
+            {ai.status === 'missing' && (
+              <p className="text-xs text-faint mt-1">
+                Setup takes approximately 1–2 minutes. Manual study tools work without it.
+              </p>
+            )}
           </div>
         </div>
-        <Button onClick={() => navigate('/ai-setup')}>Open AI Setup</Button>
+        <Button onClick={() => navigate('/ai-setup')}>
+          {ai.status === 'missing'
+            ? 'Connect my AI'
+            : ai.requiresSetup
+              ? 'Review AI setup'
+              : 'Manage AI setup'}
+        </Button>
       </Card>
 
       <Card>

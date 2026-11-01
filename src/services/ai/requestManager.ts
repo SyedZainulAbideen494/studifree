@@ -1,5 +1,6 @@
 import type { AIRequest, AIResponse, ModelSwitchEvent } from '../../types/ai'
 import { classifyError, friendlyErrorMessage, redactSecrets } from './errorClassifier'
+import { classifyConnectionFailure } from './connection'
 import { DEFAULT_RETRY, parseRetryAfter, sleep, withTimeout } from './retryPolicy'
 import { modelRegistry } from './modelRegistry'
 import { fallbackManager } from './fallbackManager'
@@ -176,7 +177,7 @@ async function run(req: AIRequest, apiKey: string, opts: ExecuteOptions): Promis
 
         // Authentication/permission: never cycle models with the same bad key.
         if (classified.authError) {
-          markAiVerification(apiKey, modelId, false, msg)
+          markAiVerification(apiKey, modelId, false, classifyConnectionFailure(classified).message)
           notify('error', 'API key problem', friendlyErrorMessage(classified), msg)
           throw classified
         }

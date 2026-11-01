@@ -2,6 +2,7 @@ import type { ProviderConfig } from '../../types'
 import { getAdapter } from './providerAdapter'
 import { modelRegistry } from './modelRegistry'
 import { useAiUiStore } from '../../store/useAiUiStore'
+import { classifyConnectionFailure, type ConnectionFailureKind } from './connection'
 
 export type AiStatus =
   | 'missing'
@@ -149,7 +150,7 @@ export function evaluateAiSetup(
         modelValid: true,
         usable: true,
         requiresSetup: false,
-        message: 'AI is connected and ready.',
+        message: 'Your AI is connected and ready to help you learn.',
         provider,
         model,
         apiKey,
@@ -227,6 +228,9 @@ export interface ConnectionTestResult {
   ms: number
   text?: string
   error?: string
+  /** Friendly category for the UI. Raw provider errors stay in `error`. */
+  kind?: ConnectionFailureKind
+  friendly?: string
 }
 
 /** Test the configured key/model through the shared provider adapter. */
@@ -256,12 +260,20 @@ export async function verifyAiConnection(apiKey: string, model: string): Promise
     }
     const error = result.error ?? 'The model did not respond.'
     modelRegistry.recordFailure(model.trim(), error)
-    markAiVerification(apiKey, model, false, error)
-    return { ok: false, ms, error }
+    const failure = classifyConnectionFailure({ message: error })
+    markAiVerification(apiKey, model, false, failure.message)
+    return { ok: false, ms, error, kind: failure.kind, friendly: failure.message }
   } catch (e: any) {
     if (timeoutId) window.clearTimeout(timeoutId)
     const error = e?.message ?? String(e)
-    markAiVerification(apiKey, model, false, error)
-    return { ok: false, ms: Date.now() - started, error }
+    const failure = classifyConnectionFailure(e)
+    markAiVerification(apiKey, model, false, failure.message)
+    return {
+      ok: false,
+      ms: Date.now() - started,
+      error,
+      kind: failure.kind,
+      friendly: failure.message,
+    }
   }
 }
