@@ -790,10 +790,3 @@ export const footerColumns = [
     ],
   },
 ] as const
-
-export const landingMeta = {
-  title: 'Studifree — Learning Should Be for Everyone',
-  description:
-    'Learn any subject, understand difficult concepts, create flashcards, practise with quizzes and organise your learning with Studifree.',
-  themeColor: '#050505',
-} as const

@@ -34,6 +34,7 @@ export function LandingFooter() {
               where it can be, optional AI when you want it.
             </p>
             <span className="sf-footer__tagline">Learning should be for everyone.</span>
+            <p className="sf-footer__credit">Built with curiosity by Syed Zainul Abideen.</p>
           </div>
 
           {footerColumns.map((column) => (

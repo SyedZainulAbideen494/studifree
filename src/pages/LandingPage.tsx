@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import '../styles/landing.css'
-import { useLandingMeta } from '../hooks/useLandingMeta'
 import { AiSetupModal } from '../components/AI/AiSetupModal'
 import { LandingNavbar } from '../components/landing/LandingNavbar'
 import { HeroSection } from '../components/landing/HeroSection'
@@ -26,8 +25,6 @@ import { LandingFooter } from '../components/landing/LandingFooter'
  * intrude on the public experience.
  */
 export default function LandingPage() {
-  useLandingMeta()
-
   useEffect(() => {
     const root = document.documentElement
     const hadDark = root.classList.contains('dark')

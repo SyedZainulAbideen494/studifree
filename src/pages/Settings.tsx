@@ -238,7 +238,11 @@ export default function Settings() {
         </div>
         <div className="flex items-center justify-between">
           <span className="text-sm text-ink">Reduced motion</span>
-          <Switch checked={settings.reducedMotion} onChange={(v) => update({ reducedMotion: v })} />
+          <Switch
+            checked={settings.reducedMotion}
+            onChange={(v) => update({ reducedMotion: v })}
+            ariaLabel="Reduced motion"
+          />
         </div>
       </Card>
 
@@ -254,7 +258,12 @@ export default function Settings() {
       <Card>
         <h2 className="font-semibold text-ink mb-3">Study goal</h2>
         <div className="flex gap-2">
-          <Input type="number" value={goal} onChange={(e) => setGoal(Number(e.target.value))} />
+          <Input
+            label="Daily study goal (minutes)"
+            type="number"
+            value={goal}
+            onChange={(e) => setGoal(Number(e.target.value))}
+          />
           <Button onClick={() => update({ studyGoalMinutes: goal })}>Save</Button>
         </div>
       </Card>

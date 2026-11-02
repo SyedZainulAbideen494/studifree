@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /settings
+Disallow: /ai-setup
+Disallow: /onboarding
+Disallow: /learn
+Disallow: /flashcards
+Disallow: /quiz
+Disallow: /practice
+Disallow: /progress
+Disallow: /library
+Disallow: /planner
+
+# Private application screens are also marked noindex in the document head.

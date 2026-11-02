@@ -3,20 +3,126 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
     <meta name="theme-color" content="#050505" />
+
+    <title>Studifree — Learn Anything. Understand Everything.</title>
+    <meta
+      name="description"
+      content="Studifree is a free-to-start learning platform with AI-powered explanations, flashcards, quizzes, study planning and progress tracking. Learn at your own pace with your own AI key."
+    />
+    <meta
+      name="keywords"
+      content="Studifree, free study platform, AI learning platform, AI study assistant, AI flashcard generator, AI quiz generator, study planner, online learning tools, Gemini AI study tool, personal AI tutor, study productivity, learning platform for students, free learning tools"
+    />
+    <meta name="author" content="Syed Zainul Abideen" />
+    <meta name="application-name" content="Studifree" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="format-detection" content="telephone=no" />
+
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Studifree" />
+
+    <link rel="canonical" href="/landing" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <title>Studifree</title>
-    <script type="module" crossorigin src="/assets/index-BXWL9VZp.js"></script>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- The application calls Gemini directly with the learner's own key. -->
+    <link rel="preconnect" href="https://generativelanguage.googleapis.com" crossorigin />
+
+    <!-- Social preview: absolute URLs are injected at build time when VITE_SITE_URL is set. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Studifree" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:title" content="Studifree — Learning Should Be for Everyone" />
+    <meta
+      property="og:description"
+      content="Learn any subject, understand difficult concepts, create flashcards, practise with quizzes and organise your learning. Your learning space starts here."
+    />
+    <meta property="og:url" content="/landing" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Studifree social preview: Learn Anything. Understand Everything. A monochrome learning workspace with flashcards, quizzes and study planning."
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Studifree — Learning Should Be for Everyone" />
+    <meta
+      name="twitter:description"
+      content="Learn any subject, understand difficult concepts, create flashcards, practise with quizzes and organise your learning. Your learning space starts here."
+    />
+    <meta name="twitter:image" content="/og-image.png" />
+    <meta
+      name="twitter:image:alt"
+      content="Studifree social preview: Learn Anything. Understand Everything."
+    />
+
+    <!-- Schema.org baseline. The app upgrades this with deployment-absolute URLs. -->
+    <script id="studifree-structured-data" type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "name": "Studifree",
+            "description": "Studifree is a free-to-start learning platform with AI-powered explanations, flashcards, quizzes, study planning and progress tracking. Learn at your own pace with your own AI key.",
+            "inLanguage": "en"
+          },
+          {
+            "@type": "Person",
+            "name": "Syed Zainul Abideen",
+            "jobTitle": "Founder of Studifree",
+            "description": "Independent founder of Studifree, a browser-based learning workspace for explanations, flashcards, quizzes and study planning."
+          },
+          {
+            "@type": "SoftwareApplication",
+            "name": "Studifree",
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "Web browser",
+            "description": "A learning platform with AI-assisted explanations, flashcards, quizzes, study planning and progress tracking.",
+            "isAccessibleForFree": true,
+            "inLanguage": "en",
+            "featureList": [
+              "AI-assisted explanations",
+              "Spaced-repetition flashcards",
+              "Generated practice quizzes",
+              "Study planner and focus timer",
+              "Local progress tracking",
+              "Bring-your-own Gemini API key"
+            ],
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "description": "Core manual study tools are free to use. AI features require your own Google Gemini API key and may be subject to separate provider quotas or charges."
+            }
+          }
+        ]
+      }
+    </script>
+    <script type="module" crossorigin src="/assets/index-BeOKJYSu.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/react-BQIr6j2H.js">
     <link rel="modulepreload" crossorigin href="/assets/motion-DkkakhaM.js">
     <link rel="modulepreload" crossorigin href="/assets/charts-BYFiz5UO.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-ByT5mHlk.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-BbbqNs3Y.css">
   <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
   <body class="bg-canvas text-ink antialiased">
     <div id="root"></div>
+    <noscript>
+      <div style="max-width: 42rem; margin: 4rem auto; padding: 1.5rem; font-family: system-ui, sans-serif; color: #fff; background: #050505; border-radius: 1.5rem;">
+        <p style="font-size: 1.75rem; font-weight: 600; margin: 0 0 0.75rem;">Studifree</p>
+        <p style="line-height: 1.6; margin: 0;">
+          Studifree is a browser-based learning workspace with AI-assisted explanations, flashcards,
+          quizzes and study planning. JavaScript is required to use the application.
+        </p>
+      </div>
+    </noscript>
   </body>
 </html>

@@ -21,6 +21,15 @@ import { extractPdf, pagesToText } from '../utils/pdf'
 import { explain, ExplainMode, ExplainResult } from '../services/gemini/explain'
 import { exportLessonPdf } from '../utils/exportPdf'
 import { AiRequired } from '../components/AI/NoApiKeyPrompt'
+import {
+  AIGenerationModal,
+  GenerationErrorModal,
+  GenerationStatusIndicator,
+  GenerationSuccessModal,
+  useDelayedVisibility,
+  useGenerationMachine,
+} from '../components/AI/generation'
+import { useAiEventsStore } from '../store/useAiEventsStore'
 import { useAiAvailability } from '../hooks/useAiAvailability'
 import { useRegionalProfile } from '../hooks/useRegionalProfile'
 import { describeRegion } from '../services/location'
@@ -47,14 +56,34 @@ export default function Learn() {
   const [compareWith, setCompareWith] = useState('')
   const [sourceText, setSourceText] = useState('')
   const [images, setImages] = useState<{ base64: string; mimeType: string }[]>([])
-  const [uploading, setUploading] = useState(false)
   const [result, setResult] = useState<ExplainResult | null>(null)
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [currentLessonId, setCurrentLessonId] = useState<string | null>(params.get('lesson'))
   const [helpOpen, setHelpOpen] = useState(false)
   const [previous, setPrevious] = useState<string | null>(null)
   const [useRegionalContext, setUseRegionalContext] = useState(false)
+  const [pendingLesson, setPendingLesson] = useState<Lesson | null>(null)
+  const [lessonSuccess, setLessonSuccess] = useState<{
+    lessonId: string
+    title: string
+    topic: string
+    style: string
+  } | null>(null)
+  const [pendingDocument, setPendingDocument] = useState<File | null>(null)
+  const [documentSuccess, setDocumentSuccess] = useState<{
+    name: string
+    pages: number
+    characters: number
+  } | null>(null)
+
+  const generation = useGenerationMachine('lesson')
+  const waitingVisible = useDelayedVisibility(generation.busy)
+  const lastSwitch = useAiEventsStore((s) => s.switches[0])
+  const fallbackNote =
+    generation.startedAt && lastSwitch && lastSwitch.timestamp >= generation.startedAt
+      ? `Studifree switched to ${lastSwitch.toModel} after your preferred model was unavailable.`
+      : undefined
+
   const ai = useAiAvailability()
   const region = useRegionalProfile()
 
@@ -72,12 +101,20 @@ export default function Learn() {
   }, [params])
 
   const runExplain = async (followup?: string) => {
-    if (!topic.trim()) { setError('Enter a topic first.'); return }
+    setError(null)
+    if (!topic.trim()) {
+      setError('Enter a topic first.')
+      return
+    }
     const apiKey = settings.ai?.apiKey
-    if (!apiKey) { setError('Add your Gemini API key in AI Setup to use AI teaching.'); return }
-    setLoading(true); setError(null)
+    if (!apiKey) {
+      setError('Add your Gemini API key in AI Setup to use AI teaching.')
+      return
+    }
+    if (!generation.begin('lesson')) return
+
     try {
-      const r = await explain(apiKey, {
+      const response = await explain(apiKey, {
         concept: topic.trim() || 'the uploaded material',
         mode: style as any,
         source: sourceText || undefined,
@@ -87,12 +124,15 @@ export default function Learn() {
         previousExplanation: previous ?? undefined,
         region: useRegionalContext && region ? { country: region.country, region: region.region } : undefined,
       })
-      setResult(r)
-      setPrevious(r.definition)
+      setResult(response)
+      setPrevious(response.definition)
+      setPendingLesson(null)
+      generation.reset()
     } catch (e: any) {
-      setError(isNoApiKeyError(e) ? 'Add your Gemini API key in AI Setup to use AI teaching.' : e?.message ?? String(e))
-    } finally {
-      setLoading(false)
+      const message = isNoApiKeyError(e)
+        ? 'Add your Gemini API key in AI Setup to use AI teaching.'
+        : e?.message ?? String(e)
+      generation.fail(message)
     }
   }
 
@@ -104,8 +144,22 @@ export default function Learn() {
     // open a quick quiz dialog? just show knowledge check inline
   }
 
+  const persistLesson = async (lesson: Lesson): Promise<Lesson> => {
+    const existing = await db.lessons.get(lesson.id)
+    if (existing) lesson.createdAt = existing.createdAt
+    await db.lessons.put(lesson)
+
+    const saved = await db.lessons.get(lesson.id)
+    if (!saved) throw new Error('The lesson could not be retrieved after saving.')
+    if (!saved.content?.trim()) throw new Error('The saved lesson content could not be verified.')
+    return saved
+  }
+
   const saveLesson = async () => {
     if (!result) return
+    setError(null)
+    if (!generation.begin('lesson')) return
+
     const now = Date.now()
     const lesson: Lesson = {
       id: currentLessonId ?? uid('lesson'),
@@ -113,19 +167,104 @@ export default function Learn() {
       topic,
       style,
       content: JSON.stringify(result),
+      source: { type: 'topic' },
       createdAt: now,
       updatedAt: now,
       tags: [],
     }
-    if (currentLessonId) {
-      const existing = await db.lessons.get(currentLessonId)
-      if (existing) { lesson.createdAt = existing.createdAt }
-      await db.lessons.put(lesson)
-    } else {
-      await db.lessons.add(lesson)
-      setCurrentLessonId(lesson.id)
+
+    try {
+      setPendingLesson(lesson)
+      generation.setStatus('saving')
+      const saved = await persistLesson(lesson)
+      setCurrentLessonId(saved.id)
+      setPendingLesson(null)
+      setLessonSuccess({
+        lessonId: saved.id,
+        title: saved.title,
+        topic: saved.topic,
+        style: saved.style,
+      })
+      generation.succeed()
+    } catch (e: any) {
+      generation.fail(e?.message ?? 'The lesson could not be saved. Please try again.')
     }
-    alert('Lesson saved.')
+  }
+
+  const retrySaveLesson = async () => {
+    if (!pendingLesson) return
+    if (!generation.begin('lesson')) return
+    generation.setStatus('saving')
+    try {
+      const saved = await persistLesson(pendingLesson)
+      setCurrentLessonId(saved.id)
+      setPendingLesson(null)
+      setLessonSuccess({
+        lessonId: saved.id,
+        title: saved.title,
+        topic: saved.topic,
+        style: saved.style,
+      })
+      generation.succeed()
+    } catch (e: any) {
+      generation.fail(e?.message ?? 'The lesson could not be saved. Please try again.')
+    }
+  }
+
+  const closeLessonSuccess = () => {
+    setLessonSuccess(null)
+    generation.reset()
+  }
+
+  const startSavedLesson = () => {
+    if (!lessonSuccess) return
+    const id = lessonSuccess.lessonId
+    setLessonSuccess(null)
+    generation.reset()
+    navigate(`/learn?lesson=${encodeURIComponent(id)}`)
+  }
+
+  const processDocument = async (file: File) => {
+    setError(null)
+    if (!generation.begin('document')) return
+    setPendingDocument(file)
+
+    try {
+      const { pages } = await extractPdf(file)
+      generation.setStatus('validating')
+      const text = pagesToText(pages)
+      if (!text.trim()) {
+        throw new Error('No readable text was found in this document. It may be a scanned PDF.')
+      }
+      setSourceText(text)
+      setPendingDocument(null)
+      setDocumentSuccess({ name: file.name, pages: pages.length, characters: text.length })
+      generation.succeed()
+    } catch (e: any) {
+      generation.fail(e?.message ?? 'The document could not be read.')
+    }
+  }
+
+  const retryDocument = async () => {
+    if (!pendingDocument) return
+    await processDocument(pendingDocument)
+  }
+
+  const closeDocumentSuccess = () => {
+    setDocumentSuccess(null)
+    generation.reset()
+  }
+
+  const useDocumentForLesson = () => {
+    setDocumentSuccess(null)
+    generation.reset()
+    if (topic.trim()) runExplain()
+  }
+
+  const retryGeneration = () => {
+    if (pendingLesson) return retrySaveLesson()
+    if (pendingDocument) return retryDocument()
+    return runExplain()
   }
 
   const exportPdf = () => {
@@ -154,10 +293,10 @@ export default function Learn() {
           <div className="flex flex-wrap gap-2">
             <label className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-surface border border-line text-sm text-muted cursor-pointer hover:text-ink">
               <input type="file" accept="application/pdf" className="hidden" onChange={async (e) => {
-                const f = e.target.files?.[0]; if (!f) return
-                setUploading(true)
-                try { const { pages } = await extractPdf(f); setSourceText(pagesToText(pages)) } catch (err: any) { setError(err?.message ?? String(err)) }
-                setUploading(false)
+                const input = e.currentTarget
+                const f = input.files?.[0]; if (!f) return
+                await processDocument(f)
+                input.value = ''
               }} />
               Upload PDF
             </label>
@@ -173,7 +312,9 @@ export default function Learn() {
               }} />
               Upload image(s)
             </label>
-            {uploading && <span className="text-xs text-muted self-center">Extracting…</span>}
+            {generation.busy && generation.taskType === 'document' && (
+              <span className="text-xs text-muted self-center">Reading document…</span>
+            )}
           </div>
           {sourceText && <p className="text-xs text-faint mt-2">PDF text loaded ({sourceText.length} chars).</p>}
           {images.length > 0 && <p className="text-xs text-faint mt-2">{images.length} image(s) attached.</p>}
@@ -222,22 +363,24 @@ export default function Learn() {
           </div>
         )}
         <div className="flex flex-wrap gap-2 mt-4">
-          <Button onClick={() => runExplain()} disabled={loading}>
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />} Explain
+          <Button onClick={() => runExplain()} disabled={generation.busy}>
+            {generation.busy && generation.taskType === 'lesson' ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Sparkles className="w-4 h-4" />
+            )}{' '}
+            Explain
           </Button>
-          <Button variant="secondary" onClick={explainSimpler} disabled={loading || !result}>Explain simpler</Button>
-          <Button variant="secondary" onClick={anotherExample} disabled={loading || !result}>Another example</Button>
-          <Button variant="secondary" onClick={showSteps} disabled={loading || !result}>Show steps</Button>
+          <Button variant="secondary" onClick={explainSimpler} disabled={generation.busy || !result}>Explain simpler</Button>
+          <Button variant="secondary" onClick={anotherExample} disabled={generation.busy || !result}>Another example</Button>
+          <Button variant="secondary" onClick={showSteps} disabled={generation.busy || !result}>Show steps</Button>
         </div>
+        <GenerationStatusIndicator status={generation.status} taskType={generation.taskType} />
         {error && <p className="text-sm text-ink mt-3">{error}</p>}
       </Card>
       </AiRequired>
 
-      {loading && (
-        <Card><div className="flex items-center gap-3 text-muted"><Loader2 className="w-5 h-5 animate-spin" /> Thinking…</div></Card>
-      )}
-
-      {result && !loading && (
+      {result && !generation.busy && (
         <Card>
           <h2 className="text-xl font-semibold text-ink mb-2">{result.title}</h2>
           <p className="text-ink leading-relaxed mb-4">{result.definition}</p>
@@ -293,9 +436,90 @@ export default function Learn() {
         </Card>
       )}
 
-      {!result && !loading && !ai.requiresSetup && (
+      {!result && !generation.busy && !ai.requiresSetup && (
         <EmptyState icon={Sparkles} title="Ready to learn" description="Enter a topic and choose a style, then press Explain." />
       )}
+
+      <AIGenerationModal
+        open={waitingVisible}
+        status={generation.status}
+        taskType={generation.taskType}
+        fallbackNote={fallbackNote}
+      />
+
+      <GenerationSuccessModal
+        open={generation.status === 'success' && !!lessonSuccess}
+        heading="Your lesson is ready!"
+        message={
+          lessonSuccess
+            ? `“${lessonSuccess.title}” is saved in this browser and ready to reopen whenever you need it.`
+            : 'Your lesson is saved and ready.'
+        }
+        kind="lesson"
+        summary={
+          lessonSuccess
+            ? [
+                { label: 'Lesson', value: lessonSuccess.title },
+                { label: 'Topic', value: lessonSuccess.topic },
+                { label: 'Style', value: lessonSuccess.style },
+              ]
+            : undefined
+        }
+        primary={{ label: 'Start learning', onClick: startSavedLesson }}
+        secondary={{ label: 'View in Library', onClick: () => navigate('/library') }}
+        tertiary={{ label: 'Keep reading', onClick: closeLessonSuccess }}
+        onClose={closeLessonSuccess}
+      />
+
+      <GenerationSuccessModal
+        open={generation.status === 'success' && !!documentSuccess}
+        heading="Your document is ready!"
+        message={
+          documentSuccess
+            ? `Studifree read “${documentSuccess.name}” and added its text to your source material.`
+            : 'Your document has been processed.'
+        }
+        kind="document"
+        saved={false}
+        summary={
+          documentSuccess
+            ? [
+                { label: 'Document', value: documentSuccess.name },
+                { label: 'Pages', value: `${documentSuccess.pages}` },
+                { label: 'Characters', value: `${documentSuccess.characters}` },
+              ]
+            : undefined
+        }
+        primary={{ label: 'Use this document', onClick: closeDocumentSuccess }}
+        secondary={
+          topic.trim()
+            ? { label: 'Generate explanation', onClick: useDocumentForLesson }
+            : undefined
+        }
+        onClose={closeDocumentSuccess}
+      />
+
+      <GenerationErrorModal
+        open={generation.status === 'error'}
+        title={
+          pendingLesson
+            ? 'Your lesson is ready, but it could not be saved.'
+            : generation.taskType === 'document'
+              ? 'That document could not be read.'
+              : 'That explanation could not be prepared.'
+        }
+        message={
+          pendingLesson
+            ? 'Studifree could not confirm that the lesson was written to this browser. The generated lesson is still here.'
+            : generation.error ?? 'Something went wrong during this request.'
+        }
+        savingFailed={!!pendingLesson}
+        retryLabel={
+          pendingLesson ? 'Try saving again' : generation.taskType === 'document' ? 'Try again' : 'Try again'
+        }
+        onRetry={retryGeneration}
+        onClose={() => generation.reset()}
+      />
 
       <Dialog open={helpOpen} onClose={() => setHelpOpen(false)} title="How to use Learn">
         <div className="space-y-3 text-sm text-muted">

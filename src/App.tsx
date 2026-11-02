@@ -6,6 +6,7 @@ import { Toasts } from './components/Notifications/Toasts'
 import { AiKeyBanner } from './components/AI/AiKeyBanner'
 import { AiSetupModal } from './components/AI/AiSetupModal'
 import { LocationConsentGate } from './components/Consent/LocationConsent'
+import { useDocumentMeta } from './hooks/useDocumentMeta'
 
 const Home = lazy(() => import('./pages/Home'))
 const Learn = lazy(() => import('./pages/Learn'))
@@ -45,6 +46,7 @@ function LandingFallback() {
 
 export default function App() {
   const location = useLocation()
+  useDocumentMeta()
 
   if (location.pathname === '/landing' || location.pathname === '/landing/') {
     return (

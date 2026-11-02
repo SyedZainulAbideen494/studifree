@@ -1,0 +1,139 @@
+/**
+ * Single source of truth for public brand and search metadata.
+ *
+ * The deployment origin is intentionally never hard-coded. Absolute URLs are
+ * derived from `window.location.origin` at runtime, or from `VITE_SITE_URL`
+ * during a production build when the host is known.
+ */
+
+export const SITE = {
+  name: 'Studifree',
+  title: 'Studifree — Learn Anything. Understand Everything.',
+  description:
+    'Studifree is a free-to-start learning platform with AI-powered explanations, flashcards, quizzes, study planning and progress tracking. Learn at your own pace with your own AI key.',
+  socialTitle: 'Studifree — Learning Should Be for Everyone',
+  socialDescription:
+    'Learn any subject, understand difficult concepts, create flashcards, practise with quizzes and organise your learning. Your learning space starts here.',
+  socialImage: '/og-image.png',
+  socialImageWidth: 1200,
+  socialImageHeight: 630,
+  socialImageAlt:
+    'Studifree social preview: Learn Anything. Understand Everything. A monochrome learning workspace with flashcards, quizzes and study planning.',
+  themeColor: '#050505',
+  author: 'Syed Zainul Abideen',
+  founder: 'Syed Zainul Abideen',
+  founderTitle: 'Founder of Studifree',
+  tagline: 'Learn Anything. Understand Everything.',
+  philosophy: 'Learning should be for everyone.',
+  language: 'en',
+  locale: 'en_GB',
+  keywords: [
+    'Studifree',
+    'free study platform',
+    'AI learning platform',
+    'AI study assistant',
+    'AI flashcard generator',
+    'AI quiz generator',
+    'study planner',
+    'online learning tools',
+    'Gemini AI study tool',
+    'personal AI tutor',
+    'study productivity',
+    'learning platform for students',
+    'free learning tools',
+  ],
+} as const
+
+export interface RouteMeta {
+  title: string
+  description: string
+  /** Public marketing pages are indexable. Application screens are not. */
+  indexable: boolean
+  /** Canonical path. Falls back to the live pathname. */
+  path?: string
+  socialTitle?: string
+  socialDescription?: string
+}
+
+const pageMeta: Record<string, RouteMeta> = {
+  '/landing': {
+    title: SITE.title,
+    description: SITE.description,
+    indexable: true,
+    path: '/landing',
+    socialTitle: SITE.socialTitle,
+    socialDescription: SITE.socialDescription,
+  },
+  '/about': {
+    title: 'About Studifree — An Idea Built by a Learner',
+    description:
+      'Studifree is an independent learning project founded by Syed Zainul Abideen. Read why it exists, what it believes and how it approaches AI and privacy.',
+    indexable: true,
+    path: '/about',
+    socialTitle: 'About Studifree — An Idea Built by a Learner',
+    socialDescription:
+      'Studifree was founded by Syed Zainul Abideen with a simple belief: useful learning tools should be accessible to everyone.',
+  },
+  '/help': {
+    title: 'Help Centre — Studifree',
+    description:
+      'Practical guides for Studifree: set up your own Gemini API key, create and study flashcards, generate quizzes, plan study sessions and understand your data.',
+    indexable: true,
+    path: '/help',
+    socialTitle: 'Help Centre — Studifree',
+    socialDescription:
+      'Set up AI, study flashcards, generate quizzes and get the most out of your learning workspace.',
+  },
+  '/privacy': {
+    title: 'Privacy Policy — Studifree',
+    description:
+      'How Studifree handles local study data, optional location consent and the external services used when you choose to enable AI features.',
+    indexable: true,
+    path: '/privacy',
+    socialTitle: 'Privacy Policy — Studifree',
+    socialDescription:
+      'What stays in your browser, what leaves it, and the choices you control in Studifree.',
+  },
+  '/terms': {
+    title: 'Terms & AI Disclaimer — Studifree',
+    description:
+      'The terms of use for Studifree and an honest disclaimer about the limits of AI-generated explanations, flashcards, quizzes and study material.',
+    indexable: true,
+    path: '/terms',
+    socialTitle: 'Terms & AI Disclaimer — Studifree',
+    socialDescription:
+      'How Studifree should be used, what AI can and cannot promise, and where responsibility sits.',
+  },
+}
+
+const privatePageTitles: Record<string, string> = {
+  '/': 'Studifree',
+  '/learn': 'Learn — Studifree',
+  '/practice': 'Practice — Studifree',
+  '/progress': 'Progress — Studifree',
+  '/library': 'Library — Studifree',
+  '/planner': 'Planner — Studifree',
+  '/settings': 'Settings — Studifree',
+  '/ai-setup': 'AI Setup — Studifree',
+  '/flashcards': 'Flashcards — Studifree',
+  '/quiz': 'Quiz Studio — Studifree',
+  '/onboarding': 'Welcome — Studifree',
+}
+
+/** Resolve metadata for a pathname without assuming a deployment domain. */
+export function getRouteMeta(pathname: string): RouteMeta {
+  const path = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname
+  const publicMeta = pageMeta[path]
+  if (publicMeta) return publicMeta
+
+  return {
+    title: privatePageTitles[path] ?? 'Studifree',
+    description: SITE.description,
+    indexable: false,
+    path,
+  }
+}
+
+export const sitemapPaths = Object.values(pageMeta)
+  .filter((meta) => meta.indexable && meta.path)
+  .map((meta) => meta.path as string)
