@@ -54,8 +54,6 @@ export function LandingFooter() {
         <div className="sf-footer__bottom">
           <span>© {year} Studifree · Independent learning project</span>
           <div className="sf-footer__bottom-links">
-            <Link to="/privacy">Privacy</Link>
-            <Link to="/terms">Terms</Link>
             <Link to="/help">Help</Link>
             <a href="#top">Back to top</a>
           </div>

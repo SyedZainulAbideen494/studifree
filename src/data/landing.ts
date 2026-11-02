@@ -391,7 +391,7 @@ export const securityNotes = [
   },
   {
     title: 'External services',
-    body: 'Studifree is not a no-server application. AI requests, visitor notifications, IP lookup and optional reverse geocoding use the external services listed here. The Privacy Policy explains these purposes in more detail.',
+    body: 'Studifree is not a no-server application. AI requests, visitor notifications, IP lookup and optional reverse geocoding use the external services listed here. The Help Centre explains these purposes in more detail.',
   },
 ] as const
 
@@ -475,7 +475,7 @@ export const trustPoints = [
   },
   {
     title: 'Visitor notifications',
-    body: 'The automatic visitor notification is separate from learning personalisation. It includes browser, page and IP information described in the Privacy Policy and contains no GPS coordinates.',
+    body: 'The automatic visitor notification is separate from learning personalisation. It includes browser, page and IP information and contains no GPS coordinates.',
   },
   {
     title: 'AI accuracy',
@@ -645,7 +645,7 @@ export const landingFaqItems: LandingFaqItem[] = [
     category: 'ai-api-keys',
     question: 'Does my data go to Google?',
     answer:
-      'When you use AI features, the relevant prompt and submitted material are sent to Google Gemini for processing if Gemini is your configured provider. Merely opening Studifree or using local study tools does not upload your library. Visitor notifications and IP lookup are separate services described in the Privacy Policy.',
+      'When you use AI features, the relevant prompt and submitted material are sent to Google Gemini for processing if Gemini is your configured provider. Merely opening Studifree or using local study tools does not upload your library. Visitor notifications and IP lookup are separate services.',
   },
 
   // Features
@@ -756,7 +756,7 @@ export const landingFaqItems: LandingFaqItem[] = [
     category: 'general',
     question: 'Is Studifree still evolving?',
     answer:
-      'Yes. Studifree is an evolving project. Features, model support and documentation may change as the application improves. The Help Centre and Privacy Policy describe the current behaviour.',
+      'Yes. Studifree is an evolving project. Features, model support and documentation may change as the application improves. The Help Centre describes the current behaviour.',
   },
 ]
 
@@ -779,14 +779,6 @@ export const footerColumns = [
       { label: 'AI Setup Guide', href: '/ai-setup', external: false },
       { label: 'FAQ', href: '#faq', external: false },
       { label: 'About Studifree', href: '/about', external: false },
-    ],
-  },
-  {
-    title: 'Legal',
-    links: [
-      { label: 'Privacy Policy', href: '/privacy', external: false },
-      { label: 'Terms', href: '/terms', external: false },
-      { label: 'AI Disclaimer', href: '/terms', external: false },
     ],
   },
 ] as const

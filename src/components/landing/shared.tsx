@@ -161,7 +161,7 @@ export interface LandingBrandProps {
   to?: string
 }
 
-export function LandingBrand({ to = '/landing' }: LandingBrandProps) {
+export function LandingBrand({ to = '/' }: LandingBrandProps) {
   return (
     <Link className="sf-brand" to={to} aria-label="Studifree home">
       <span className="sf-brand__mark" aria-hidden="true">

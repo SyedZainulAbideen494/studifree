@@ -45,7 +45,7 @@ function absolute(path: string): string {
  * subject to the learner's own provider key and that provider's limits.
  */
 export function buildStructuredData(origin: string) {
-  const landing = `${origin}/landing`
+  const siteRoot = `${origin}/`
   const about = `${origin}/about`
   const personId = `${origin}/#founder`
   const appId = `${origin}/#software`
@@ -57,7 +57,7 @@ export function buildStructuredData(origin: string) {
       {
         '@type': 'WebSite',
         '@id': websiteId,
-        url: landing,
+        url: siteRoot,
         name: SITE.name,
         description: SITE.description,
         inLanguage: SITE.language,
@@ -81,7 +81,7 @@ export function buildStructuredData(origin: string) {
         operatingSystem: 'Web browser',
         description:
           'A learning platform with AI-assisted explanations, flashcards, quizzes, study planning and progress tracking.',
-        url: landing,
+        url: siteRoot,
         author: { '@id': personId },
         isAccessibleForFree: true,
         inLanguage: SITE.language,

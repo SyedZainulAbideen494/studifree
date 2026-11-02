@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { BottomNav } from './components/Navigation/BottomNav'
 import { Skeleton } from './components/UI/Skeleton'
 import { Toasts } from './components/Notifications/Toasts'
@@ -17,8 +17,6 @@ const Planner = lazy(() => import('./pages/Planner'))
 const Help = lazy(() => import('./pages/Help'))
 const About = lazy(() => import('./pages/About'))
 const Settings = lazy(() => import('./pages/Settings'))
-const Privacy = lazy(() => import('./pages/Privacy'))
-const Terms = lazy(() => import('./pages/Legal'))
 const AiSetup = lazy(() => import('./pages/AiSetup'))
 const Flashcards = lazy(() => import('./pages/Flashcards'))
 const QuizStudio = lazy(() => import('./pages/QuizStudio'))
@@ -48,7 +46,7 @@ export default function App() {
   const location = useLocation()
   useDocumentMeta()
 
-  if (location.pathname === '/landing' || location.pathname === '/landing/') {
+  if (location.pathname === '/') {
     return (
       <Suspense fallback={<LandingFallback />}>
         <LandingPage />
@@ -56,12 +54,16 @@ export default function App() {
     )
   }
 
+  if (location.pathname === '/landing' || location.pathname === '/landing/') {
+    return <Navigate to="/" replace />
+  }
+
   return (
     <div className="min-h-full pb-28">
       <AiKeyBanner />
       <Suspense fallback={<Fallback />}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/practice" element={<Practice />} />
           <Route path="/progress" element={<Progress />} />
@@ -70,8 +72,6 @@ export default function App() {
           <Route path="/help" element={<Help />} />
           <Route path="/about" element={<About />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
           <Route path="/ai-setup" element={<AiSetup />} />
           <Route path="/flashcards" element={<Flashcards />} />
           <Route path="/quiz" element={<QuizStudio />} />

@@ -42,7 +42,7 @@ export function FinalCTA() {
           </Reveal>
 
           <Reveal className="sf-actions" delay={0.12} y={12} style={{ justifyContent: 'center' }}>
-            <LandingLink href="/" variant="primary" size="lg" showArrow>
+            <LandingLink href="/home" variant="primary" size="lg" showArrow>
               Start learning — it’s free
             </LandingLink>
             <LandingLink href="/ai-setup" variant="secondary" size="lg">

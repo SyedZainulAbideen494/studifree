@@ -56,11 +56,11 @@ export interface RouteMeta {
 }
 
 const pageMeta: Record<string, RouteMeta> = {
-  '/landing': {
+  '/': {
     title: SITE.title,
     description: SITE.description,
     indexable: true,
-    path: '/landing',
+    path: '/',
     socialTitle: SITE.socialTitle,
     socialDescription: SITE.socialDescription,
   },
@@ -84,30 +84,10 @@ const pageMeta: Record<string, RouteMeta> = {
     socialDescription:
       'Set up AI, study flashcards, generate quizzes and get the most out of your learning workspace.',
   },
-  '/privacy': {
-    title: 'Privacy Policy — Studifree',
-    description:
-      'How Studifree handles local study data, optional location consent and the external services used when you choose to enable AI features.',
-    indexable: true,
-    path: '/privacy',
-    socialTitle: 'Privacy Policy — Studifree',
-    socialDescription:
-      'What stays in your browser, what leaves it, and the choices you control in Studifree.',
-  },
-  '/terms': {
-    title: 'Terms & AI Disclaimer — Studifree',
-    description:
-      'The terms of use for Studifree and an honest disclaimer about the limits of AI-generated explanations, flashcards, quizzes and study material.',
-    indexable: true,
-    path: '/terms',
-    socialTitle: 'Terms & AI Disclaimer — Studifree',
-    socialDescription:
-      'How Studifree should be used, what AI can and cannot promise, and where responsibility sits.',
-  },
 }
 
 const privatePageTitles: Record<string, string> = {
-  '/': 'Studifree',
+  '/home': 'Home — Studifree',
   '/learn': 'Learn — Studifree',
   '/practice': 'Practice — Studifree',
   '/progress': 'Progress — Studifree',

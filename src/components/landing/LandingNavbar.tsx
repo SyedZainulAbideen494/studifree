@@ -78,10 +78,10 @@ export function LandingNavbar() {
         </div>
 
         <div className="sf-nav__actions">
-          <LandingLink href="/" variant="secondary" size="sm">
+          <LandingLink href="/home" variant="secondary" size="sm">
             Open app
           </LandingLink>
-          <LandingLink href="/" variant="primary" size="sm" showArrow>
+          <LandingLink href="/home" variant="primary" size="sm" showArrow>
             Start learning
           </LandingLink>
         </div>
@@ -111,10 +111,10 @@ export function LandingNavbar() {
             </a>
           ))}
           <div className="sf-nav__mobile-actions">
-            <LandingLink href="/" variant="secondary" onClick={() => setOpen(false)}>
+            <LandingLink href="/home" variant="secondary" onClick={() => setOpen(false)}>
               Open app
             </LandingLink>
-            <LandingLink href="/" variant="primary" showArrow onClick={() => setOpen(false)}>
+            <LandingLink href="/home" variant="primary" showArrow onClick={() => setOpen(false)}>
               Start learning
             </LandingLink>
           </div>

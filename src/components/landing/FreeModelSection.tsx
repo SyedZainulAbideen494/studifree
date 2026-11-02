@@ -25,7 +25,7 @@ export function FreeModelSection() {
               <LandingLink href="#api-keys" variant="secondary" showArrow>
                 See how AI setup works
               </LandingLink>
-              <LandingLink href="/" variant="primary" showArrow>
+              <LandingLink href="/home" variant="primary" showArrow>
                 Start learning
               </LandingLink>
             </div>

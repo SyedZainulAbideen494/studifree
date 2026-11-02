@@ -120,7 +120,7 @@ const sections: { title: string; items: HelpItem[] }[] = [
       },
       {
         q: 'What does the visitor notification contain?',
-        a: 'The deployed site may email the visit time, page URL, IP address, browser details, language, screen size, timezone and referrer. Precise location is included only if you separately switch on location in visitor analytics. The Privacy Policy explains this in full.',
+        a: 'The deployed site may email the visit time, page URL, IP address, browser details, language, screen size, timezone and referrer. Precise location is included only if you separately switch on location in visitor analytics.',
       },
     ],
   },
@@ -133,8 +133,8 @@ const sections: { title: string; items: HelpItem[] }[] = [
         q: 'Where can I read more?',
         a: (
           <>
-            The <Link to="/about#faq" className="text-ink underline">About page FAQ</Link> answers common questions,
-            and the <Link to="/privacy" className="text-ink underline">Privacy Policy</Link> explains data handling.
+            The <Link to="/about#faq" className="text-ink underline">About page FAQ</Link> answers common
+            questions about the project. The sections above explain how features and data handling work.
           </>
         ),
       },

@@ -28,7 +28,7 @@ export function HowItWorks() {
         </div>
 
         <Reveal className="sf-steps__cta" y={12}>
-          <LandingLink href="/" variant="primary" size="lg" showArrow>
+          <LandingLink href="/home" variant="primary" size="lg" showArrow>
             Open Studifree
           </LandingLink>
         </Reveal>

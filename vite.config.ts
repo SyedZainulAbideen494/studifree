@@ -6,9 +6,10 @@ import { VitePWA } from 'vite-plugin-pwa'
  * Public pages only. Settings, API-key setup, onboarding and every in-app
  * study screen are intentionally excluded from the sitemap.
  */
-const SITEMAP_PATHS = ['/landing', '/about', '/help', '/privacy', '/terms']
+const SITEMAP_PATHS = ['/', '/about', '/help']
 
 const PRIVATE_PATHS = [
+  '/home',
   '/settings',
   '/ai-setup',
   '/onboarding',

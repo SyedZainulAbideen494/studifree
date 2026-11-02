@@ -62,8 +62,8 @@ export function LandingFAQ() {
                 <HelpCircle width={12} height={12} aria-hidden="true" /> Still curious?
               </p>
               <p className="sf-faq__category-description" style={{ marginTop: 10 }}>
-                The Help Centre covers the tools one by one, and the Privacy Policy explains what is stored
-                locally and what is sent externally.
+                The Help Centre covers the tools one by one and explains what is stored locally and what is
+                sent externally.
               </p>
               <div style={{ marginTop: 14 }}>
                 <TextLink href="/help">Visit the Help Centre</TextLink>

@@ -26,7 +26,7 @@ export function HeroSection() {
             <p className="sf-lead sf-hero__description">{heroCopy.description}</p>
 
             <div className="sf-actions">
-              <LandingLink href="/" variant="primary" size="lg" showArrow>
+              <LandingLink href="/home" variant="primary" size="lg" showArrow>
                 {heroCopy.primaryCta}
               </LandingLink>
               <LandingLink href="#how-it-works" variant="secondary" size="lg">

@@ -466,7 +466,7 @@ export default function About() {
             <p className="text-ink mt-6 font-medium">
               Thank you for being here. And more importantly, thank you for learning.
             </p>
-            <Button onClick={() => navigate('/')} className="mt-6">
+            <Button onClick={() => navigate('/home')} className="mt-6">
               Start learning <ArrowRight className="w-4 h-4" />
             </Button>
           </div>

@@ -38,13 +38,14 @@ not ideal for social crawlers that do not execute JavaScript.
 ## Hosting
 
 The app is a single-page application. Configure the host to rewrite unknown
-paths to `/index.html` so routes such as `/landing`, `/about` and `/help` work
-on direct navigation and refresh. Public marketing pages are indexable; the
+paths to `/index.html` so routes such as `/home`, `/about` and `/help` work
+on direct navigation and refresh. The root path `/` is the public landing page;
+the application home is `/home`. Public marketing pages are indexable; the
 application screens are marked `noindex`.
 
 ## Public routes in the sitemap
 
-`/landing`, `/about`, `/help`, `/privacy`, `/terms`
+`/`, `/about`, `/help`
 
 Settings, AI setup, onboarding and all in-app study screens are intentionally
 excluded from the sitemap and search indexing.

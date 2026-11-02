@@ -36,7 +36,7 @@ export default function Onboarding() {
   const Icon = step.icon
   const finish = () => {
     update({ onboardingDone: true })
-    navigate('/')
+    navigate('/home')
   }
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12">

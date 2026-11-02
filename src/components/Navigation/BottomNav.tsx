@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Home, BookOpen, Dumbbell, BarChart3, MoreHorizontal, X, Library, Calendar, HelpCircle, Info, Settings, Shield, FileText } from 'lucide-react'
+import { Home, BookOpen, Dumbbell, BarChart3, MoreHorizontal, X, Library, Calendar, HelpCircle, Info, Settings, KeyRound } from 'lucide-react'
 import { Sheet } from '../UI/Sheet'
 
 const primary = [
-  { to: '/', label: 'Home', icon: Home },
+  { to: '/home', label: 'Home', icon: Home },
   { to: '/learn', label: 'Learn', icon: BookOpen },
   { to: '/practice', label: 'Practice', icon: Dumbbell },
   { to: '/progress', label: 'Progress', icon: BarChart3 },
@@ -17,8 +17,7 @@ const moreItems = [
   { to: '/help', label: 'Help Centre', icon: HelpCircle },
   { to: '/about', label: 'About Studifree', icon: Info },
   { to: '/settings', label: 'Settings', icon: Settings },
-  { to: '/privacy', label: 'Privacy', icon: Shield },
-  { to: '/terms', label: 'Terms', icon: FileText },
+  { to: '/ai-setup', label: 'AI Setup', icon: KeyRound },
 ]
 
 export const BottomNav: React.FC = () => {
@@ -41,7 +40,7 @@ export const BottomNav: React.FC = () => {
             <li key={item.to} className="flex-1">
               <NavLink
                 to={item.to}
-                end={item.to === '/'}
+                end={item.to === '/home'}
                 className={({ isActive }) =>
                   `relative flex flex-col items-center justify-center gap-0.5 py-2 rounded-2xl transition-colors ${isActive ? 'text-ink' : 'text-muted hover:text-ink'}`
                 }

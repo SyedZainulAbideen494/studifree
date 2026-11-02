@@ -49,20 +49,20 @@ describe('social and search metadata', () => {
 
 describe('canonicalisation and route metadata', () => {
   it('keeps the landing page as the primary indexable product page', () => {
-    const meta = getRouteMeta('/landing')
+    const meta = getRouteMeta('/')
     expect(meta.indexable).toBe(true)
-    expect(meta.path).toBe('/landing')
+    expect(meta.path).toBe('/')
     expect(meta.title).toBe(SITE.title)
   })
 
   it('marks private application screens as noindex', () => {
-    for (const path of ['/', '/settings', '/ai-setup', '/flashcards', '/quiz', '/learn', '/onboarding']) {
+    for (const path of ['/home', '/settings', '/ai-setup', '/flashcards', '/quiz', '/learn', '/onboarding']) {
       expect(getRouteMeta(path).indexable).toBe(false)
     }
   })
 
   it('only includes public pages in the sitemap', () => {
-    expect(sitemapPaths).toEqual(['/landing', '/about', '/help', '/privacy', '/terms'])
+    expect(sitemapPaths).toEqual(['/', '/about', '/help'])
     for (const path of ['/settings', '/ai-setup', '/flashcards', '/quiz', '/learn', '/onboarding']) {
       expect(sitemapPaths).not.toContain(path)
     }

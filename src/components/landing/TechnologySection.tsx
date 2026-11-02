@@ -145,7 +145,7 @@ export function TechnologySection() {
               data if you need a backup.
             </p>
             <div className="sf-actions">
-              <TextLink href="/privacy">How data is handled</TextLink>
+              <TextLink href="/help">How data is handled</TextLink>
               <TextLink href="/settings">Manage local data</TextLink>
             </div>
           </Reveal>

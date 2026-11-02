@@ -39,7 +39,7 @@ export default function AiSetup() {
       setChanging(false)
       return
     }
-    navigate('/')
+    navigate('/home')
   }
 
   const exploreModels = () => {

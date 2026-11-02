@@ -43,13 +43,7 @@ export function TrustSection() {
         </div>
 
         <Reveal className="sf-trust__links" y={10}>
-          <LandingLink href="/privacy" variant="secondary">
-            Privacy Policy
-          </LandingLink>
-          <LandingLink href="/terms" variant="ghost">
-            Terms
-          </LandingLink>
-          <LandingLink href="/help" variant="ghost" showArrow>
+          <LandingLink href="/help" variant="secondary" showArrow>
             Help Centre
           </LandingLink>
         </Reveal>

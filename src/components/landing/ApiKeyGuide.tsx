@@ -143,10 +143,7 @@ export function ApiKeyGuide() {
         </div>
 
         <Reveal className="sf-actions" style={{ marginTop: 28 }} y={10}>
-          <LandingLink href="/privacy" variant="secondary">
-            Read the Privacy Policy
-          </LandingLink>
-          <LandingLink href="/help" variant="ghost" showArrow>
+          <LandingLink href="/help" variant="secondary" showArrow>
             Visit the Help Centre
           </LandingLink>
           <a

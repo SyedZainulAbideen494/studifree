@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Sun, Monitor, Sparkles, Download, Upload, Trash2, RotateCcw, MapPin, ShieldCheck, Globe2, Send } from 'lucide-react'
+import { Moon, Sun, Monitor, Sparkles, Download, Upload, Trash2, RotateCcw, MapPin, Globe2, Send } from 'lucide-react'
 import { Button } from '../components/UI/Button'
 import { Input } from '../components/UI/Input'
 import { Card } from '../components/UI/Card'
@@ -369,9 +369,6 @@ export default function Settings() {
           )}
           <Button size="sm" variant="ghost" onClick={changePreference}>
             <MapPin className="w-4 h-4" /> {locationPref ? 'Change preference' : 'Choose preference'}
-          </Button>
-          <Button size="sm" variant="ghost" onClick={() => navigate('/privacy')}>
-            <ShieldCheck className="w-4 h-4" /> Privacy policy
           </Button>
         </div>
 
