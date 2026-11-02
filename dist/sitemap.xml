@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Set VITE_SITE_URL at build time to emit fully qualified URLs. -->
   <url>
-    <loc>/landing</loc>
+    <loc>/</loc>
     <lastmod>2026-11-02</lastmod>
     <changefreq>monthly</changefreq>
   </url>
@@ -13,16 +13,6 @@
   </url>
   <url>
     <loc>/help</loc>
-    <lastmod>2026-11-02</lastmod>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>/privacy</loc>
-    <lastmod>2026-11-02</lastmod>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>/terms</loc>
     <lastmod>2026-11-02</lastmod>
     <changefreq>monthly</changefreq>
   </url>

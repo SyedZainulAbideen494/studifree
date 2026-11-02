@@ -6,6 +6,7 @@ export interface LandingNavItem {
 }
 
 export const landingNavItems: LandingNavItem[] = [
+  { label: 'System', href: '#showcase' },
   { label: 'Features', href: '#features' },
   { label: 'How it works', href: '#how-it-works' },
   { label: 'Why Studifree', href: '#why-studifree' },
@@ -13,13 +14,15 @@ export const landingNavItems: LandingNavItem[] = [
 ]
 
 export const heroCopy = {
-  eyebrow: 'Your space to learn',
-  titleLines: ['Make learning feel', 'effortless.'],
+  eyebrow: 'Studifree // Learning intelligence',
+  titleLines: ['LEARNING,', 'RE-ENGINEERED.'],
   description:
-    'Studifree brings learning, AI-powered explanations, flashcards, quizzes and study planning into one simple space. Learn at your own pace, understand difficult concepts and make every study session count.',
-  primaryCta: "Start learning — It's free",
-  secondaryCta: 'Explore how it works',
-  trust: 'No mandatory account · Free core learning tools · Bring your own AI key',
+    'One intelligent learning space. Built around the way you think, learn and grow.',
+  primaryCta: 'Start learning',
+  secondaryCta: 'Explore the system',
+  trust: 'No mandatory account · Core tools free · Bring your own AI key',
+  status: 'System online · Local-first architecture',
+  coordinates: 'SF—01 / 2026 / BROWSE',
 }
 
 export interface FeatureStory {

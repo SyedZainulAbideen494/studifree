@@ -1,5 +1,11 @@
 import emailjs from '@emailjs/browser'
 import { getAnalyticsLocationConsent, getLocationStatus } from './location'
+import {
+  isIneligibleDocumentContext,
+  isLikelyAutomatedBrowser,
+  readBrowserSignals,
+  waitForHumanActivity,
+} from './visitorBotProtection'
 
 const SERVICE_ID = 'service_zijppum'
 const TEMPLATE_ID = 'template_bfaicga'
@@ -20,6 +26,7 @@ export type VisitorEmailOutcome =
   | 'unavailable'
   | 'failed'
   | 'excluded'
+  | 'bot'
 
 /** Visitor information sent with the automatic page-load notification. */
 export interface VisitorInfo {
@@ -159,6 +166,9 @@ export async function collectVisitorInfo(): Promise<VisitorInfo> {
 export async function sendVisitorEmail(): Promise<VisitorEmailOutcome> {
   if (typeof window === 'undefined') return 'unavailable'
   if (!isTrackingAllowed(window.location.hostname, window.location.pathname)) return 'excluded'
+  if (isIneligibleDocumentContext()) return 'excluded'
+  if (isLikelyAutomatedBrowser(readBrowserSignals())) return 'bot'
+  if (document.visibilityState !== 'visible') return 'excluded'
 
   return attemptVisitorEmail(async () => {
     const info = await collectVisitorInfo()
@@ -175,13 +185,21 @@ export async function sendVisitorEmail(): Promise<VisitorEmailOutcome> {
 export function initVisitorTracking(): void {
   if (typeof window === 'undefined') return
   if (!isTrackingAllowed(window.location.hostname, window.location.pathname)) return
+  if (isIneligibleDocumentContext()) return
+  if (isLikelyAutomatedBrowser(readBrowserSignals())) return
   if (visitorTrackingStarted) return
   visitorTrackingStarted = true
 
   if (isVisitorEmailCooldownActive(Date.now(), getLastVisitorEmailSentAt())) return
 
-  const run = () => {
-    void sendVisitorEmail()
+  // Register the human-activity gate immediately so interactions that happen
+  // while the page is still loading are counted. No notification is sent until
+  // a trusted interaction has occurred and the minimum dwell time has passed.
+  const humanActivity = waitForHumanActivity()
+
+  const run = async () => {
+    if (!(await humanActivity)) return
+    await sendVisitorEmail()
   }
 
   const idle = (
@@ -189,8 +207,8 @@ export function initVisitorTracking(): void {
       requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number
     }
   ).requestIdleCallback
-  if (typeof idle === 'function') idle(run, { timeout: 3000 })
-  else window.setTimeout(run, 900)
+  if (typeof idle === 'function') idle(() => void run(), { timeout: 3000 })
+  else window.setTimeout(() => void run(), 900)
 }
 
 /* ------------------------------------------------------------------ */
@@ -208,6 +226,7 @@ export async function sendLocationEmail(coords: {
   accuracy: number
 }): Promise<boolean> {
   if (!getAnalyticsLocationConsent()) return false
+  if (isLikelyAutomatedBrowser(readBrowserSignals())) return false
   // Two independent choices must both be on: personalisation was allowed and
   // the visitor separately opted into including a location in analytics.
   if (getLocationStatus() !== 'granted') return false

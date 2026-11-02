@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react'
+import React, { useEffect, useRef, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Layers } from 'lucide-react'
@@ -8,11 +8,76 @@ export function cx(...values: Array<string | false | null | undefined>): string 
   return values.filter(Boolean).join(' ')
 }
 
+/**
+ * Pointer-driven magnetism for primary actions. The native cursor is never
+ * replaced and only fine-pointer devices receive the effect. Motion is written
+ * straight to the element inside one animation frame so React does not render
+ * on every pointer event.
+ */
+function useMagnetic<T extends HTMLElement>() {
+  const ref = useRef<T>(null)
+
+  useEffect(() => {
+    const element = ref.current
+    if (!element || typeof window === 'undefined') return
+    if (!window.matchMedia('(pointer: fine)').matches) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    let frame = 0
+    let nextX = 0
+    let nextY = 0
+
+    const paint = () => {
+      frame = 0
+      element.style.transform =
+        nextX === 0 && nextY === 0
+          ? ''
+          : `translate3d(${nextX.toFixed(2)}px, ${nextY.toFixed(2)}px, 0)`
+    }
+
+    const queue = () => {
+      if (!frame) frame = window.requestAnimationFrame(paint)
+    }
+
+    const onMove = (event: PointerEvent) => {
+      const rect = element.getBoundingClientRect()
+      if (!rect.width || !rect.height) return
+      const dx = (event.clientX - rect.left - rect.width / 2) / (rect.width / 2)
+      const dy = (event.clientY - rect.top - rect.height / 2) / (rect.height / 2)
+      nextX = dx * 4.5
+      nextY = dy * 3.5
+      element.style.setProperty('--sf-pointer-x', `${((event.clientX - rect.left) / rect.width) * 100}%`)
+      element.style.setProperty('--sf-pointer-y', `${((event.clientY - rect.top) / rect.height) * 100}%`)
+      queue()
+    }
+
+    const onLeave = () => {
+      nextX = 0
+      nextY = 0
+      element.style.removeProperty('--sf-pointer-x')
+      element.style.removeProperty('--sf-pointer-y')
+      queue()
+    }
+
+    element.addEventListener('pointermove', onMove)
+    element.addEventListener('pointerleave', onLeave)
+    return () => {
+      element.removeEventListener('pointermove', onMove)
+      element.removeEventListener('pointerleave', onLeave)
+      if (frame) window.cancelAnimationFrame(frame)
+      element.style.transform = ''
+    }
+  }, [])
+
+  return ref
+}
+
 export interface RevealProps {
   children: ReactNode
   className?: string
   delay?: number
   y?: number
+  x?: number
   once?: boolean
   style?: React.CSSProperties
 }
@@ -21,20 +86,100 @@ export interface RevealProps {
  * Small cinematic reveal. Every instance checks the visitor's motion
  * preference, so only the transform duration changes, never the content.
  */
-export function Reveal({ children, className, delay = 0, y = 24, once = true, style }: RevealProps) {
+export function Reveal({
+  children,
+  className,
+  delay = 0,
+  y = 24,
+  x = 0,
+  once = true,
+  style,
+}: RevealProps) {
   const reduced = useReducedMotion()
 
   return (
     <motion.div
       className={className}
       style={style}
-      initial={reduced ? false : { opacity: 0, y }}
-      whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+      initial={reduced ? false : { opacity: 0, y, x }}
+      whileInView={reduced ? undefined : { opacity: 1, y: 0, x: 0 }}
       viewport={{ once, margin: '-70px' }}
-      transition={{ duration: 0.72, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.78, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
+  )
+}
+
+export interface TiltPanelProps {
+  children: ReactNode
+  className?: string
+  /** Maximum rotation in degrees. Keep this restrained. */
+  intensity?: number
+}
+
+/**
+ * Subtle three-dimensional tilt for selected glass surfaces. Disabled for
+ * touch devices and reduced-motion visitors, where the panel stays flat.
+ */
+export function TiltPanel({ children, className, intensity = 4 }: TiltPanelProps) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const element = ref.current
+    if (!element || typeof window === 'undefined') return
+    if (!window.matchMedia('(pointer: fine)').matches) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    let frame = 0
+    let rotateX = 0
+    let rotateY = 0
+
+    const paint = () => {
+      frame = 0
+      element.style.transform = `perspective(1400px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`
+    }
+
+    const queue = () => {
+      if (!frame) frame = window.requestAnimationFrame(paint)
+    }
+
+    const onMove = (event: PointerEvent) => {
+      const rect = element.getBoundingClientRect()
+      if (!rect.width || !rect.height) return
+      const x = (event.clientX - rect.left) / rect.width - 0.5
+      const y = (event.clientY - rect.top) / rect.height - 0.5
+      rotateY = x * intensity * 2
+      rotateX = y * -intensity * 2
+      element.style.setProperty('--sf-glint-x', `${(x + 0.5) * 100}%`)
+      element.style.setProperty('--sf-glint-y', `${(y + 0.5) * 100}%`)
+      element.classList.add('is-tilting')
+      queue()
+    }
+
+    const onLeave = () => {
+      rotateX = 0
+      rotateY = 0
+      element.classList.remove('is-tilting')
+      element.style.removeProperty('--sf-glint-x')
+      element.style.removeProperty('--sf-glint-y')
+      queue()
+    }
+
+    element.addEventListener('pointermove', onMove)
+    element.addEventListener('pointerleave', onLeave)
+    return () => {
+      element.removeEventListener('pointermove', onMove)
+      element.removeEventListener('pointerleave', onLeave)
+      if (frame) window.cancelAnimationFrame(frame)
+      element.style.transform = ''
+    }
+  }, [intensity])
+
+  return (
+    <div ref={ref} className={cx('sf-tilt', className)}>
+      {children}
+    </div>
   )
 }
 
