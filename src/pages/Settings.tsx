@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Moon, Sun, Monitor, Sparkles, Download, Upload, Trash2, RotateCcw, MapPin, Globe2, Send } from 'lucide-react'
+import { Moon, Sun, Monitor, Sparkles, Download, Upload, Trash2, RotateCcw, MapPin, Globe2 } from 'lucide-react'
 import { Button } from '../components/UI/Button'
 import { Input } from '../components/UI/Input'
 import { Card } from '../components/UI/Card'
@@ -15,17 +15,14 @@ import {
   clearRegionalProfile,
   declineLocation,
   describeRegion,
-  getAnalyticsLocationConsent,
   getCurrentCoordinates,
   getLocationPreference,
   resolveRegionalProfile,
-  setAnalyticsLocationConsent,
   updateRegionalProfile,
   watchBrowserLocationPermission,
   LOCATION_PREFERENCE_CHANGED_EVENT,
   type BrowserLocationPermission,
 } from '../services/location'
-import { sendLocationEmail } from '../services/visitorTracking'
 
 export default function Settings() {
   const navigate = useNavigate()
@@ -36,8 +33,6 @@ export default function Settings() {
   const ai = useAiAvailability()
   const [locationPref, setLocationPref] = useState(getLocationPreference)
   const [browserPermission, setBrowserPermission] = useState<BrowserLocationPermission>('unsupported')
-  const [analyticsLocation, setAnalyticsLocation] = useState(getAnalyticsLocationConsent)
-  const [analyticsBusy, setAnalyticsBusy] = useState(false)
   const [regionBusy, setRegionBusy] = useState(false)
   const [work, setWork] = useState(settings.pomodoroWork)
   const [brk, setBrk] = useState(settings.pomodoroBreak)
@@ -46,7 +41,6 @@ export default function Settings() {
   useEffect(() => {
     const sync = () => {
       setLocationPref(getLocationPreference())
-      setAnalyticsLocation(getAnalyticsLocationConsent())
     }
     window.addEventListener(LOCATION_PREFERENCE_CHANGED_EVENT, sync)
     window.addEventListener('storage', sync)
@@ -101,34 +95,6 @@ export default function Settings() {
       'Your stored country or region was removed. Location personalisation remains ' +
         (locationGranted ? 'on without a region.' : 'off.'),
     )
-  }
-
-  const sendAnalyticsLocation = async () => {
-    if (analyticsBusy) return
-    setAnalyticsBusy(true)
-    try {
-      const coords = await getCurrentCoordinates()
-      const sent = await sendLocationEmail({
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-        accuracy: coords.accuracy,
-      })
-      notify(
-        sent ? 'success' : 'warning',
-        sent ? 'Location sent' : 'Location not sent',
-        sent
-          ? 'Your coordinates were included in the anonymous visitor notification.'
-          : 'The notification could not be sent. This does not affect Studifree.',
-      )
-    } catch {
-      notify(
-        'warning',
-        'Location unavailable',
-        'Your browser did not provide a location. Studifree continues to work normally.',
-      )
-    } finally {
-      setAnalyticsBusy(false)
-    }
   }
 
   const refreshRegion = async () => {
@@ -370,50 +336,6 @@ export default function Settings() {
           <Button size="sm" variant="ghost" onClick={changePreference}>
             <MapPin className="w-4 h-4" /> {locationPref ? 'Change preference' : 'Choose preference'}
           </Button>
-        </div>
-
-        <div className="mt-4 pt-4 border-t border-line">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-sm text-ink">Location in visitor analytics</p>
-              <p className="text-xs text-muted mt-0.5 leading-relaxed">
-                Separate from personalisation and off by default. When on, this visit&apos;s precise
-                coordinates can be included in the anonymous visitor notification.
-              </p>
-              {!locationGranted && (
-                <p className="text-xs text-faint mt-1">
-                  Allow location personalisation first. Visitor analytics never reads location on its own.
-                </p>
-              )}
-            </div>
-            <Switch
-              checked={analyticsLocation}
-              ariaLabel="Include location in visitor analytics"
-              disabled={!locationGranted && !analyticsLocation}
-              onChange={(value) => {
-                setAnalyticsLocationConsent(value)
-                setAnalyticsLocation(value)
-              }}
-            />
-          </div>
-
-          {locationGranted && analyticsLocation && (
-            <Button
-              size="sm"
-              variant="secondary"
-              className="mt-3"
-              onClick={sendAnalyticsLocation}
-              loading={analyticsBusy}
-              disabled={browserPermission === 'denied'}
-            >
-              {analyticsBusy ? (
-                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <Send className="w-4 h-4" />
-              )}
-              Send this visit&apos;s location
-            </Button>
-          )}
         </div>
       </Card>
 

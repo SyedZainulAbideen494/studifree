@@ -128,8 +128,9 @@ export async function attemptVisitorEmail(
     // Only a confirmed send starts the one-hour cooldown.
     recordVisitorEmailSent(now(), storage)
     return 'sent'
-  } catch (error) {
-    console.error('Visitor notification failed:', error)
+  } catch {
+    // Failures are intentionally silent: the notification is internal and
+    // should never surface visitor data or diagnostics in the interface.
     return 'failed'
   } finally {
     visitorEmailInFlight = false
@@ -173,7 +174,6 @@ export async function sendVisitorEmail(): Promise<VisitorEmailOutcome> {
   return attemptVisitorEmail(async () => {
     const info = await collectVisitorInfo()
     await emailjs.send(SERVICE_ID, TEMPLATE_ID, { ...info }, PUBLIC_KEY)
-    console.log('Visitor email sent')
   })
 }
 
@@ -193,8 +193,8 @@ export function initVisitorTracking(): void {
   if (isVisitorEmailCooldownActive(Date.now(), getLastVisitorEmailSentAt())) return
 
   // Register the human-activity gate immediately so interactions that happen
-  // while the page is still loading are counted. No notification is sent until
-  // a trusted interaction has occurred and the minimum dwell time has passed.
+  // while the page is still loading are counted. No notification is sent when
+  // the page opens — only after a trusted scroll, tap, click, wheel or key.
   const humanActivity = waitForHumanActivity()
 
   const run = async () => {
@@ -247,8 +247,7 @@ export async function sendLocationEmail(coords: {
       PUBLIC_KEY,
     )
     return true
-  } catch (err) {
-    console.error('Location email failed:', err)
+  } catch {
     return false
   }
 }

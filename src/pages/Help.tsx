@@ -118,10 +118,6 @@ const sections: { title: string; items: HelpItem[] }[] = [
         q: 'How do I change or disable location personalisation?',
         a: 'Open Settings → Location personalisation to disable or reset it. You can also revoke browser location permission in your browser’s site settings. AI regional context is a separate switch inside Learn and is off by default.',
       },
-      {
-        q: 'What does the visitor notification contain?',
-        a: 'The deployed site may email the visit time, page URL, IP address, browser details, language, screen size, timezone and referrer. Precise location is included only if you separately switch on location in visitor analytics.',
-      },
     ],
   },
   {

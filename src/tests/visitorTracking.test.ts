@@ -116,7 +116,8 @@ describe('visitor email sending', () => {
     deliver.mockResolvedValueOnce(undefined)
     await expect(attemptVisitorEmail(deliver, { now: () => 10_500, storage })).resolves.toBe('sent')
     expect(getLastVisitorEmailSentAt(storage)).toBe(10_500)
-    expect(errorSpy).toHaveBeenCalled()
+    // The notification is internal: failures must stay silent.
+    expect(errorSpy).not.toHaveBeenCalled()
   })
 
   it('deduplicates concurrent requests, as React StrictMode would', async () => {

@@ -178,7 +178,7 @@ export const faqItems: FaqItem[] = [
     category: 'privacy-data',
     question: 'Does Studifree collect my location?',
     answer:
-      'Only if you choose to allow it. Studifree asks once for optional location personalisation. If you allow it and your browser grants permission, your coordinates are used to look up a general country and region. Precise coordinates are not stored in your browser and are not sent to the AI provider; only the country and region are saved locally. If you decline, no location is read. Precise coordinates are included in visitor analytics only if you separately switch that on in Settings.',
+      'Only if you choose to allow it. Studifree asks once for optional location personalisation. If you allow it and your browser grants permission, your coordinates are used to look up a general country and region. Precise coordinates are not stored in your browser and are not sent to the AI provider; only the country and region are saved locally. If you decline, no location is read.',
   },
   {
     id: 'disable-location',

@@ -303,8 +303,7 @@ export const storageBuckets = [
       'AI settings, including your API key',
       'Model cache, health and fallback policy',
       'AI verification state',
-      'Visitor email cooldown timestamp',
-      'Location consent and separate analytics preference',
+      'Location consent and regional preference',
     ],
   },
   {
@@ -315,9 +314,7 @@ export const storageBuckets = [
       'Some parts of the experience communicate with external services. Opening the app alone does not upload your study library.',
     items: [
       'AI prompts and relevant material → Google Gemini, when you request AI',
-      'Visitor notification fields and IP → EmailJS and ipify',
       'Coordinates for reverse geocoding → BigDataCloud, after consent',
-      'Precise location in analytics → only with a separate explicit opt-in',
     ],
   },
 ] as const
@@ -373,16 +370,6 @@ export const externalServices = [
     data: 'Your prompt and the relevant material you submit, plus authentication through your API key.',
   },
   {
-    name: 'EmailJS',
-    purpose: 'Sends the optional visitor notification configured for the site.',
-    data: 'Page URL, time, browser and device details, language, timezone, referrer and platform.',
-  },
-  {
-    name: 'ipify',
-    purpose: 'Looks up the public IP address included in that visitor notification.',
-    data: 'A network request that returns your public IP address.',
-  },
-  {
     name: 'BigDataCloud',
     purpose: 'Turns consented coordinates into a coarse country and region.',
     data: 'Latitude and longitude in the reverse-geocode request. Coordinates are not stored by Studifree.',
@@ -404,7 +391,7 @@ export const securityNotes = [
   },
   {
     title: 'External services',
-    body: 'Studifree is not a no-server application. AI requests, visitor notifications, IP lookup and optional reverse geocoding use the external services listed here. The Help Centre explains these purposes in more detail.',
+    body: 'Studifree is not a no-server application. AI requests and optional reverse geocoding use the external services listed here. The Help Centre explains these purposes in more detail.',
   },
 ] as const
 
@@ -627,7 +614,7 @@ export const landingFaqItems: LandingFaqItem[] = [
     category: 'ai-api-keys',
     question: 'Does my data go to Google?',
     answer:
-      'When you use AI features, the relevant prompt and submitted material are sent to Google Gemini for processing if Gemini is your configured provider. Merely opening Studifree or using local study tools does not upload your library. Visitor notifications and IP lookup are separate services.',
+      'When you use AI features, the relevant prompt and submitted material are sent to Google Gemini for processing if Gemini is your configured provider. Merely opening Studifree or using local study tools does not upload your library.',
   },
 
   // Features
