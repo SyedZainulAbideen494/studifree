@@ -211,6 +211,7 @@ export function LandingLink({
   onClick,
   ariaLabel,
 }: LandingLinkProps) {
+  const magneticRef = useMagnetic<HTMLAnchorElement>()
   const classes = cx(
     'sf-btn',
     `sf-btn--${variant}`,
@@ -231,6 +232,7 @@ export function LandingLink({
   if (isExternal) {
     return (
       <a
+        ref={magneticRef}
         className={classes}
         href={href}
         target="_blank"
@@ -245,7 +247,7 @@ export function LandingLink({
 
   if (isInternalRoute) {
     return (
-      <Link className={classes} to={href} onClick={onClick} aria-label={ariaLabel}>
+      <Link ref={magneticRef} className={classes} to={href} onClick={onClick} aria-label={ariaLabel}>
         {content}
       </Link>
     )
@@ -253,6 +255,7 @@ export function LandingLink({
 
   return (
     <a
+      ref={magneticRef}
       className={classes}
       href={isHash ? href : `#${href}`}
       onClick={onClick}
@@ -324,14 +327,28 @@ export interface SectionHeadProps {
   center?: boolean
   className?: string
   id?: string
+  meta?: string
 }
 
-export function SectionHead({ eyebrow, title, description, center = false, className, id }: SectionHeadProps) {
+export function SectionHead({
+  eyebrow,
+  title,
+  description,
+  center = false,
+  className,
+  id,
+  meta,
+}: SectionHeadProps) {
   return (
     <div
       className={cx('sf-section-head', center && 'sf-section-head--center', className)}
     >
-      {eyebrow && <p className="sf-eyebrow">{eyebrow}</p>}
+      {(eyebrow || meta) && (
+        <div className="sf-section-head__meta">
+          {eyebrow && <p className="sf-eyebrow">{eyebrow}</p>}
+          {meta && <span className="sf-section-head__index">{meta}</span>}
+        </div>
+      )}
       <h2 className="sf-h2" id={id}>
         {title}
       </h2>

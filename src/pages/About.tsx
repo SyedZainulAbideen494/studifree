@@ -22,8 +22,6 @@ import { Button } from '../components/UI/Button'
 import { Faq } from '../components/About/Faq'
 
 // Only genuine public profiles belong here. Empty until real ones are supplied.
-const founderLinks: Array<{ label: string; href: string }> = []
-
 const beliefs = [
   {
     icon: Users,
@@ -196,132 +194,43 @@ export default function About() {
         </motion.div>
       </header>
 
-      {/* Founder identity */}
-      <motion.section
-        {...fade}
-        transition={{ duration: 0.55 }}
-        className="mt-16 sm:mt-24 border-t border-line pt-10 sm:pt-14"
-        aria-labelledby="founder-heading"
-      >
-        <div className="grid md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)] gap-8 md:gap-12">
-          <div className="md:sticky md:top-24 self-start">
-            <div className="relative rounded-[2rem] border border-line-strong bg-surface overflow-hidden p-6 sm:p-7">
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background:
-                    'radial-gradient(circle at 30% 20%, var(--color-accent-soft), transparent 65%)',
-                }}
-              />
-              <div className="relative">
-                <p className="text-[10px] uppercase tracking-[0.22em] text-faint">Founder</p>
-                <p
-                  className="mt-5 text-5xl sm:text-6xl font-semibold tracking-[-0.06em] text-ink leading-none"
-                  aria-hidden="true"
-                >
-                  SZA
-                </p>
-                <div className="h-px w-12 bg-line-strong mt-5" />
-                <p className="mt-4 text-base font-medium text-ink">Syed Zainul Abideen</p>
-                <p className="text-sm text-muted mt-0.5">Founder of Studifree</p>
-                <p className="text-xs text-faint mt-5 leading-relaxed">
-                  An independent, learner-led project. No invented team page, no borrowed credentials —
-                  just the person building it.
-                </p>
-                {founderLinks.length > 0 && (
-                  <ul className="mt-5 space-y-2">
-                    {founderLinks.map((link) => (
-                      <li key={link.href}>
-                        <a
-                          href={link.href}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          className="text-xs text-muted hover:text-ink inline-flex items-center gap-1"
-                        >
-                          {link.label} <ArrowUpRight className="w-3 h-3" />
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.16em] text-faint mb-3">The founder</p>
-            <h2
-              id="founder-heading"
-              className="text-3xl sm:text-4xl font-semibold text-ink tracking-[-0.03em] leading-[1.08]"
-            >
-              An idea built by a learner.
-            </h2>
-
-            <div className="space-y-4 text-muted leading-relaxed mt-6">
-              <p>
-                Studifree was founded by Syed Zainul Abideen with a simple belief: useful learning tools
-                should be accessible to everyone.
-              </p>
-              <p>
-                The idea came from wanting a more organised and approachable way to learn — a place where
-                people could understand difficult concepts, create study resources, practise and take
-                control of their own learning.
-              </p>
-              <p>
-                What started as an idea grew into an attempt to bring those experiences together in one
-                platform.
-              </p>
-              <p>
-                Studifree is independently built and continues to evolve with the goal of making learning
-                simpler, more accessible and more personal.
-              </p>
-            </div>
-
-            <p className="mt-6 text-sm text-ink border-l-2 border-line-strong pl-4">
-              Studifree is an independent project founded by Syed Zainul Abideen.
-            </p>
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Why I made Studifree */}
-      <motion.section {...fade} transition={{ duration: 0.5 }} className="mt-16 sm:mt-20" aria-labelledby="why-heading">
+      {/* Why Studifree exists */}
+      <motion.section {...fade} transition={{ duration: 0.5 }} className="mt-16 sm:mt-24 border-t border-line pt-10 sm:pt-14" aria-labelledby="why-heading">
         <p className="text-[11px] uppercase tracking-[0.16em] text-faint mb-3">The reason</p>
         <h2 id="why-heading" className="text-2xl sm:text-3xl font-semibold text-ink tracking-tight">
-          Why I made Studifree
+          Why Studifree exists
         </h2>
 
         <div className="mt-7 grid md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.4fr)] gap-7 md:gap-10">
           <div className="md:sticky md:top-24 self-start">
             <p className="text-2xl sm:text-[28px] font-medium text-ink leading-snug tracking-tight">
-              “I wanted learning to feel simpler.”
+              “Learning should feel simpler.”
             </p>
             <div className="h-px w-12 bg-line-strong mt-5" />
-            <p className="text-xs text-faint mt-4">A note from the creator</p>
+            <p className="text-xs text-faint mt-4">A note on the project</p>
           </div>
 
           <div className="space-y-4 text-muted leading-relaxed">
             <p>
-              I created Studifree because I wanted learning to feel simpler. I believe that everyone should have
-              access to tools that help them understand, practise and improve, regardless of what they study or
+              Studifree exists because learning can feel more complicated than it needs to be. Useful tools that
+              help people understand, practise and improve should be accessible, regardless of what they study or
               where they come from.
             </p>
             <p>
-              Learning can sometimes feel overwhelming. There is so much information available, yet finding a way
-              to understand it, organise it and remember it can be difficult. I wanted to bring those parts
-              together into one place.
+              There is more information available than ever, yet finding a way to understand it, organise it and
+              remember it can still be difficult. Studifree brings those parts together into one place.
             </p>
             <p>
               A place where you can learn at your own pace, ask questions without hesitation, turn your material
-              into useful study resources and gradually see yourself improve. Studifree is my attempt to make that
-              experience more accessible.
+              into useful study resources and gradually see yourself improve. The aim is to make that experience
+              more accessible.
             </p>
             <p>
               It is not about replacing teachers, classrooms or independent thinking. It is about giving learners
               another tool to explore ideas, build confidence and take control of their learning.
             </p>
             <p className="text-ink">
-              I want Studifree to remain simple, useful and welcoming to anyone who wants to learn something new.
+              Studifree aims to remain simple, useful and welcoming to anyone who wants to learn something new.
             </p>
           </div>
         </div>
@@ -454,12 +363,12 @@ export default function About() {
             style={{ background: 'radial-gradient(circle at 50% 0%, var(--color-accent-soft), transparent 60%)' }}
           />
           <div className="relative">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-faint mb-3">A message from the creator</p>
+            <p className="text-[11px] uppercase tracking-[0.16em] text-faint mb-3">Looking ahead</p>
             <h2 className="text-2xl sm:text-3xl font-semibold text-ink tracking-tight max-w-xl mx-auto">
               There&apos;s always something new to learn.
             </h2>
             <p className="text-muted mt-4 max-w-xl mx-auto leading-relaxed">
-              Studifree is an evolving project, and I want it to keep growing with the people who use it. Every
+              Studifree is an evolving project, and it should keep growing with the people who use it. Every
               improvement should make learning a little clearer, a little more organised and a little more
               accessible.
             </p>

@@ -20,9 +20,6 @@ export const SITE = {
   socialImageAlt:
     'Studifree social preview: Learn Anything. Understand Everything. A monochrome learning workspace with flashcards, quizzes and study planning.',
   themeColor: '#050505',
-  author: 'Syed Zainul Abideen',
-  founder: 'Syed Zainul Abideen',
-  founderTitle: 'Founder of Studifree',
   tagline: 'Learn Anything. Understand Everything.',
   philosophy: 'Learning should be for everyone.',
   language: 'en',
@@ -65,14 +62,14 @@ const pageMeta: Record<string, RouteMeta> = {
     socialDescription: SITE.socialDescription,
   },
   '/about': {
-    title: 'About Studifree — An Idea Built by a Learner',
+    title: 'About Studifree — Learning Should Be for Everyone',
     description:
-      'Studifree is an independent learning project founded by Syed Zainul Abideen. Read why it exists, what it believes and how it approaches AI and privacy.',
+      'Studifree is an independent learning project. Read why it exists, what it believes and how it approaches AI and privacy.',
     indexable: true,
     path: '/about',
-    socialTitle: 'About Studifree — An Idea Built by a Learner',
+    socialTitle: 'About Studifree — Learning Should Be for Everyone',
     socialDescription:
-      'Studifree was founded by Syed Zainul Abideen with a simple belief: useful learning tools should be accessible to everyone.',
+      'Studifree is an independent learning project built around a simple belief: useful learning tools should be accessible to everyone.',
   },
   '/help': {
     title: 'Help Centre — Studifree',

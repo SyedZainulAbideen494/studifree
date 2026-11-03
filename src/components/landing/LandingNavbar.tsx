@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { motion, useScroll, useSpring } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { landingNavItems } from '../../data/landing'
 import { LandingBrand, LandingLink, cx } from './shared'
@@ -6,12 +7,15 @@ import { LandingBrand, LandingLink, cx } from './shared'
 /**
  * Floating navigation that becomes a glass surface once the page moves.
  * The mobile panel is a normal, keyboard-reachable list; nothing is hidden
- * behind hover-only behaviour.
+ * behind hover-only behaviour. The hairline beneath the pill reports document
+ * progress without intercepting scroll.
  */
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState<string | null>(null)
+  const { scrollYProgress } = useScroll()
+  const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, mass: 0.3 })
 
   useEffect(() => {
     const update = () => {
@@ -60,6 +64,11 @@ export function LandingNavbar() {
       >
         <LandingBrand />
 
+        <span className="sf-nav__status" aria-hidden="true">
+          <span />
+          LIVE
+        </span>
+
         <div className="sf-nav__links">
           {landingNavItems.map((item) => {
             const id = item.href.replace('#', '')
@@ -96,17 +105,24 @@ export function LandingNavbar() {
         >
           {open ? <X width={18} height={18} /> : <Menu width={18} height={18} />}
         </button>
+
+        <motion.span
+          className="sf-nav__progress"
+          style={{ scaleX: progress }}
+          aria-hidden="true"
+        />
       </nav>
 
       {open && (
         <div className="sf-glass sf-nav__mobile" id="landing-mobile-menu">
-          {landingNavItems.map((item) => (
+          {landingNavItems.map((item, index) => (
             <a
               key={item.href}
               className="sf-nav__mobile-link"
               href={item.href}
               onClick={() => setOpen(false)}
             >
+              <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
               {item.label}
             </a>
           ))}
@@ -118,6 +134,7 @@ export function LandingNavbar() {
               Start learning
             </LandingLink>
           </div>
+          <p className="sf-nav__mobile-note">Local-first · Optional AI · No mandatory account</p>
         </div>
       )}
     </div>

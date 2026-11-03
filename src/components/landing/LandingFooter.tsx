@@ -20,6 +20,10 @@ function FooterLink({ href, label }: { href: string; label: string }) {
   return <a href={href.startsWith('#') ? href : `#${href}`}>{label}</a>
 }
 
+/**
+ * Minimal closing frame: brand statement, real destinations, authorship and a
+ * quiet technical baseline. No newsletter form, no invented social proof.
+ */
 export function LandingFooter() {
   const year = new Date().getFullYear()
 
@@ -34,7 +38,6 @@ export function LandingFooter() {
               where it can be, optional AI when you want it.
             </p>
             <span className="sf-footer__tagline">Learning should be for everyone.</span>
-            <p className="sf-footer__credit">Built with curiosity by Syed Zainul Abideen.</p>
           </div>
 
           {footerColumns.map((column) => (
@@ -49,6 +52,10 @@ export function LandingFooter() {
               </ul>
             </div>
           ))}
+        </div>
+
+        <div className="sf-footer__wordmark" aria-hidden="true">
+          STUDIFREE
         </div>
 
         <div className="sf-footer__bottom">

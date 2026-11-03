@@ -4,14 +4,13 @@ import { AiSetupModal } from '../components/AI/AiSetupModal'
 import { LandingNavbar } from '../components/landing/LandingNavbar'
 import { HeroSection } from '../components/landing/HeroSection'
 import { ProductIntro } from '../components/landing/ProductIntro'
+import { ProductShowcase } from '../components/landing/ProductShowcase'
 import { FeatureStories } from '../components/landing/FeatureStories'
 import { HowItWorks } from '../components/landing/HowItWorks'
 import { FreeModelSection } from '../components/landing/FreeModelSection'
 import { ApiKeyGuide } from '../components/landing/ApiKeyGuide'
 import { TechnologySection } from '../components/landing/TechnologySection'
-import { CreatorStory } from '../components/landing/CreatorStory'
 import { Principles } from '../components/landing/Principles'
-import { TrustSection } from '../components/landing/TrustSection'
 import { LandingFAQ } from '../components/landing/LandingFAQ'
 import { FinalCTA } from '../components/landing/FinalCTA'
 import { LandingFooter } from '../components/landing/LandingFooter'
@@ -46,14 +45,13 @@ export default function LandingPage() {
       <main id="main">
         <HeroSection />
         <ProductIntro />
+        <ProductShowcase />
         <FeatureStories />
         <HowItWorks />
         <FreeModelSection />
         <ApiKeyGuide />
         <TechnologySection />
-        <CreatorStory />
         <Principles />
-        <TrustSection />
         <LandingFAQ />
         <FinalCTA />
       </main>

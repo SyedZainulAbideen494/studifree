@@ -12,10 +12,14 @@ type Filter = 'all' | LandingFaqCategoryId
 
 const featured = landingFaqItems.find((item) => item.id === 'why-own-key') ?? landingFaqItems[0]
 
+/**
+ * The question archive. Filtering and the accordion remain ordinary buttons
+ * with explicit ARIA state; only the open/close height is animated.
+ */
 export function LandingFAQ() {
   const [filter, setFilter] = useState<Filter>('all')
   const [openId, setOpenId] = useState<string | null>('how-does-it-work')
-  const reduced = useReducedMotion()
+  const reduced = useReducedMotion() === true
 
   const filtered =
     filter === 'all'
@@ -34,44 +38,41 @@ export function LandingFAQ() {
   }
 
   return (
-    <section className="sf-section" id="faq" aria-labelledby="faq-title">
+    <section className="sf-section sf-faq" id="faq" aria-labelledby="faq-title">
       <div className="sf-container">
         <Reveal>
           <SectionHead
             eyebrow="Frequently asked"
+            meta="09 / ARCHIVE"
             title={<span id="faq-title">Questions, answered plainly.</span>}
             description="Everything from how the app works to where your data goes. If something is still unclear, the Help Centre goes further."
           />
         </Reveal>
 
         <div className="sf-faq__layout">
-          <Reveal className="sf-faq__aside">
-            <div className="sf-glass sf-faq__featured">
+          <div className="sf-faq__aside">
+            <Reveal className="sf-faq__featured">
               <span className="sf-faq__featured-label">
                 <Sparkles width={12} height={12} aria-hidden="true" /> Start here
               </span>
               <h3>{featured.question}</h3>
               <p>{featured.answer}</p>
-              <div style={{ marginTop: 16 }}>
-                <TextLink href="#api-keys">See the setup guide</TextLink>
-              </div>
-            </div>
+              <TextLink href="#api-keys">See the setup guide</TextLink>
+            </Reveal>
 
-            <div className="sf-glass sf-glass--flat" style={{ padding: 20, borderRadius: 20 }}>
+            <Reveal className="sf-faq__support" delay={0.08} y={14}>
               <p className="sf-faq__featured-label">
                 <HelpCircle width={12} height={12} aria-hidden="true" /> Still curious?
               </p>
-              <p className="sf-faq__category-description" style={{ marginTop: 10 }}>
+              <p className="sf-faq__category-description">
                 The Help Centre covers the tools one by one and explains what is stored locally and what is
                 sent externally.
               </p>
-              <div style={{ marginTop: 14 }}>
-                <TextLink href="/help">Visit the Help Centre</TextLink>
-              </div>
-            </div>
-          </Reveal>
+              <TextLink href="/help">Visit the Help Centre</TextLink>
+            </Reveal>
+          </div>
 
-          <div>
+          <div className="sf-faq__main">
             <div className="sf-faq__filters" role="group" aria-label="Filter questions by topic">
               <button
                 type="button"
@@ -94,20 +95,16 @@ export function LandingFAQ() {
               ))}
             </div>
 
-            <p
-              className="sf-faq__category-description"
-              style={{ marginTop: 14 }}
-              aria-live="polite"
-            >
+            <p className="sf-faq__category-description sf-faq__summary" aria-live="polite">
               {activeCategory?.description ?? 'All questions, grouped by topic.'}
             </p>
 
-            <div className="sf-faq__list" style={{ marginTop: 16 }}>
+            <div className="sf-faq__list">
               {filtered.map((item, index) => {
                 const isOpen = openId === item.id
                 return (
-                  <div className="sf-faq__item" key={item.id}>
-                    <h3 style={{ margin: 0 }}>
+                  <div className={cx('sf-faq__item', isOpen && 'is-open')} key={item.id}>
+                    <h3>
                       <button
                         type="button"
                         className="sf-faq__trigger"
@@ -149,11 +146,11 @@ export function LandingFAQ() {
               })}
             </div>
 
-            <div className={cx('sf-faq__more')}>
-              <p className="sf-small" style={{ marginBottom: 12 }}>
+            <div className="sf-faq__more">
+              <p className="sf-small">
                 Showing {filtered.length} of {landingFaqItems.length} questions.
               </p>
-              <LandingLink href="/help" variant="secondary" showArrow>
+              <LandingLink href="/help" variant="secondary" size="sm" showArrow>
                 Open the Help Centre
               </LandingLink>
             </div>

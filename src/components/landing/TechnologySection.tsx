@@ -35,6 +35,12 @@ const bucketIcons = {
   external: Cloud,
 } as const
 
+const invariants = [
+  { code: '01', label: 'Browser application', value: 'React + TypeScript' },
+  { code: '02', label: 'Local study data', value: 'IndexedDB · LocalStorage' },
+  { code: '03', label: 'AI connection', value: 'Optional · your key' },
+]
+
 const aiFlow = [
   {
     title: 'You ask in Studifree',
@@ -63,6 +69,10 @@ const aiFlow = [
   },
 ]
 
+/**
+ * The technical chapter. Architecture, storage, the optional AI flow and the
+ * external services are all exposed as inspectable panels, not marketing copy.
+ */
 export function TechnologySection() {
   const [selectedNode, setSelectedNode] = useState(techNodes[0].id)
   const [selectedBucket, setSelectedBucket] = useState<string>(storageBuckets[0].id)
@@ -74,13 +84,28 @@ export function TechnologySection() {
   return (
     <section className="sf-section sf-tech" id="technology" aria-labelledby="technology-title">
       <div className="sf-container">
-        <Reveal>
-          <SectionHead
-            eyebrow="Under the hood"
-            title={<span id="technology-title">Less dependency. More control.</span>}
-            description="Studifree is a browser application with local storage at its centre and AI as an optional extension. Here is how the pieces fit together, in plain language."
-          />
-        </Reveal>
+        <div className="sf-tech__head">
+          <Reveal>
+            <SectionHead
+              eyebrow="Under the hood"
+              meta="07 / SYSTEM"
+              title={<span id="technology-title">Less dependency. More control.</span>}
+              description="Studifree is a browser application with local storage at its centre and AI as an optional extension. Here is how the pieces fit together, in plain language."
+            />
+          </Reveal>
+
+          <Reveal className="sf-tech__aside" delay={0.08} y={16}>
+            <ul>
+              {invariants.map((item) => (
+                <li key={item.code}>
+                  <span aria-hidden="true">{item.code}</span>
+                  <strong>{item.label}</strong>
+                  <em>{item.value}</em>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
 
         <div className="sf-arch">
           <div className="sf-arch__flow">
@@ -116,7 +141,7 @@ export function TechnologySection() {
             })}
           </div>
 
-          <div className="sf-glass sf-arch__detail" aria-live="polite">
+          <div className="sf-arch__detail" aria-live="polite">
             <div className="sf-arch__detail-label">
               <Network width={13} height={13} aria-hidden="true" />
               {node.short}
@@ -174,9 +199,7 @@ export function TechnologySection() {
               <p className="sf-data__bucket-title">
                 <BucketIcon width={15} height={15} aria-hidden="true" />
                 {bucket.label}
-                <span className="sf-pill" style={{ marginLeft: 'auto' }}>
-                  {bucket.badge}
-                </span>
+                <span className="sf-pill">{bucket.badge}</span>
               </p>
               <p className="sf-data__bucket-copy">{bucket.summary}</p>
               <ul className="sf-data__items">
@@ -188,32 +211,21 @@ export function TechnologySection() {
                 ))}
               </ul>
 
-              {bucket.id === 'external' ? (
-                <div className="sf-data__warning">
-                  <AlertTriangle aria-hidden="true" />
-                  <span>
-                    These requests happen only for the purposes shown. Opening the app alone does not upload
-                    your study library.
-                  </span>
-                </div>
-              ) : (
-                <div className="sf-data__warning">
-                  <AlertTriangle aria-hidden="true" />
-                  <span>
-                    Browser storage is not automatically encrypted. Protect your device and browser profile,
-                    and keep a backup of anything important.
-                  </span>
-                </div>
-              )}
+              <div className="sf-data__warning">
+                <AlertTriangle aria-hidden="true" />
+                <span>
+                  {bucket.id === 'external'
+                    ? 'These requests happen only for the purposes shown. Opening the app alone does not upload your study library.'
+                    : 'Browser storage is not automatically encrypted. Protect your device and browser profile, and keep a backup of anything important.'}
+                </span>
+              </div>
             </div>
           </Reveal>
         </div>
 
-        <Reveal className="sf-aiflow" style={{ overflow: 'hidden' }} y={18}>
-          <div style={{ padding: '22px clamp(16px, 3vw, 26px) 4px' }}>
-            <p className="sf-eyebrow" style={{ marginBottom: 8 }}>
-              BYOK AI flow
-            </p>
+        <Reveal className="sf-aiflow" y={18}>
+          <div className="sf-aiflow__head">
+            <p className="sf-eyebrow">BYOK AI flow</p>
             <h3 className="sf-h3">What happens when you use AI.</h3>
           </div>
           {aiFlow.map((step, index) => (
@@ -228,7 +240,7 @@ export function TechnologySection() {
           ))}
         </Reveal>
 
-        <Reveal style={{ marginTop: 'clamp(48px, 7vw, 84px)' }}>
+        <Reveal className="sf-tech__subhead">
           <SectionHead
             eyebrow="A fair comparison"
             title="Different models, different trade-offs."
@@ -267,9 +279,9 @@ export function TechnologySection() {
           specific competitor’s current plan. Check each service’s own documentation before choosing.
         </p>
 
-        <Reveal style={{ marginTop: 'clamp(40px, 6vw, 64px)' }} y={16}>
+        <Reveal className="sf-tech__subhead sf-tech__subhead--tight" y={16}>
           <h3 className="sf-h3">Services outside your browser.</h3>
-          <p className="sf-body" style={{ marginTop: 12, maxWidth: '70ch' }}>
+          <p className="sf-body">
             Studifree is not a no-server application. These services are used for specific, disclosed
             purposes only.
           </p>
@@ -305,8 +317,8 @@ export function TechnologySection() {
               When you are ready for AI, the setup is a short browser task. The steps on the right are the
               whole process.
             </p>
-            <div className="sf-beginner__video sf-glass sf-glass--flat">
-              <h3>Prefer to watch someone do it?</h3>
+            <div className="sf-beginner__video">
+              <h4>Prefer to watch someone do it?</h4>
               <p>
                 Search YouTube for a current beginner walkthrough of Google AI Studio. Third-party videos are
                 not maintained by Studifree, so follow the official AI Studio labels and Google’s current
@@ -328,7 +340,7 @@ export function TechnologySection() {
           </Reveal>
         </div>
 
-        <Reveal className={cx('sf-actions')} style={{ marginTop: 28 }} y={10}>
+        <Reveal className={cx('sf-actions', 'sf-tech__actions')} y={10}>
           <LandingLink href="/ai-setup" variant="secondary" showArrow>
             Open AI Setup
           </LandingLink>

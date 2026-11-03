@@ -165,6 +165,16 @@ export const featureStories: FeatureStory[] = [
   },
 ]
 
+export const finalCtaCopy = {
+  eyebrow: 'Begin',
+  title: 'YOUR NEXT CHAPTER STARTS HERE.',
+  description:
+    'Everything you need to understand more, learn better and move forward.',
+  primaryCta: 'Start learning',
+  secondaryCta: 'Explore Studifree',
+  note: 'No mandatory account for supported local tools · AI is optional · Bring your own key',
+}
+
 export const howItWorksSteps = [
   {
     number: '01',
@@ -452,37 +462,6 @@ export const principles = [
     number: '04',
     title: 'Technology with purpose',
     body: 'AI should support curiosity and independent thinking, not replace them.',
-  },
-] as const
-
-export const trustPoints = [
-  {
-    title: 'Local-first functionality',
-    body: 'Supported learning data is stored locally in your browser. Local data is not automatically synchronised between devices because there is no cloud sync feature.',
-  },
-  {
-    title: 'No mandatory account',
-    body: 'Use supported core Studifree features without creating an account. There is no sign-in wall between you and the local study tools.',
-  },
-  {
-    title: 'AI provider transparency',
-    body: 'When you use AI features, your prompts and relevant submitted material are sent to the configured AI provider for processing.',
-  },
-  {
-    title: 'Your API key',
-    body: 'Your API key authenticates requests. Browser-based key storage is not completely secure. Take care to restrict your key and protect your device.',
-  },
-  {
-    title: 'Location permission',
-    body: 'If location personalisation is enabled, device location is requested only after you grant browser permission. Only a coarse country and region are stored, and you can clear or change the choice in Settings.',
-  },
-  {
-    title: 'Visitor notifications',
-    body: 'The automatic visitor notification is separate from learning personalisation. It includes browser, page and IP information and contains no GPS coordinates.',
-  },
-  {
-    title: 'AI accuracy',
-    body: 'AI can make mistakes. Verify important information, calculations and examination-related answers against reliable sources.',
   },
 ] as const
 

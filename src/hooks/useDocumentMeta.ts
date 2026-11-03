@@ -46,8 +46,6 @@ function absolute(path: string): string {
  */
 export function buildStructuredData(origin: string) {
   const siteRoot = `${origin}/`
-  const about = `${origin}/about`
-  const personId = `${origin}/#founder`
   const appId = `${origin}/#software`
   const websiteId = `${origin}/#website`
 
@@ -61,17 +59,6 @@ export function buildStructuredData(origin: string) {
         name: SITE.name,
         description: SITE.description,
         inLanguage: SITE.language,
-        publisher: { '@id': personId },
-      },
-      {
-        '@type': 'Person',
-        '@id': personId,
-        name: SITE.founder,
-        jobTitle: SITE.founderTitle,
-        description:
-          'Independent founder of Studifree, a browser-based learning workspace for explanations, flashcards, quizzes and study planning.',
-        url: about,
-        founderOf: { '@id': appId },
       },
       {
         '@type': 'SoftwareApplication',
@@ -82,7 +69,6 @@ export function buildStructuredData(origin: string) {
         description:
           'A learning platform with AI-assisted explanations, flashcards, quizzes, study planning and progress tracking.',
         url: siteRoot,
-        author: { '@id': personId },
         isAccessibleForFree: true,
         inLanguage: SITE.language,
         featureList: [
@@ -136,7 +122,7 @@ export function useDocumentMeta(): void {
     document.documentElement.lang = SITE.language
 
     setMeta('name', 'description', meta.description)
-    setMeta('name', 'author', SITE.author)
+    setMeta('name', 'author', SITE.name)
     setMeta('name', 'theme-color', SITE.themeColor)
     setMeta('name', 'robots', meta.indexable ? 'index, follow, max-image-preview:large' : 'noindex, nofollow')
     setMeta('name', 'googlebot', meta.indexable ? 'index, follow' : 'noindex, nofollow')

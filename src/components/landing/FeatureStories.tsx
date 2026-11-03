@@ -1,7 +1,7 @@
 import React from 'react'
 import { Check } from 'lucide-react'
 import { featureStories } from '../../data/landing'
-import { LandingLink, Reveal, SectionHead, cx } from './shared'
+import { LandingLink, Reveal, SectionHead, TiltPanel, cx } from './shared'
 import {
   FlashcardPreview,
   LessonPreview,
@@ -56,17 +56,28 @@ function FeatureVisual({ id }: { id: string }) {
 
 export function FeatureStories() {
   return (
-    <section className="sf-section" id="features" aria-labelledby="features-title">
+    <section className="sf-section sf-features" id="features" aria-labelledby="features-title">
       <div className="sf-container">
-        <Reveal>
-          <SectionHead
-            eyebrow="Inside Studifree"
-            title={<span id="features-title">Seven ways to make learning stick.</span>}
-            description="Each tool is designed for a specific part of learning. Use them together, or start with the one that fits the way you study today."
-          />
-        </Reveal>
+        <div className="sf-features__head">
+          <Reveal>
+            <SectionHead
+              eyebrow="Inside Studifree"
+              meta="03 / CAPABILITIES"
+              title={<span id="features-title">Seven ways to make learning stick.</span>}
+              description="Each tool is designed for a specific part of learning. Use them together, or start with the one that fits the way you study today."
+            />
+          </Reveal>
 
-        <div style={{ marginTop: 'clamp(36px, 5vw, 64px)' }}>
+          <Reveal className="sf-features__aside" delay={0.08} y={14}>
+            <span className="sf-features__aside-label">Capability map</span>
+            <p>
+              The tools share one workspace, one local library and one quiet visual language. Nothing is
+              bolted on for the sake of a feature list.
+            </p>
+          </Reveal>
+        </div>
+
+        <div className="sf-features__list">
           {featureStories.map((story, index) => {
             const reverse = index % 2 === 1
             return (
@@ -76,10 +87,16 @@ export function FeatureStories() {
                 className={cx('sf-feature', reverse && 'sf-feature--reverse')}
                 aria-labelledby={`${story.id}-title`}
               >
-                <Reveal className="sf-feature__copy" y={22}>
+                <Reveal
+                  className="sf-feature__copy"
+                  x={reverse ? 18 : -18}
+                  y={22}
+                  delay={0.02}
+                >
                   <div className="sf-feature__index">
                     <span>{story.index}</span>
                     <span aria-hidden="true" />
+                    <span className="sf-feature__index-label">MODULE</span>
                   </div>
 
                   <span className="sf-pill">{story.label}</span>
@@ -106,8 +123,17 @@ export function FeatureStories() {
                   </div>
                 </Reveal>
 
-                <Reveal className="sf-feature__visual" delay={0.08} y={20}>
-                  <div className="sf-preview sf-glass">
+                <Reveal
+                  className="sf-feature__visual"
+                  delay={0.08}
+                  x={reverse ? -18 : 18}
+                  y={20}
+                >
+                  <TiltPanel className="sf-preview sf-glass">
+                    <div className="sf-preview__hud" aria-hidden="true">
+                      <span>FRAME / {story.index}</span>
+                      <span>{story.label}</span>
+                    </div>
                     <div className="sf-preview__canvas">
                       <FeatureVisual id={story.id} />
                     </div>
@@ -115,7 +141,7 @@ export function FeatureStories() {
                       <span>Illustrative preview</span>
                       <span>{story.label}</span>
                     </div>
-                  </div>
+                  </TiltPanel>
                 </Reveal>
               </article>
             )
