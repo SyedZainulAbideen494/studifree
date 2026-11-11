@@ -21,7 +21,8 @@ describe('social and search metadata', () => {
     expect(html).toContain(
       'Studifree is a free-to-start learning platform with AI-powered explanations, flashcards, quizzes, study planning and progress tracking. Learn at your own pace with your own AI key.',
     )
-    expect(html).toContain('name="author" content="Studifree"')
+    expect(html).toContain('name="author" content="Syed Zain-ul Abideen"')
+    expect(html).toContain('name="creator" content="Syed Zain-ul Abideen"')
     expect(html).toContain('name="robots" content="index, follow, max-image-preview:large"')
   })
 
@@ -73,12 +74,13 @@ describe('structured data', () => {
   const data = buildStructuredData('https://studifree.example') as any
   const graph = data['@graph'] as any[]
 
-  it('keeps the structured data anonymous', () => {
+  it('attributes the software to its author without inventing an organisation', () => {
     expect(() => JSON.parse(JSON.stringify(data))).not.toThrow()
     expect(data['@context']).toBe('https://schema.org')
     expect(graph.map((node) => node['@type'])).toEqual(['WebSite', 'SoftwareApplication'])
-    expect(graph.some((node) => node['@type'] === 'Person')).toBe(false)
-    expect(JSON.stringify(data)).not.toMatch(/"@type"\s*:\s*"Person"/i)
+    const app = graph.find((node) => node['@type'] === 'SoftwareApplication')
+    expect(app.author).toEqual({ '@type': 'Person', name: SITE.author })
+    expect(graph.some((node) => node['@type'] === 'Organization')).toBe(false)
   })
 
   it('does not invent ratings, reviews, offers or contact details', () => {

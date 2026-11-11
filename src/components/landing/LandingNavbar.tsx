@@ -1,36 +1,34 @@
 import React, { useEffect, useState } from 'react'
-import { motion, useScroll, useSpring } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring } from 'framer-motion'
+import { ArrowUpRight, Menu, X } from 'lucide-react'
 import { landingNavItems } from '../../data/landing'
 import { LandingBrand, LandingLink, cx } from './shared'
 
 /**
- * Floating navigation that becomes a glass surface once the page moves.
- * The mobile panel is a normal, keyboard-reachable list; nothing is hidden
- * behind hover-only behaviour. The hairline beneath the pill reports document
- * progress without intercepting scroll.
+ * Floating glass navigation. It shrinks and gains blur after the hero begins,
+ * and the mobile version expands as an iOS-style sheet instead of a full-width
+ * traditional menu bar.
  */
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState<string | null>(null)
+  const reduced = useReducedMotion() === true
   const { scrollYProgress } = useScroll()
-  const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, mass: 0.3 })
+  const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.3 })
 
   useEffect(() => {
     const update = () => {
-      setScrolled(window.scrollY > 12)
-
+      setScrolled(window.scrollY > 32)
       let current: string | null = null
       for (const item of landingNavItems) {
         const id = item.href.replace('#', '')
         const element = document.getElementById(id)
         if (!element) continue
-        if (element.getBoundingClientRect().top <= 180) current = id
+        if (element.getBoundingClientRect().top <= window.innerHeight * 0.42) current = id
       }
       setActive(current)
     }
-
     update()
     window.addEventListener('scroll', update, { passive: true })
     window.addEventListener('resize', update)
@@ -48,26 +46,26 @@ export function LandingNavbar() {
     const onResize = () => {
       if (window.innerWidth > 920) setOpen(false)
     }
-    window.addEventListener('keydown', onKey)
+    document.addEventListener('keydown', onKey)
     window.addEventListener('resize', onResize)
     return () => {
-      window.removeEventListener('keydown', onKey)
+      document.removeEventListener('keydown', onKey)
       window.removeEventListener('resize', onResize)
     }
   }, [open])
 
   return (
     <div className="sf-nav-wrap">
-      <nav
+      <motion.nav
         className={cx('sf-nav', scrolled && 'sf-nav--scrolled', open && 'sf-nav--open')}
         aria-label="Studifree landing page"
+        initial={reduced ? false : { y: -26, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
       >
         <LandingBrand />
 
-        <span className="sf-nav__status" aria-hidden="true">
-          <span />
-          LIVE
-        </span>
+        <span className="sf-nav__divider" aria-hidden="true" />
 
         <div className="sf-nav__links">
           {landingNavItems.map((item) => {
@@ -75,10 +73,9 @@ export function LandingNavbar() {
             return (
               <a
                 key={item.href}
-                className="sf-nav__link"
+                className={cx('sf-nav__link', active === id && 'is-active')}
                 href={item.href}
                 aria-current={active === id ? 'true' : undefined}
-                onClick={() => setOpen(false)}
               >
                 {item.label}
               </a>
@@ -86,14 +83,9 @@ export function LandingNavbar() {
           })}
         </div>
 
-        <div className="sf-nav__actions">
-          <LandingLink href="/home" variant="secondary" size="sm">
-            Open app
-          </LandingLink>
-          <LandingLink href="/home" variant="primary" size="sm" showArrow>
-            Start learning
-          </LandingLink>
-        </div>
+        <LandingLink href="/home" className="sf-nav__cta" size="sm" variant="primary">
+          Open Studifree <span aria-hidden="true">→</span>
+        </LandingLink>
 
         <button
           type="button"
@@ -103,7 +95,7 @@ export function LandingNavbar() {
           aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
           onClick={() => setOpen((value) => !value)}
         >
-          {open ? <X width={18} height={18} /> : <Menu width={18} height={18} />}
+          {open ? <X width={17} height={17} /> : <Menu width={17} height={17} />}
         </button>
 
         <motion.span
@@ -111,32 +103,52 @@ export function LandingNavbar() {
           style={{ scaleX: progress }}
           aria-hidden="true"
         />
-      </nav>
+      </motion.nav>
 
-      {open && (
-        <div className="sf-glass sf-nav__mobile" id="landing-mobile-menu">
-          {landingNavItems.map((item, index) => (
-            <a
-              key={item.href}
-              className="sf-nav__mobile-link"
-              href={item.href}
-              onClick={() => setOpen(false)}
-            >
-              <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-              {item.label}
-            </a>
-          ))}
-          <div className="sf-nav__mobile-actions">
-            <LandingLink href="/home" variant="secondary" onClick={() => setOpen(false)}>
-              Open app
-            </LandingLink>
-            <LandingLink href="/home" variant="primary" showArrow onClick={() => setOpen(false)}>
-              Start learning
-            </LandingLink>
-          </div>
-          <p className="sf-nav__mobile-note">Local-first · Optional AI · No mandatory account</p>
-        </div>
-      )}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="sf-glass sf-nav__mobile"
+            id="landing-mobile-menu"
+            initial={reduced ? false : { opacity: 0, y: -10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={reduced ? undefined : { opacity: 0, y: -8, scale: 0.985 }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="sf-nav__mobile-head">
+              <span>Navigate</span>
+              <span>SF / 2026</span>
+            </div>
+            {landingNavItems.map((item, index) => (
+              <motion.a
+                key={item.href}
+                className="sf-nav__mobile-link"
+                href={item.href}
+                onClick={() => setOpen(false)}
+                initial={reduced ? false : { opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  duration: 0.45,
+                  delay: reduced ? 0 : 0.05 + index * 0.045,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+              >
+                <span className="sf-nav__mobile-index" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                {item.label}
+                <ArrowUpRight width={14} height={14} aria-hidden="true" />
+              </motion.a>
+            ))}
+            <div className="sf-nav__mobile-actions">
+              <LandingLink href="/home" variant="primary" showArrow onClick={() => setOpen(false)}>
+                Open Studifree
+              </LandingLink>
+            </div>
+            <p className="sf-nav__mobile-note">Local-first · Optional AI · No mandatory account</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

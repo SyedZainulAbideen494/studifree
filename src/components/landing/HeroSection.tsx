@@ -9,41 +9,28 @@ import {
 } from 'framer-motion'
 import { heroCopy } from '../../data/landing'
 import { LandingLink } from './shared'
-import {
-  HeroFlashcardCard,
-  HeroLessonCard,
-  HeroProgressCard,
-  HeroQuizCard,
-} from './ProductPreviews'
+import { Aura } from './visuals'
 
-const lineContainer = {
+const lineGroup = {
   hidden: {},
   visible: {
-    transition: {
-      staggerChildren: 0.022,
-      delayChildren: 0.18,
-    },
+    transition: { staggerChildren: 0.028, delayChildren: 0.45 },
   },
 }
 
 const letter = {
-  hidden: { y: '108%', opacity: 0 },
+  hidden: { y: '110%', opacity: 0 },
   visible: {
     y: '0%',
     opacity: 1,
-    transition: { duration: 1, ease: [0.16, 1, 0.3, 1] as const },
+    transition: { duration: 1.15, ease: [0.16, 1, 0.3, 1] as const },
   },
 }
 
-const specs = heroCopy.trust.split(' · ')
-
 /**
- * Cinematic opening act.
- *
- * The copy and console share one scroll timeline: the words leave first, the
- * product console moves forward, and the whole composition dissolves into the
- * showcase. Pointer tilt is desktop-only and is written to motion values so it
- * never causes a React render.
+ * Opening act: oversized type, a slowly morphing intelligence form and
+ * instrument-like floating readouts. The whole composition is scroll-linked
+ * and pointer-reactive only on fine-pointer devices.
  */
 export function HeroSection() {
   const heroRef = useRef<HTMLElement>(null)
@@ -54,18 +41,19 @@ export function HeroSection() {
     offset: ['start start', 'end start'],
   })
 
-  const copyY = useTransform(scrollYProgress, [0, 1], [0, reduced ? 0 : -90])
-  const copyOpacity = useTransform(scrollYProgress, [0, 0.78], [1, reduced ? 1 : 0.15])
-  const stageY = useTransform(scrollYProgress, [0, 1], [0, reduced ? 0 : -44])
-  const stageScale = useTransform(scrollYProgress, [0, 1], [1, reduced ? 1 : 1.06])
-  const stageOpacity = useTransform(scrollYProgress, [0, 0.9], [1, reduced ? 1 : 0.35])
+  const titleY = useTransform(scrollYProgress, [0, 1], [0, reduced ? 0 : -110])
+  const titleOpacity = useTransform(scrollYProgress, [0, 0.72], [1, reduced ? 1 : 0.12])
+  const auraY = useTransform(scrollYProgress, [0, 1], [0, reduced ? 0 : 150])
+  const auraScale = useTransform(scrollYProgress, [0, 1], [1, reduced ? 1 : 1.14])
+  const statsY = useTransform(scrollYProgress, [0, 1], [0, reduced ? 0 : -60])
+  const lowerOpacity = useTransform(scrollYProgress, [0, 0.58], [1, reduced ? 1 : 0])
 
   const pointerX = useMotionValue(0)
   const pointerY = useMotionValue(0)
-  const smoothX = useSpring(pointerX, { stiffness: 85, damping: 22, mass: 0.5 })
-  const smoothY = useSpring(pointerY, { stiffness: 85, damping: 22, mass: 0.5 })
-  const rotateY = useTransform(smoothX, [-0.5, 0.5], [-5, 5])
-  const rotateX = useTransform(smoothY, [-0.5, 0.5], [4, -4])
+  const smoothX = useSpring(pointerX, { stiffness: 70, damping: 22, mass: 0.6 })
+  const smoothY = useSpring(pointerY, { stiffness: 70, damping: 22, mass: 0.6 })
+  const rotateY = useTransform(smoothX, [-0.5, 0.5], [-4, 4])
+  const rotateX = useTransform(smoothY, [-0.5, 0.5], [3, -3])
 
   useEffect(() => {
     if (reduced || typeof window === 'undefined') return
@@ -76,7 +64,6 @@ export function HeroSection() {
     let frame = 0
     let nextX = 0
     let nextY = 0
-
     const paint = () => {
       frame = 0
       pointerX.set(nextX)
@@ -107,157 +94,113 @@ export function HeroSection() {
   }, [pointerX, pointerY, reduced])
 
   return (
-    <motion.section
-      ref={heroRef}
-      className="sf-hero"
-      id="top"
-      aria-labelledby="hero-title"
-    >
-      <div className="sf-hero__ambient" aria-hidden="true">
-        <div className="sf-hero__technical-grid" />
-        <div className="sf-hero__scanline" />
-        <div className="sf-hero__orbit sf-hero__orbit--a" />
-        <div className="sf-hero__orbit sf-hero__orbit--b" />
-        <div className="sf-hero__glow" />
+    <section ref={heroRef} className="sf-hero" id="top" aria-labelledby="hero-title">
+      <div className="sf-hero__topbar">
+        <span className="sf-status">
+          <span className="sf-status__dot" aria-hidden="true" />
+          {heroCopy.status}
+        </span>
+        <span className="sf-coordinate">{heroCopy.coordinates}</span>
       </div>
 
-      <div className="sf-container sf-hero__container">
-        <div className="sf-hero__layout">
-          <motion.div className="sf-hero__copy" style={{ y: copyY, opacity: copyOpacity }}>
-            <div className="sf-hero__topline">
-              <span className="sf-status">
-                <span className="sf-status__dot" aria-hidden="true" />
-                {heroCopy.status}
+      <motion.div
+        className="sf-hero__aura"
+        style={{ y: auraY, scale: auraScale, rotateX, rotateY }}
+      >
+        <Aura variant="hero" />
+      </motion.div>
+
+      <div className="sf-container sf-hero__inner">
+        <motion.div className="sf-hero__copy" style={{ y: titleY, opacity: titleOpacity }}>
+          <p className="sf-label sf-hero__eyebrow">{heroCopy.eyebrow}</p>
+
+          <motion.h1
+            className="sf-hero__title"
+            id="hero-title"
+            aria-label={heroCopy.titleLines.join(' ')}
+            variants={lineGroup}
+            initial={reduced ? false : 'hidden'}
+            animate="visible"
+          >
+            {heroCopy.titleLines.map((line, lineIndex) => (
+              <span className="sf-hero__line" aria-hidden="true" key={line}>
+                {line.split('').map((character, characterIndex) => (
+                  <span className="sf-hero__letter-mask" key={`${character}-${characterIndex}`}>
+                    <motion.span
+                      className={
+                        character === '.'
+                          ? 'sf-hero__letter sf-hero__letter--accent'
+                          : 'sf-hero__letter'
+                      }
+                      variants={reduced ? undefined : letter}
+                    >
+                      {character}
+                    </motion.span>
+                  </span>
+                ))}
+                {lineIndex === 0 && <span className="sf-hero__signal" aria-hidden="true" />}
               </span>
-              <span className="sf-coordinate">{heroCopy.coordinates}</span>
-            </div>
+            ))}
+          </motion.h1>
+        </motion.div>
 
-            <p className="sf-eyebrow sf-hero__eyebrow">{heroCopy.eyebrow}</p>
-
-            <motion.h1
-              className="sf-display sf-hero__title"
-              id="hero-title"
-              aria-label={heroCopy.titleLines.join(' ')}
-              variants={lineContainer}
-              initial={reduced ? false : 'hidden'}
-              animate="visible"
-            >
-              {heroCopy.titleLines.map((line, lineIndex) => (
-                <span className="sf-hero__line" aria-hidden="true" key={line}>
-                  {line.split(' ').map((word, wordIndex) => (
-                    <span className="sf-hero__word" key={`${word}-${wordIndex}`}>
-                      {word.split('').map((character, characterIndex) => (
-                        <span className="sf-hero__letter-mask" key={`${character}-${characterIndex}`}>
-                          <motion.span
-                            className="sf-hero__letter"
-                            variants={reduced ? undefined : letter}
-                          >
-                            {character}
-                          </motion.span>
-                        </span>
-                      ))}
-                      {lineIndex === 0 && wordIndex === 0 ? (
-                        <span className="sf-hero__signal" aria-hidden="true" />
-                      ) : null}
-                    </span>
-                  ))}
-                </span>
-              ))}
-            </motion.h1>
-
-            <p className="sf-lead sf-hero__description">{heroCopy.description}</p>
-
-            <div className="sf-actions sf-hero__actions">
-              <LandingLink href="/home" variant="primary" size="lg" showArrow>
-                {heroCopy.primaryCta}
-              </LandingLink>
-              <LandingLink href="#showcase" variant="secondary" size="lg">
-                {heroCopy.secondaryCta}
-              </LandingLink>
-            </div>
-
-            <ul className="sf-hero__specs" aria-label="Studifree at a glance">
-              {specs.map((spec, index) => (
-                <li key={spec}>
-                  <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-                  {spec}
-                </li>
-              ))}
-            </ul>
-          </motion.div>
+        <motion.div className="sf-hero__lower" style={{ opacity: lowerOpacity }}>
+          <motion.p
+            className="sf-hero__description"
+            initial={reduced ? false : { opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1.15, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {heroCopy.description}
+          </motion.p>
 
           <motion.div
-            className="sf-hero__visual"
-            style={{ y: stageY, scale: stageScale, opacity: stageOpacity }}
+            className="sf-hero__actions"
+            initial={reduced ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="sf-hero__axis sf-hero__axis--top" aria-hidden="true">
-              <span>SF—01</span>
-              <span>LEARNING INTELLIGENCE</span>
-              <span>2026</span>
-            </div>
-
-            <div className="sf-hero__axis sf-hero__axis--side" aria-hidden="true">
-              <span>LAT 00.00</span>
-              <span>LON 00.00</span>
-            </div>
-
-            <motion.div
-              className="sf-hero__stage"
-              style={{ rotateX, rotateY }}
-              aria-hidden="true"
-            >
-              <div className="sf-hero__ring sf-hero__ring--one" />
-              <div className="sf-hero__ring sf-hero__ring--two" />
-
-              <div className="sf-console">
-                <div className="sf-console__bar">
-                  <span className="sf-console__status">
-                    <span /> LIVE SESSION
-                  </span>
-                  <span className="sf-console__title">SF / LEARNING CONSOLE</span>
-                  <span className="sf-console__code">V.01</span>
-                </div>
-                <div className="sf-console__screen">
-                  <HeroLessonCard />
-                </div>
-                <div className="sf-console__footer">
-                  <span>AI PERSONAL TEACHER</span>
-                  <span className="sf-console__meter">
-                    <span />
-                  </span>
-                  <span>READY</span>
-                </div>
-              </div>
-
-              <div className="sf-hero-panel sf-hero-panel--flashcard">
-                <div className="sf-hero-panel__float sf-hero-panel__float--fast">
-                  <HeroFlashcardCard />
-                </div>
-              </div>
-
-              <div className="sf-hero-panel sf-hero-panel--quiz">
-                <div className="sf-hero-panel__float sf-hero-panel__float--slow">
-                  <HeroQuizCard />
-                </div>
-              </div>
-
-              <div className="sf-hero-panel sf-hero-panel--progress">
-                <div className="sf-hero-panel__float">
-                  <HeroProgressCard />
-                </div>
-              </div>
-
-              <span className="sf-hero__hud sf-hero__hud--a">01 / UNDERSTAND</span>
-              <span className="sf-hero__hud sf-hero__hud--b">SYNCED / LOCAL</span>
-            </motion.div>
+            <LandingLink href="/home" variant="primary" size="lg" showArrow>
+              {heroCopy.primaryCta}
+            </LandingLink>
+            <LandingLink href="#how-it-works" variant="secondary" size="lg">
+              {heroCopy.secondaryCta}
+            </LandingLink>
           </motion.div>
-        </div>
+
+          <motion.p
+            className="sf-hero__note"
+            initial={reduced ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.2, delay: 1.5 }}
+          >
+            {heroCopy.note}
+          </motion.p>
+        </motion.div>
       </div>
 
-      <a className="sf-hero__scroll" href="#showcase" aria-label="Continue to the product system">
-        <span>Enter the system</span>
-        <span className="sf-hero__scroll-line" aria-hidden="true" />
+      <motion.div className="sf-hero__stats" style={{ y: statsY }} aria-label="Studifree at a glance">
+        {heroCopy.stats.map((stat, index) => (
+          <motion.div
+            key={stat.label}
+            className={`sf-hero__stat ${stat.className}`}
+            initial={reduced ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 1.6 + index * 0.1 }}
+          >
+            <span className="sf-hero__stat-line" aria-hidden="true" />
+            <strong>{stat.value}</strong>
+            <span>{stat.label}</span>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      <a className="sf-hero__scroll" href="#what" aria-label="Continue to the introduction">
+        <span>Scroll to enter</span>
+        <span className="sf-hero__scroll-track" aria-hidden="true">
+          <span />
+        </span>
       </a>
-    </motion.section>
+    </section>
   )
 }

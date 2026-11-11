@@ -1,57 +1,48 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowUpRight } from 'lucide-react'
-import { footerColumns } from '../../data/landing'
+import { ArrowUp } from 'lucide-react'
+import { footerColumns, footerCopy } from '../../data/landing'
 import { LandingBrand } from './shared'
 
 function FooterLink({ href, label }: { href: string; label: string }) {
-  if (/^https?:\/\//i.test(href)) {
+  if (href.startsWith('/')) {
     return (
-      <a href={href} target="_blank" rel="noreferrer noopener">
-        {label} <ArrowUpRight width={12} height={12} aria-hidden="true" />
-      </a>
+      <Link to={href} className="sf-footer__link">
+        {label}
+      </Link>
     )
   }
-
-  if (href.startsWith('/')) {
-    return <Link to={href}>{label}</Link>
-  }
-
-  return <a href={href.startsWith('#') ? href : `#${href}`}>{label}</a>
+  return (
+    <a href={href} className="sf-footer__link">
+      {label}
+    </a>
+  )
 }
 
-/**
- * Minimal closing frame: brand statement, real destinations, authorship and a
- * quiet technical baseline. No newsletter form, no invented social proof.
- */
 export function LandingFooter() {
-  const year = new Date().getFullYear()
-
   return (
-    <footer className="sf-footer">
+    <footer className="sf-footer" id="footer">
       <div className="sf-container">
         <div className="sf-footer__top">
           <div className="sf-footer__brand">
             <LandingBrand />
-            <p>
-              A browser-based learning workspace for understanding, recall, practice and planning. Local
-              where it can be, optional AI when you want it.
-            </p>
-            <span className="sf-footer__tagline">Learning should be for everyone.</span>
+            <p>{footerCopy.statement}</p>
           </div>
 
-          {footerColumns.map((column) => (
-            <div className="sf-footer__column" key={column.title}>
-              <h3>{column.title}</h3>
-              <ul>
-                {column.links.map((link) => (
-                  <li key={`${column.title}-${link.label}`}>
-                    <FooterLink href={link.href} label={link.label} />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div className="sf-footer__columns">
+            {footerColumns.map((column) => (
+              <div key={column.title} className="sf-footer__column">
+                <h3>{column.title}</h3>
+                <ul>
+                  {column.links.map((link) => (
+                    <li key={`${column.title}-${link.label}`}>
+                      <FooterLink href={link.href} label={link.label} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="sf-footer__wordmark" aria-hidden="true">
@@ -59,10 +50,15 @@ export function LandingFooter() {
         </div>
 
         <div className="sf-footer__bottom">
-          <span>© {year} Studifree · Independent learning project</span>
-          <div className="sf-footer__bottom-links">
-            <Link to="/help">Help</Link>
-            <a href="#top">Back to top</a>
+          <div className="sf-footer__credit">
+            <span>{footerCopy.credit}</span>
+            <span>{footerCopy.note}</span>
+          </div>
+          <div className="sf-footer__legal">
+            <span>© {new Date().getFullYear()} Studifree</span>
+            <a href="#top" className="sf-footer__back">
+              Back to top <ArrowUp width={12} height={12} aria-hidden="true" />
+            </a>
           </div>
         </div>
       </div>

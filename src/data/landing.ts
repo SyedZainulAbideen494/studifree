@@ -1,753 +1,663 @@
 import { aiLinks } from './aiLinks'
 
+/* -------------------------------------------------------------------------- */
+/* Navigation and hero                                                        */
+/* -------------------------------------------------------------------------- */
+
 export interface LandingNavItem {
   label: string
   href: string
 }
 
 export const landingNavItems: LandingNavItem[] = [
-  { label: 'System', href: '#showcase' },
   { label: 'Features', href: '#features' },
   { label: 'How it works', href: '#how-it-works' },
-  { label: 'Why Studifree', href: '#why-studifree' },
+  { label: 'Why free', href: '#why-free' },
+  { label: 'Privacy', href: '#privacy' },
   { label: 'FAQ', href: '#faq' },
 ]
 
-export const heroCopy = {
-  eyebrow: 'Studifree // Learning intelligence',
-  titleLines: ['LEARNING,', 'RE-ENGINEERED.'],
-  description:
-    'One intelligent learning space. Built around the way you think, learn and grow.',
-  primaryCta: 'Start learning',
-  secondaryCta: 'Explore the system',
-  trust: 'No mandatory account · Core tools free · Bring your own AI key',
-  status: 'System online · Local-first architecture',
-  coordinates: 'SF—01 / 2026 / BROWSE',
+export interface HeroStat {
+  value: string
+  label: string
+  className: string
 }
 
-export interface FeatureStory {
+export const heroCopy = {
+  eyebrow: 'Studifree — the learning operating system',
+  titleLines: ['LEARN', 'DIFFERENTLY.'],
+  description:
+    'One focused space where difficult topics become clear, your notes become memory, and every session moves you forward.',
+  primaryCta: 'Start learning free',
+  secondaryCta: 'See how it works',
+  status: 'SYSTEM ONLINE',
+  coordinates: 'SF — 01 / 2026',
+  note: 'No subscription wall · Your own AI key · Local-first by design',
+  stats: [
+    { value: '+∞', label: 'Ways to learn', className: 'sf-hero__stat--a' },
+    { value: 'AI', label: 'Optional intelligence', className: 'sf-hero__stat--b' },
+    { value: 'LOCAL', label: 'Your study space', className: 'sf-hero__stat--c' },
+    { value: 'FREE', label: 'No subscription wall', className: 'sf-hero__stat--d' },
+  ] satisfies HeroStat[],
+}
+
+/* -------------------------------------------------------------------------- */
+/* Statement                                                                  */
+/* -------------------------------------------------------------------------- */
+
+export const statementCopy = {
+  eyebrow: '01 / The problem',
+  title: 'Studying was never supposed to feel this hard.',
+  support:
+    'Too many tabs. Too many subscriptions. Too much time spent organising instead of understanding. Studifree turns your material into one interactive learning space.',
+  footnote: 'Scroll to focus the sentence',
+}
+
+/* -------------------------------------------------------------------------- */
+/* Product experience                                                         */
+/* -------------------------------------------------------------------------- */
+
+export const productCopy = {
+  eyebrow: '02 / The workspace',
+  title: 'An operating system for learning.',
+  lead: 'Explanations, flashcards, quizzes and notes are not separate products here. They are layers of the same study session.',
+  caption: 'A real learning workspace, not a chat window with extra buttons.',
+}
+
+export const productLayers = [
+  {
+    id: 'teacher',
+    label: 'AI teacher',
+    meta: 'LIVE EXPLANATION',
+    title: 'Photosynthesis, in plain words',
+    body: 'A plant uses light to turn carbon dioxide and water into glucose. Oxygen is released along the way.',
+    accent: 'blue',
+  },
+  {
+    id: 'flashcard',
+    label: 'Flashcard',
+    meta: 'ACTIVE RECALL',
+    title: 'What is the difference between mitosis and meiosis?',
+    body: 'Tap to reveal the answer.',
+    accent: 'violet',
+  },
+  {
+    id: 'quiz',
+    label: 'Quiz',
+    meta: 'CHECKING UNDERSTANDING',
+    title: 'What happens to population growth as resources become limited?',
+    body: 'The rate slows and levels off near the carrying capacity.',
+    accent: 'orange',
+  },
+  {
+    id: 'notes',
+    label: 'Notes',
+    meta: 'STRUCTURED MATERIAL',
+    title: 'Cell division — key points',
+    body: 'Definitions, common misconceptions, memory hooks and a knowledge check.',
+    accent: 'white',
+  },
+] as const
+
+/* -------------------------------------------------------------------------- */
+/* Learning engine                                                            */
+/* -------------------------------------------------------------------------- */
+
+export interface EngineCard {
   id: string
   index: string
-  label: string
+  size: 'large' | 'wide' | 'small'
   title: string
-  description: string
-  points: string[]
-  to: string
-  cta: string
+  body: string
+  meta: string
+  accent: 'blue' | 'violet' | 'orange' | 'red' | 'white'
 }
 
-export const featureStories: FeatureStory[] = [
+export const engineCopy = {
+  eyebrow: '03 / The learning engine',
+  title: 'More than just AI answers.',
+  lead: 'Studifree is built around the actions that actually help you learn: retrieving, testing, explaining and revisiting.',
+}
+
+export const engineCards: EngineCard[] = [
   {
-    id: 'feature-ai-teacher',
+    id: 'recall',
     index: '01',
-    label: 'AI Personal Teacher',
-    title: 'Finally, an explanation that makes sense.',
-    description:
-      'Meet your personal AI learning assistant. Explore any topic, break complicated concepts into smaller ideas, ask questions and learn at your own pace.',
-    points: [
-      'Learn any topic from a question or a starting point',
-      'Step-by-step explanations written for your level',
-      'Beginner-friendly teaching with examples and analogies',
-      'Follow-up questions when something still feels unclear',
-      'PDF text and image understanding when you ask AI to process them',
-      'Save lessons, export them as a PDF or generate revision material',
-    ],
-    to: '/learn',
-    cta: 'Open Learn',
+    size: 'large',
+    title: 'Active recall',
+    body: 'Test yourself instead of rereading. Retrieving an answer is harder than recognising one — and far more useful.',
+    meta: 'PRACTICE',
+    accent: 'blue',
   },
   {
-    id: 'feature-flashcards',
+    id: 'flashcards',
     index: '02',
-    label: 'Smart Flashcards',
-    title: 'Remember what matters.',
-    description:
-      'Turn a topic into a deck, or write cards yourself. Review with active recall and spaced repetition instead of simply rereading your notes.',
-    points: [
-      'AI-generated cards from a topic you choose',
-      'Manual card creation for exactly what you need',
-      'Decks to keep subjects and topics organised',
-      'Flip interactions for active recall',
-      'Spaced repetition scheduled by how you rate each card',
-      'Due reviews and local review history',
-    ],
-    to: '/flashcards',
-    cta: 'Open Flashcards',
+    size: 'small',
+    title: 'Flashcards',
+    body: 'Turn information into memory training with cards you can create or generate.',
+    meta: 'MEMORY',
+    accent: 'violet',
   },
   {
-    id: 'feature-quiz',
+    id: 'explanations',
     index: '03',
-    label: 'Quiz Studio',
-    title: "Don't just study it. Test it.",
-    description:
-      'Create a practice quiz from a topic or your own source text, test your understanding and discover the concepts that deserve more attention.',
-    points: [
-      'Multiple-choice questions generated from your material',
-      'Difficulty selection for mixed, easier or harder practice',
-      'Practice, exam, timed and untimed modes',
-      'Answer explanations after submission',
-      'Results and weak-concept identification',
-      'Quiz history saved locally',
-    ],
-    to: '/quiz',
-    cta: 'Open Quiz Studio',
+    size: 'small',
+    title: 'AI explanations',
+    body: 'Ask questions until a concept actually makes sense, at the level you need.',
+    meta: 'UNDERSTANDING',
+    accent: 'orange',
   },
   {
-    id: 'feature-notes',
+    id: 'adaptive',
     index: '04',
-    label: 'AI Notes',
-    title: 'From information to understanding.',
-    description:
-      'Every AI lesson can become organised study material: clear definitions, structured sections, important points, common misconceptions and a memory trick.',
-    points: [
-      'Structured lesson sections instead of one long answer',
-      'Important points and definitions pulled together',
-      'Common misconceptions to watch for',
-      'Memory tricks and a knowledge check',
-      'Source material from a topic, PDF text or images',
-      'Save lessons to your local library and export as a PDF',
-    ],
-    to: '/learn',
-    cta: 'Open Learn',
+    size: 'small',
+    title: 'Adaptive focus',
+    body: 'See where your results and reviews suggest spending more attention next.',
+    meta: 'ATTENTION',
+    accent: 'red',
   },
   {
-    id: 'feature-planner',
+    id: 'quiz',
     index: '05',
-    label: 'Study Planner',
-    title: 'Make time for what matters.',
-    description:
-      'Bring structure to your study routine. Plan what needs doing, set a daily goal and use a focus timer to keep your learning moving forward.',
-    points: [
-      'A daily study goal in minutes',
-      'Planner items with due dates and completion state',
-      'Work and break modes in the focus timer',
-      'Study sessions recorded locally when you finish a timer',
-      'A clear view of what is due next',
-      'Everything stays on your device',
-    ],
-    to: '/planner',
-    cta: 'Open Planner',
+    size: 'small',
+    title: 'Quiz mode',
+    body: 'Practise retrieval with generated questions, then read the explanation for every answer.',
+    meta: 'RETRIEVAL',
+    accent: 'white',
   },
   {
-    id: 'feature-progress',
+    id: 'material',
     index: '06',
-    label: 'Progress & Insights',
-    title: "See how far you've come.",
-    description:
-      'Learning becomes more motivating when you can see your progress. Review your activity, understand your strengths and find the topics that need more practice.',
-    points: [
-      'Learning activity from your local study data',
-      'Quiz scores and recent results',
-      'Flashcard counts and due reviews',
-      'Concept mastery distribution',
-      'Weak topics and a recommended next step',
-      'Built from your device data, not invented community statistics',
-    ],
-    to: '/progress',
-    cta: 'Open Progress',
-  },
-  {
-    id: 'feature-library',
-    index: '07',
-    label: 'Personal Library',
-    title: 'Your learning, all in one place.',
-    description:
-      'Keep saved lessons, flashcard decks and quizzes together in one personal library, ready to reopen, rename or remove.',
-    points: [
-      'Saved AI lessons in one list',
-      'Flashcard decks and their review material',
-      'Generated quizzes and past attempts',
-      'Open an item and continue where you left off',
-      'Rename or remove items you no longer need',
-      'Stored in your browser on your own device',
-    ],
-    to: '/library',
-    cta: 'Open Library',
+    size: 'wide',
+    title: 'Study material intelligence',
+    body: 'Upload a PDF or bring your own source text. Turn the material you already have into explanations, cards, quizzes and notes.',
+    meta: 'UPLOAD → LEARN',
+    accent: 'blue',
   },
 ]
 
-export const finalCtaCopy = {
-  eyebrow: 'Begin',
-  title: 'YOUR NEXT CHAPTER STARTS HERE.',
-  description:
-    'Everything you need to understand more, learn better and move forward.',
-  primaryCta: 'Start learning',
-  secondaryCta: 'Explore Studifree',
-  note: 'No mandatory account for supported local tools · AI is optional · Bring your own key',
+/* -------------------------------------------------------------------------- */
+/* Brain / learning principles                                                */
+/* -------------------------------------------------------------------------- */
+
+export const brainCopy = {
+  eyebrow: '04 / Built for your brain',
+  title: 'BUILT FOR YOUR BRAIN.',
+  lead: 'No gimmicks. Studifree is shaped around a few well-known learning principles and keeps the explanations simple.',
+  note: 'These are study strategies, not medical claims or a guarantee of results.',
+}
+
+export const learningPrinciples = [
+  {
+    id: 'active-recall',
+    number: '01',
+    title: 'Active recall',
+    body: 'Try to remember before you look. The effort of retrieving is part of what makes the memory stronger.',
+  },
+  {
+    id: 'spaced-repetition',
+    number: '02',
+    title: 'Spaced repetition',
+    body: 'Revisit material across increasing gaps instead of cramming it into one long session.',
+  },
+  {
+    id: 'retrieval-practice',
+    number: '03',
+    title: 'Retrieval practice',
+    body: 'Quizzes and flashcards give you a low-pressure way to find out what you actually know.',
+  },
+  {
+    id: 'interleaving',
+    number: '04',
+    title: 'Interleaving',
+    body: 'Mix related topics so your brain has to choose the right approach, not just repeat the last one.',
+  },
+  {
+    id: 'chunking',
+    number: '05',
+    title: 'Chunking',
+    body: 'Break a large subject into smaller ideas, then connect those ideas back into a larger picture.',
+  },
+] as const
+
+/* -------------------------------------------------------------------------- */
+/* How it works                                                               */
+/* -------------------------------------------------------------------------- */
+
+export const howItWorksCopy = {
+  eyebrow: '05 / The loop',
+  title: 'Four steps. One continuous loop.',
+  lead: 'Start with what you have. Leave with something you can actually remember.',
 }
 
 export const howItWorksSteps = [
   {
     number: '01',
-    title: 'Choose what you want to learn',
-    description: 'Start with a topic, ask a question or use your own study material.',
-    detail: 'Learn, Flashcards, Quiz Studio and Planner all begin with a simple choice.',
+    kicker: 'MATERIAL',
+    title: 'Add your study material',
+    body: 'Upload a PDF, paste your notes or start with a topic you want to understand.',
+    detail: 'Learn · PDF text · Your own source',
   },
   {
     number: '02',
-    title: 'Learn your way',
-    description:
-      'Explore explanations, create notes, practise with flashcards and challenge yourself with quizzes.',
-    detail: 'Use the tools together, or pick the one that fits the way you study today.',
+    kicker: 'TRANSFORM',
+    title: 'AI transforms it',
+    body: 'Turn the same material into explanations, flashcards, quizzes and structured notes.',
+    detail: 'Explanations · Cards · Quizzes · Notes',
   },
   {
     number: '03',
-    title: 'Improve with every session',
-    description:
-      'Review your progress, revisit difficult topics and build a consistent learning routine.',
-    detail: 'Your local progress view helps you decide what deserves the next session.',
+    kicker: 'PRACTISE',
+    title: 'Actually study',
+    body: 'Use the interactive tools instead of passively reading. Test, flip, answer and ask.',
+    detail: 'Recall · Practice · Feedback',
   },
-]
+  {
+    number: '04',
+    kicker: 'REMEMBER',
+    title: 'Remember more',
+    body: 'Revisit what needs attention and build a routine that compounds over time.',
+    detail: 'Reviews · Progress · Next step',
+  },
+] as const
 
-export const freeCoreFeatures = [
-  'Manual flashcard creation',
-  'Spaced-repetition reviews and confidence ratings',
-  'Deck organisation',
-  'Study planner, daily goals and due items',
-  'Focus timer with work and break modes',
-  'Personal library of saved lessons, decks and quizzes',
-  'Local progress tracking from your activity',
-  'Export and import of supported study data',
-  'Theme, motion and study preferences',
-]
+/* -------------------------------------------------------------------------- */
+/* AI key                                                                     */
+/* -------------------------------------------------------------------------- */
 
-export const aiPoweredFeatures = [
-  'AI Personal Teacher explanations',
-  'Simpler explanations, extra examples and step-by-step support',
-  'Structured AI lesson notes and summaries',
-  'AI-generated flashcards from a topic',
-  'AI-generated quizzes from a topic or source text',
-  'PDF text and image understanding in Learn',
-  'Compatible Gemini model selection and fallback',
-]
-
-export interface TechNode {
-  id: string
-  label: string
-  short: string
-  description: string
-  detail: string
+export const aiKeyCopy = {
+  eyebrow: '06 / Your AI',
+  title: ['YOUR AI.', 'YOUR KEY.', 'YOUR CONTROL.'],
+  lead: 'Studifree lets you connect your own AI provider key. Your requests use your own quota — not a shared pool behind a subscription wall.',
+  reassurance: "Don't worry — it's easier than it sounds. The setup guide walks through every click.",
+  primaryCta: 'Get your AI key',
+  secondaryCta: 'Watch a quick tutorial',
+  footnote: 'Google AI Studio is free to open. Provider quotas and pricing are set by the provider, not by Studifree.',
 }
 
-export const techNodes: TechNode[] = [
+export const aiKeyBenefits = [
   {
-    id: 'application',
-    label: 'Studifree application',
-    short: 'The learning interface',
-    description:
-      'Studifree runs in your browser. You use Learn, Flashcards, Quiz Studio, Planner, Progress and Library directly in the application.',
-    detail:
-      'No mandatory account is needed for supported local tools. The interface is a React application, and AI is an optional part of the experience rather than the whole product.',
+    title: 'Your own quota',
+    body: 'Your AI requests are connected through your own provider project, rather than competing for one shared key.',
   },
   {
-    id: 'storage',
-    label: 'Local device storage',
-    short: 'Where your study work lives',
-    description:
-      'Supported learning data is saved in your browser using IndexedDB and, for smaller settings, LocalStorage.',
-    detail:
-      'IndexedDB stores structured records such as lessons, decks, cards, quizzes, results, concepts, sessions, planner items, goals, library entries and file metadata. LocalStorage holds lighter preferences and configuration.',
+    title: 'No Studifree subscription',
+    body: 'You do not need a paid Studifree plan to use the core study tools or connect a key.',
   },
   {
-    id: 'key',
-    label: 'Your API key',
-    short: 'The optional AI connection',
-    description:
-      'When you use an AI feature, your configured Gemini API key authenticates the request to Google.',
-    detail:
-      'The key belongs to your own Google AI project. In a browser-only app it is stored in this browser profile as part of your settings. That is convenient, but it cannot be guaranteed secret from someone with access to the device or browser profile.',
-  },
-  {
-    id: 'provider',
-    label: 'Google Gemini API',
-    short: 'Optional AI processing',
-    description:
-      'AI requests are sent to Google Gemini only when you use an AI-powered feature. Google processes the request under your project.',
-    detail:
-      'Prompts and the relevant material you submit are sent for processing. Uploaded PDFs are parsed locally first; extracted text or images are included only when you request AI processing. Google’s terms, quotas and data-handling policies apply.',
-  },
-  {
-    id: 'response',
-    label: 'AI response',
-    short: 'Back into your learning space',
-    description:
-      'The provider returns a response to Studifree, where it appears as an explanation, notes, flashcards or quiz questions.',
-    detail:
-      'You decide what to keep. Saved lessons and generated study material can be stored locally in your library so you can return to them later without regenerating everything.',
-  },
-]
-
-export const storageBuckets = [
-  {
-    id: 'indexeddb',
-    label: 'IndexedDB',
-    badge: 'Structured study data',
-    summary:
-      'A browser database used through Dexie for larger, structured learning records. It is the main home for your study work.',
-    items: [
-      'Lessons and their saved content',
-      'Flashcard decks and cards',
-      'Quizzes and quiz results',
-      'Concept mastery records',
-      'Study sessions and planner items',
-      'Daily goals, library entries and file metadata',
-    ],
-  },
-  {
-    id: 'localstorage',
-    label: 'LocalStorage',
-    badge: 'Settings & preferences',
-    summary:
-      'A smaller key-value store used for interface choices and lightweight application configuration.',
-    items: [
-      'Theme, effects and study preferences',
-      'AI settings, including your API key',
-      'Model cache, health and fallback policy',
-      'AI verification state',
-      'Location consent and regional preference',
-    ],
-  },
-  {
-    id: 'external',
-    label: 'Sent externally',
-    badge: 'Only for disclosed purposes',
-    summary:
-      'Some parts of the experience communicate with external services. Opening the app alone does not upload your study library.',
-    items: [
-      'AI prompts and relevant material → Google Gemini, when you request AI',
-      'Coordinates for reverse geocoding → BigDataCloud, after consent',
-    ],
+    title: 'Replace or remove it',
+    body: 'Change provider settings whenever you want. Your key can be removed from AI Setup at any time.',
   },
 ] as const
-
-export interface ComparisonRow {
-  area: string
-  traditional: string
-  studifree: string
-}
-
-export const comparisonRows: ComparisonRow[] = [
-  {
-    area: 'AI access',
-    traditional: 'Often bundled into a paid plan',
-    studifree: 'Connect your own provider key',
-  },
-  {
-    area: 'AI usage limits',
-    traditional: 'Set by the platform plan',
-    studifree: 'Set by the provider and your project',
-  },
-  {
-    area: 'AI costs',
-    traditional: 'Subscription or usage fees',
-    studifree: 'Provider pricing, including eligible free-tier usage',
-  },
-  {
-    area: 'Core local tools',
-    traditional: 'Varies by platform',
-    studifree: 'Available without AI where supported',
-  },
-  {
-    area: 'Account',
-    traditional: 'Varies by platform',
-    studifree: 'No mandatory account for supported local features',
-  },
-  {
-    area: 'Storage',
-    traditional: 'Varies by platform',
-    studifree: 'Local-first where supported',
-  },
-  {
-    area: 'Model choice',
-    traditional: 'Varies by platform',
-    studifree: 'Compatible models supported by Studifree',
-  },
-]
-
-export const externalServices = [
-  {
-    name: 'Google Gemini API',
-    purpose: 'Processes AI requests when you ask for an explanation, notes, flashcards or a quiz.',
-    data: 'Your prompt and the relevant material you submit, plus authentication through your API key.',
-  },
-  {
-    name: 'BigDataCloud',
-    purpose: 'Turns consented coordinates into a coarse country and region.',
-    data: 'Latitude and longitude in the reverse-geocode request. Coordinates are not stored by Studifree.',
-  },
-] as const
-
-export const securityNotes = [
-  {
-    title: 'Local data',
-    body: 'Browser storage is not automatically encrypted just because it is local. Someone with access to the same device and browser profile may be able to read stored information. Browser extensions and malicious scripts can introduce risks, and clearing browser storage can remove your data.',
-  },
-  {
-    title: 'AI requests',
-    body: 'When you use AI features, your prompt and relevant submitted content are sent to your configured AI provider for processing. Provider privacy and retention policies apply. Avoid submitting sensitive information you do not need to share.',
-  },
-  {
-    title: 'Your API key',
-    body: 'Your key authenticates requests to Google. In a browser-only application, a frontend key cannot be guaranteed secret. Restrict keys where Google supports it, never share them publicly, rotate exposed keys and remove the key from AI Setup if you no longer need it.',
-  },
-  {
-    title: 'External services',
-    body: 'Studifree is not a no-server application. AI requests and optional reverse geocoding use the external services listed here. The Help Centre explains these purposes in more detail.',
-  },
-] as const
-
-export const beginnerSteps = [
-  'Open Google AI Studio.',
-  'Sign in with your Google account.',
-  'Create an API key.',
-  'Copy the key.',
-  'Paste it into Studifree AI Setup.',
-  'Test the connection.',
-  'Start learning.',
-] as const
-
-export const youtubeTutorialSearch =
-  'https://www.youtube.com/results?search_query=Google+AI+Studio+Gemini+API+key+tutorial+beginner'
 
 export const aiKeySteps = [
   {
     number: '01',
     title: 'Open Google AI Studio',
-    body: 'Visit the official API key page and sign in with the Google account you want to use.',
-    action: { label: 'Get my API key', href: aiLinks.apiKey, external: true },
+    body: 'Sign in with the Google account you want to use. No payment is required to create a key.',
+    action: { label: 'Open AI Studio', href: aiLinks.apiKey, external: true },
   },
   {
     number: '02',
-    title: 'Create your key',
-    body: 'Press “Create API key”, choose or create a Google Cloud project if prompted, then copy the key.',
-    action: { label: 'Gemini API documentation', href: aiLinks.docs, external: true },
+    title: 'Create and copy a key',
+    body: 'Press “Create API key”, choose or create a project if prompted, then copy the key.',
+    action: { label: 'Read the docs', href: aiLinks.docs, external: true },
   },
   {
     number: '03',
-    title: 'Connect it to Studifree',
-    body: 'Return to Studifree, open AI Setup, paste your key and test the connection before you start.',
+    title: 'Connect it in Studifree',
+    body: 'Paste the key into AI Setup and test the connection before your first lesson.',
     action: { label: 'Open AI Setup', href: '/ai-setup', external: false },
   },
 ] as const
 
-export const principles = [
+export const tutorialHref =
+  'https://www.youtube.com/results?search_query=Google+AI+Studio+Gemini+API+key+tutorial+beginner'
+
+/* -------------------------------------------------------------------------- */
+/* Free model                                                                 */
+/* -------------------------------------------------------------------------- */
+
+export const freeCopy = {
+  eyebrow: '07 / Why free',
+  title: ['FREE DOESN’T', 'HAVE TO MEAN', 'LIMITED.'],
+  lead: 'Studifree is designed around a different trade-off. Instead of bundling every AI request into a subscription, the learning experience stays open and you control your own AI access.',
+  note: 'Honest detail: AI providers may have their own pricing, limits or free quotas. Studifree cannot promise unlimited AI usage from every provider.',
+}
+
+export const freePoints = [
   {
     number: '01',
-    title: 'Accessible learning',
-    body: 'Useful learning tools should be within reach.',
+    title: 'Core tools stay open',
+    body: 'Manual flashcards, reviews, the planner, focus timer, library and local progress remain usable without AI where supported.',
   },
   {
     number: '02',
-    title: 'Understanding first',
-    body: 'We want to help learners understand concepts, not simply memorise answers.',
+    title: 'You own the AI relationship',
+    body: 'Connect the provider account you choose. Your usage is governed by that provider’s project, quotas and terms.',
   },
   {
     number: '03',
-    title: 'Learning at your own pace',
-    body: 'Everyone learns differently. Your learning experience should be flexible.',
+    title: 'No artificial feature wall',
+    body: 'You are not asked to upgrade just to open your own notes, cards or study history.',
   },
   {
     number: '04',
-    title: 'Technology with purpose',
-    body: 'AI should support curiosity and independent thinking, not replace them.',
+    title: 'Transparent by design',
+    body: 'When something depends on a provider or a browser limitation, the interface says so instead of making an absolute promise.',
   },
 ] as const
 
-export type LandingFaqCategoryId =
-  | 'getting-started'
-  | 'ai-api-keys'
-  | 'features'
-  | 'privacy'
-  | 'general'
+/* -------------------------------------------------------------------------- */
+/* Privacy                                                                    */
+/* -------------------------------------------------------------------------- */
 
-export interface LandingFaqCategory {
-  id: LandingFaqCategoryId
-  label: string
-  description: string
+export const privacyCopy = {
+  eyebrow: '08 / Privacy',
+  title: ['YOUR DATA.', 'YOUR DEVICE.'],
+  lead: 'Studifree is designed with a local-first approach. Supported study data lives in your browser on your device, rather than being uploaded to a central study database by default.',
+  labels: ['LOCAL-FIRST', 'NO REQUIRED ACCOUNT', 'YOU CONTROL YOUR KEY', 'YOUR STUDY SPACE'],
+  note: 'Local-first is a design choice, not an absolute security guarantee. Browser storage can be cleared, and data does not automatically sync across devices unless a future sync option is enabled.',
 }
 
-export const landingFaqCategories: LandingFaqCategory[] = [
+export const privacyLimits = [
   {
-    id: 'getting-started',
-    label: 'Getting started',
-    description: 'What Studifree is, who it is for and how to begin.',
+    title: 'Browser storage can be cleared',
+    body: 'Clearing site data, using private browsing or changing devices may remove local study material. Export important work if you need a backup.',
   },
   {
-    id: 'ai-api-keys',
-    label: 'AI & API keys',
-    description: 'The BYOK model, Gemini setup, quotas and model choice.',
+    title: 'No automatic cross-device sync',
+    body: 'Your data does not move between devices by itself. The app is designed around one browser profile at a time.',
   },
   {
-    id: 'features',
-    label: 'Features',
-    description: 'What you can learn, create, upload and track.',
+    title: 'Local does not mean invisible to everything',
+    body: 'Someone with access to the same device and browser profile may be able to open stored information. Treat your device like you would any study notebook.',
+  },
+] as const
+
+/* -------------------------------------------------------------------------- */
+/* Comparison                                                                 */
+/* -------------------------------------------------------------------------- */
+
+export const comparisonCopy = {
+  eyebrow: '09 / A different approach',
+  title: 'A DIFFERENT APPROACH.',
+  lead: 'Many study platforms are built around central accounts and subscription tiers. Studifree takes a more local-first, bring-your-own-AI approach. Different tools make different trade-offs — this is ours.',
+}
+
+export const comparisonRows = [
+  {
+    area: 'Account',
+    traditional: 'Often account-based',
+    studifree: 'Designed to work without a mandatory account',
   },
   {
-    id: 'privacy',
-    label: 'Privacy',
-    description: 'Where your data lives and what is sent externally.',
+    area: 'AI access',
+    traditional: 'Usually platform-managed',
+    studifree: 'Connect your own provider key',
   },
   {
-    id: 'general',
-    label: 'General',
-    description: 'Independence, accuracy, devices and the road ahead.',
+    area: 'AI usage',
+    traditional: 'Set by the platform plan',
+    studifree: 'Set by your provider project and quota',
+  },
+  {
+    area: 'Storage',
+    traditional: 'Often cloud-first',
+    studifree: 'Local-first where supported',
+  },
+  {
+    area: 'Cost model',
+    traditional: 'Subscription tiers are common',
+    studifree: 'Core experience designed to be free; provider costs separate',
+  },
+] as const
+
+/* -------------------------------------------------------------------------- */
+/* Model fallback                                                             */
+/* -------------------------------------------------------------------------- */
+
+export const fallbackCopy = {
+  eyebrow: '10 / Model resilience',
+  title: ['WHEN ONE MODEL', 'STOPS, KEEP GOING.'],
+  lead: 'If a configured model becomes temporarily unavailable or returns certain errors, Studifree can attempt the other models you have configured. The goal is simple: fewer interruptions in the middle of a study session.',
+  note: 'Fallback is not a promise of infinite uptime. It depends on your available models, API access, provider availability and configuration.',
+}
+
+export const fallbackSteps = [
+  { id: 'request', label: 'MODEL A', state: 'REQUEST', detail: 'Your selected model receives the task.' },
+  { id: 'error', label: 'ERROR', state: 'INTERRUPTED', detail: 'Unavailable, rate-limited or an eligible error.' },
+  { id: 'policy', label: 'FALLBACK POLICY', state: 'EVALUATING', detail: 'Checks the remaining configured models.' },
+  { id: 'next', label: 'MODEL B', state: 'RETRYING', detail: 'A compatible model receives the same task.' },
+  { id: 'continue', label: 'LEARNING CONTINUES', state: 'RECOVERED', detail: 'When a model responds, the session carries on.' },
+] as const
+
+/* -------------------------------------------------------------------------- */
+/* Study modes                                                                */
+/* -------------------------------------------------------------------------- */
+
+export const studyModesCopy = {
+  eyebrow: '11 / Study modes',
+  title: 'One workspace. Five ways in.',
+  lead: 'Choose the mode that fits the moment. Switch without losing the thread.',
+}
+
+export interface StudyMode {
+  id: string
+  label: string
+  title: string
+  body: string
+  detail: string
+  chips: string[]
+  accent: 'blue' | 'violet' | 'orange' | 'white' | 'red'
+}
+
+export const studyModes: StudyMode[] = [
+  {
+    id: 'learn',
+    label: 'Learn',
+    title: 'Understand it, step by step.',
+    body: 'Ask a question or paste your material. Get an explanation written for your level, then keep asking until it clicks.',
+    detail: 'A patient explanation, not a wall of text.',
+    chips: ['Explain simply', 'Give an example', 'Go deeper', 'Save as notes'],
+    accent: 'blue',
+  },
+  {
+    id: 'flashcards',
+    label: 'Flashcards',
+    title: 'Turn information into memory.',
+    body: 'Create cards yourself or generate a deck from a topic. Flip, recall and rate how well you knew each answer.',
+    detail: 'Active recall with spaced review.',
+    chips: ['Generate deck', 'Flip card', 'Rate recall', 'Due reviews'],
+    accent: 'violet',
+  },
+  {
+    id: 'quiz',
+    label: 'Quiz',
+    title: 'Find out what you actually know.',
+    body: 'Build a practice quiz from a topic or source text. Answer, submit and read an explanation for every choice.',
+    detail: 'Practice and exam-style modes.',
+    chips: ['Practice mode', 'Exam mode', 'Timed', 'See explanations'],
+    accent: 'orange',
+  },
+  {
+    id: 'notes',
+    label: 'Notes',
+    title: 'Shape the material into structure.',
+    body: 'Turn a lesson into clear sections, key points, definitions, misconceptions and memory hooks you can revisit.',
+    detail: 'Structured study material you can keep.',
+    chips: ['Key points', 'Definitions', 'Misconceptions', 'Memory hook'],
+    accent: 'white',
+  },
+  {
+    id: 'ask',
+    label: 'Ask AI',
+    title: 'Stay curious about the details.',
+    body: 'Ask a follow-up about the thing you are reading. The learning session stays in context instead of sending you somewhere else.',
+    detail: 'Questions are part of the workflow.',
+    chips: ['Follow up', 'Simplify', 'Compare ideas', 'Check my answer'],
+    accent: 'red',
   },
 ]
 
+/* -------------------------------------------------------------------------- */
+/* Beginner                                                                   */
+/* -------------------------------------------------------------------------- */
+
+export const beginnerCopy = {
+  eyebrow: '12 / No assumed knowledge',
+  title: 'YOU DON’T NEED TO BE TECHNICAL.',
+  lead: 'Every important feature should explain what it does, why it matters and how to use it. No prior knowledge of API keys, models or study terminology is assumed.',
+  note: 'Plain language, visible guidance and a setup path you can follow one step at a time.',
+}
+
+export const beginnerPoints = [
+  {
+    title: 'Plain-language setup',
+    body: 'The AI guide explains each step in order, with a visible test before anything is saved.',
+  },
+  {
+    title: 'Guidance inside the app',
+    body: 'Tooltips and onboarding explain unfamiliar terms when they appear, not in a manual you have to find.',
+  },
+  {
+    title: 'You can ask for help',
+    body: 'The Help Centre covers the tools one by one, including what an API key is and why it exists.',
+  },
+] as const
+
+/* -------------------------------------------------------------------------- */
+/* Founder                                                                    */
+/* -------------------------------------------------------------------------- */
+
+export const founderCopy = {
+  eyebrow: '13 / Why I built this',
+  title: ['WHY I BUILT', 'STUDIFREE.'],
+  name: 'Syed Zain-ul Abideen',
+  role: 'Founder / Builder',
+  paragraphs: [
+    'Studying often feels unnecessarily complicated. Students are surrounded by subscriptions, multiple apps, distractions and tools that do not actually help them learn.',
+    'I wanted to build something simpler. A place where a student could take their own material and turn it into something they could actually study with. Flashcards. Quizzes. Explanations. Notes. One learning space.',
+    'Studifree is built around curiosity and making difficult subjects feel easier to understand — not around adding more noise to the process.',
+  ],
+  signatureNote: 'Built to make learning feel simpler.',
+}
+
+/* -------------------------------------------------------------------------- */
+/* Future moment                                                              */
+/* -------------------------------------------------------------------------- */
+
+export const futureMomentCopy = {
+  eyebrow: '14 / Signal',
+  title: 'Information becomes knowledge.',
+  note: 'A quiet moment between the noise.',
+}
+
+/* -------------------------------------------------------------------------- */
+/* FAQ                                                                        */
+/* -------------------------------------------------------------------------- */
+
 export interface LandingFaqItem {
   id: string
-  category: LandingFaqCategoryId
   question: string
   answer: string
 }
 
 export const landingFaqItems: LandingFaqItem[] = [
-  // Getting started
   {
-    id: 'what-is-studifree',
-    category: 'getting-started',
-    question: 'What is Studifree?',
+    id: 'really-free',
+    question: 'Is Studifree really free?',
     answer:
-      'Studifree is a browser-based learning workspace. It brings AI-assisted explanations, flashcards, quizzes, a study planner, progress insights and a personal library into one application. Supported study data is stored locally in your browser.',
+      'The core learning experience is designed to be free to use. AI features depend on your own provider key, and that provider may have its own quotas, pricing or free-tier limits. Studifree does not promise unlimited AI usage from every provider.',
   },
   {
-    id: 'how-does-it-work',
-    category: 'getting-started',
-    question: 'How does Studifree work?',
+    id: 'own-key',
+    question: 'Why do I need my own AI key?',
     answer:
-      'Studifree runs as a browser-based learning application. Supported study materials are stored locally using IndexedDB and LocalStorage, while AI-powered features send the relevant request to your configured AI provider. You do not need an account for supported local tools.',
+      'A key connects Studifree to your own AI provider project. That means your requests use your own quota rather than a shared pool, and you stay in control of which provider account is used. The setup guide explains it in plain language.',
   },
   {
-    id: 'who-can-use',
-    category: 'getting-started',
-    question: 'Who can use it?',
+    id: 'data-online',
+    question: 'Is my data stored online?',
     answer:
-      'Anyone who wants to learn: school students, university students, examination candidates, professionals and lifelong learners. Studifree is designed for a wide range of subjects and goals.',
+      'Supported study data is stored locally in your browser on your device. AI requests send the relevant prompt or material to your configured provider when you ask for AI. Studifree does not automatically upload your whole study library to a central account database.',
   },
   {
-    id: 'need-account',
-    category: 'getting-started',
-    question: 'Is an account required?',
+    id: 'account',
+    question: 'Can I use it without an account?',
     answer:
-      'No mandatory account is required for supported local learning features. There is no sign-up wall for the core tools, and your study data stays in your browser.',
+      'Yes — supported local tools are designed to work without a mandatory Studifree account. AI features still require a configured provider key.',
   },
   {
-    id: 'how-start',
-    category: 'getting-started',
-    question: 'How do I start learning?',
+    id: 'difficult-setup',
+    question: 'Is it difficult to set up?',
     answer:
-      'Open the app and choose a tool: Learn for an AI explanation, Flashcards for recall practice, Quiz Studio to test yourself, or Planner to organise a session. For AI-powered tools, connect a Gemini API key in AI Setup first.',
+      'It is a short sequence of steps: open Google AI Studio, create a key, copy it, then paste it into AI Setup. The guide shows each step and tests the connection before saving.',
   },
   {
-    id: 'is-free',
-    category: 'getting-started',
-    question: 'Is Studifree free?',
+    id: 'model-fails',
+    question: 'What happens if an AI model fails?',
     answer:
-      'The core local learning tools are free to use without a Studifree subscription. AI features use your own Gemini API key, so Google’s quotas and pricing for your account and project apply. Eligible models and accounts may have free-tier usage, but it is not guaranteed.',
+      'Studifree can attempt another configured model when the current one is unavailable or returns certain errors. Whether fallback succeeds depends on which models you have configured, your API access, provider availability and your settings.',
   },
   {
-    id: 'multiple-devices',
-    category: 'getting-started',
-    question: 'Can I use it on multiple devices?',
+    id: 'beginners',
+    question: 'Can beginners use this?',
     answer:
-      'Yes, you can open Studifree on multiple devices, but local study data does not automatically synchronise between them because there is no cloud sync feature. You can export supported data from one device and import it on another.',
+      'Yes. The interface uses plain language, explains unfamiliar terms and provides a guided setup path. You do not need to understand how AI works to use the study tools.',
   },
   {
-    id: 'programming-knowledge',
-    category: 'getting-started',
-    question: 'Do I need programming knowledge?',
+    id: 'key-safety',
+    question: 'Is my API key safe?',
     answer:
-      'No. API key setup is a short, beginner-friendly process: sign in, create a key, copy it and paste it into AI Setup. You do not need to write or understand code.',
-  },
-
-  // AI & API keys
-  {
-    id: 'why-own-key',
-    category: 'ai-api-keys',
-    question: 'Why do I need my own API key?',
-    answer:
-      'Your key authenticates your requests to the AI provider. This gives you access to the quota and pricing associated with your own Google AI project instead of relying on a shared Studifree AI allowance. It also means AI processing is tied to an account you control.',
+      'In a browser application, a key cannot be guaranteed secret from someone with access to the same device and browser profile. Treat it like a password: do not share it, restrict it where your provider supports restrictions, and remove or rotate it if needed. The Help Centre explains the trade-off honestly.',
   },
   {
-    id: 'does-studifree-have-ai',
-    category: 'ai-api-keys',
-    question: 'Does Studifree have its own AI?',
+    id: 'get-key',
+    question: 'Where can I learn how to get an API key?',
     answer:
-      'Studifree provides the learning interface and the AI integration. AI processing is performed by the configured provider, such as Google Gemini. The app does not claim to train or host its own language model.',
-  },
-  {
-    id: 'is-gemini-free',
-    category: 'ai-api-keys',
-    question: 'Is Gemini free?',
-    answer:
-      'Google may provide free-tier usage for eligible Gemini models and accounts. Depending on your account, selected model and current quotas, you may be able to use AI features without paying. Google controls quotas, pricing and availability, so free access is not guaranteed for every model or amount of usage. Check Google’s official pricing page for current details.',
-  },
-  {
-    id: 'where-get-key',
-    category: 'ai-api-keys',
-    question: 'Where do I get a key?',
-    answer:
-      'Open Google AI Studio from the AI key section on this page, sign in with your Google account, create an API key and copy it. Then return to Studifree, open AI Setup and paste the key.',
-  },
-  {
-    id: 'without-ai',
-    category: 'ai-api-keys',
-    question: 'Can I use Studifree without AI?',
-    answer:
-      'Yes. Manual flashcards, spaced-repetition reviews, deck organisation, the planner, daily goals, the focus timer, your local library and progress tracking remain available without configuring an AI provider.',
-  },
-  {
-    id: 'change-models',
-    category: 'ai-api-keys',
-    question: 'Can I change AI models?',
-    answer:
-      'Yes, where your key has access to compatible models. AI Setup includes model management, and Studifree can discover available Gemini models and use fallback when a model is unavailable or busy.',
-  },
-  {
-    id: 'reach-quota',
-    category: 'ai-api-keys',
-    question: 'What happens if I reach my quota?',
-    answer:
-      'Google may reject the request or return a quota error. Studifree shows a friendly message, and you can wait for the quota to reset, choose another compatible model, or review the limits and billing for your Google AI project. There is no shared Studifree AI allowance to fall back on.',
-  },
-  {
-    id: 'data-to-google',
-    category: 'ai-api-keys',
-    question: 'Does my data go to Google?',
-    answer:
-      'When you use AI features, the relevant prompt and submitted material are sent to Google Gemini for processing if Gemini is your configured provider. Merely opening Studifree or using local study tools does not upload your library.',
-  },
-
-  // Features
-  {
-    id: 'any-subject',
-    category: 'features',
-    question: 'Can I study any subject?',
-    answer:
-      'Studifree is intended for a wide range of subjects and learning goals. AI output quality varies by topic, and you should verify important facts and calculations.',
-  },
-  {
-    id: 'create-flashcards',
-    category: 'features',
-    question: 'Can I create flashcards?',
-    answer:
-      'Yes. You can create decks and add cards manually, or generate cards from a topic with AI when your key is configured. Reviews use spaced repetition and confidence ratings.',
-  },
-  {
-    id: 'generate-quizzes',
-    category: 'features',
-    question: 'Can I generate quizzes?',
-    answer:
-      'Yes, with an AI key. Quiz Studio generates multiple-choice questions from a topic or source text. You can choose practice, exam, timed or untimed modes and review explanations after submission.',
-  },
-  {
-    id: 'upload-pdfs',
-    category: 'features',
-    question: 'Can I upload PDFs?',
-    answer:
-      'Yes, in Learn. PDF text is extracted in your browser. When you request AI processing, the relevant extracted text or uploaded images are sent to your configured AI provider. A scanned PDF may be rendered to images for processing where supported.',
-  },
-  {
-    id: 'track-progress',
-    category: 'features',
-    question: 'Can I track my progress?',
-    answer:
-      'Yes. Progress uses your local activity, including quiz results, flashcard counts, study sessions and concept mastery. It is built from data on your device rather than community averages.',
-  },
-
-  // Privacy
-  {
-    id: 'where-data-stored',
-    category: 'privacy',
-    question: 'Where is my data stored?',
-    answer:
-      'Supported learning data is stored locally in your browser using IndexedDB and LocalStorage where implemented. IndexedDB holds structured study records, while LocalStorage holds settings and lightweight configuration. There is no automatic cloud sync.',
-  },
-  {
-    id: 'collect-location',
-    category: 'privacy',
-    question: 'Does Studifree collect location?',
-    answer:
-      'Only if you choose to allow it. Studifree asks once per browser. If you allow it and the browser grants permission, coordinates are used to look up a general country and region. Precise coordinates are not stored in your browser and are not sent to the AI provider. You can change or clear this in Settings.',
-  },
-  {
-    id: 'key-secure',
-    category: 'privacy',
-    question: 'Is my API key completely secure?',
-    answer:
-      'No browser-based key storage can be guaranteed completely secure. Your key is stored in this browser profile and used by the page, so someone with access to the profile or enough technical knowledge of the running page may be able to read it. Restrict keys where possible, avoid shared devices and remove or rotate a key if it may have been exposed.',
-  },
-  {
-    id: 'ai-receives-documents',
-    category: 'privacy',
-    question: 'Does AI receive my uploaded documents?',
-    answer:
-      'A document is not sent just because you select it. In Learn, PDF text is extracted locally. When you request AI processing, the relevant extracted text and any uploaded images needed for that request are sent to your configured AI provider. Upload only material you have the right to use.',
-  },
-  {
-    id: 'local-storage-secure',
-    category: 'privacy',
-    question: 'Is local storage completely secure?',
-    answer:
-      'No storage method is completely risk-free. Local browser storage gives you more control over where supported learning data is kept, but it is not automatically encrypted and can be accessed by someone with access to your browser profile. Clearing browser data can also remove it, so keep backups of important material.',
-  },
-  {
-    id: 'better-than-quizlet',
-    category: 'privacy',
-    question: 'Is Studifree better than Quizlet?',
-    answer:
-      'Studifree and Quizlet have different approaches and features. Studifree focuses on local-first study functionality and a bring-your-own-AI-key model. This can appeal to learners who prefer individual AI usage control and do not want a mandatory Studifree subscription. Compare each platform’s current features, pricing and privacy policies before choosing; Studifree does not claim to be better for every learner.',
-  },
-
-  // General
-  {
-    id: 'affiliation',
-    category: 'general',
-    question: 'Is Studifree affiliated with any education board?',
-    answer:
-      'No. Studifree is an independent learning project and implies no official affiliation with any examination authority, school or education board.',
-  },
-  {
-    id: 'ai-mistakes',
-    category: 'general',
-    question: 'Can AI make mistakes?',
-    answer:
-      'Yes. AI-generated content can be incorrect, incomplete or biased. Verify important facts, calculations and examination-related answers against reliable sources, and do not rely on AI for safety-critical decisions.',
-  },
-  {
-    id: 'on-mobile',
-    category: 'general',
-    question: 'Can I use Studifree on mobile?',
-    answer:
-      'Yes. Studifree is designed to work across phones, tablets and desktop screens, with responsive layouts and touch-friendly controls.',
-  },
-  {
-    id: 'still-evolving',
-    category: 'general',
-    question: 'Is Studifree still evolving?',
-    answer:
-      'Yes. Studifree is an evolving project. Features, model support and documentation may change as the application improves. The Help Centre describes the current behaviour.',
+      'Open the AI key section on this page for the three-step path, or visit AI Setup and the Help Centre. The official Google AI Studio page is linked directly so you can create a key there.',
   },
 ]
+
+/* -------------------------------------------------------------------------- */
+/* Final CTA                                                                  */
+/* -------------------------------------------------------------------------- */
+
+export const finalCtaCopy = {
+  eyebrow: '15 / Begin',
+  title: ['READY TO', 'LEARN', 'DIFFERENTLY?'],
+  description: 'Everything you need to understand more, learn better and move forward.',
+  primaryCta: 'Open Studifree',
+  secondaryCta: 'Learn how it works',
+  note: 'No mandatory account for supported local tools · AI is optional · Bring your own key',
+}
+
+/* -------------------------------------------------------------------------- */
+/* Footer                                                                     */
+/* -------------------------------------------------------------------------- */
 
 export const footerColumns = [
   {
     title: 'Product',
     links: [
-      { label: 'Features', href: '#features', external: false },
-      { label: 'AI Personal Teacher', href: '#feature-ai-teacher', external: false },
-      { label: 'Flashcards', href: '#feature-flashcards', external: false },
-      { label: 'Quiz Studio', href: '#feature-quiz', external: false },
-      { label: 'Study Planner', href: '#feature-planner', external: false },
-      { label: 'Progress', href: '#feature-progress', external: false },
+      { label: 'Open App', href: '/home' },
+      { label: 'Features', href: '#features' },
+      { label: 'AI Setup', href: '/ai-setup' },
     ],
   },
   {
-    title: 'Resources',
+    title: 'Explore',
     links: [
-      { label: 'Help Centre', href: '/help', external: false },
-      { label: 'AI Setup Guide', href: '/ai-setup', external: false },
-      { label: 'FAQ', href: '#faq', external: false },
-      { label: 'About Studifree', href: '/about', external: false },
+      { label: 'How it works', href: '#how-it-works' },
+      { label: 'Privacy', href: '#privacy' },
+      { label: 'FAQ', href: '#faq' },
     ],
   },
-] as const
+]
+
+export const footerCopy = {
+  statement: 'Built to make learning feel simpler.',
+  credit: 'Created by Syed Zain-ul Abideen',
+  note: 'Studifree is an independent learning project.',
+}

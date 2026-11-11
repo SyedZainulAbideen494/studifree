@@ -1,0 +1,60 @@
+import React from 'react'
+import { HardDrive, KeyRound, MonitorSmartphone, ShieldCheck } from 'lucide-react'
+import { privacyCopy, privacyLimits } from '../../data/landing'
+import { Reveal } from './shared'
+import { Aura } from './visuals'
+
+const labelIcons = [HardDrive, ShieldCheck, KeyRound, MonitorSmartphone] as const
+
+/** Local-first privacy, including the honest limits. */
+export function PrivacySection() {
+  return (
+    <section className="sf-privacy sf-section" id="privacy" aria-labelledby="privacy-title">
+      <div className="sf-privacy__aura">
+        <Aura variant="privacy" />
+      </div>
+
+      <div className="sf-container sf-privacy__inner">
+        <div className="sf-privacy__head">
+          <p className="sf-label">{privacyCopy.eyebrow}</p>
+          <h2 className="sf-privacy__title" id="privacy-title">
+            {privacyCopy.title.map((line) => (
+              <span key={line}>{line}</span>
+            ))}
+          </h2>
+        </div>
+
+        <Reveal className="sf-privacy__lead" y={18}>
+          <p>{privacyCopy.lead}</p>
+        </Reveal>
+
+        <div className="sf-privacy__labels">
+          {privacyCopy.labels.map((label, index) => {
+            const Icon = labelIcons[index]
+            return (
+              <Reveal key={label} className="sf-privacy__label" delay={index * 0.06}>
+                <Icon width={14} height={14} aria-hidden="true" />
+                <span>{label}</span>
+              </Reveal>
+            )
+          })}
+        </div>
+
+        <div className="sf-privacy__limits">
+          {privacyLimits.map((limit, index) => (
+            <Reveal key={limit.title} className="sf-privacy__limit" delay={index * 0.06}>
+              <span className="sf-privacy__limit-index">{String(index + 1).padStart(2, '0')}</span>
+              <h3>{limit.title}</h3>
+              <p>{limit.body}</p>
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal className="sf-privacy__note">
+          <span aria-hidden="true">!</span>
+          <p>{privacyCopy.note}</p>
+        </Reveal>
+      </div>
+    </section>
+  )
+}

@@ -1,1 +1,0 @@
-import{j as t}from"./motion-C33GY0tM.js";import{c as d}from"./charts-BNRYEkxT.js";const c=({glass:r,padded:s=!0,className:o,children:e,...a})=>t.jsx("div",{className:d("rounded-3xl border border-line",r?"glass":"bg-surface",s&&"p-5",o),...a,children:e});export{c as C};

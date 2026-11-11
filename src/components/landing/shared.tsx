@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, Layers } from 'lucide-react'
+
+const cinematicEase: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
 /** Join conditional class names without pulling in another dependency. */
 export function cx(...values: Array<string | false | null | undefined>): string {
@@ -9,10 +11,9 @@ export function cx(...values: Array<string | false | null | undefined>): string 
 }
 
 /**
- * Pointer-driven magnetism for primary actions. The native cursor is never
- * replaced and only fine-pointer devices receive the effect. Motion is written
- * straight to the element inside one animation frame so React does not render
- * on every pointer event.
+ * Pointer-driven magnetism and a cursor-following highlight for primary
+ * actions. Only fine-pointer devices receive the effect, and all writes happen
+ * inside one animation frame so React does not render on pointer movement.
  */
 function useMagnetic<T extends HTMLElement>() {
   const ref = useRef<T>(null)
@@ -42,12 +43,12 @@ function useMagnetic<T extends HTMLElement>() {
     const onMove = (event: PointerEvent) => {
       const rect = element.getBoundingClientRect()
       if (!rect.width || !rect.height) return
-      const dx = (event.clientX - rect.left - rect.width / 2) / (rect.width / 2)
-      const dy = (event.clientY - rect.top - rect.height / 2) / (rect.height / 2)
-      nextX = dx * 4.5
-      nextY = dy * 3.5
-      element.style.setProperty('--sf-pointer-x', `${((event.clientX - rect.left) / rect.width) * 100}%`)
-      element.style.setProperty('--sf-pointer-y', `${((event.clientY - rect.top) / rect.height) * 100}%`)
+      const x = (event.clientX - rect.left) / rect.width
+      const y = (event.clientY - rect.top) / rect.height
+      nextX = (x - 0.5) * 7
+      nextY = (y - 0.5) * 5
+      element.style.setProperty('--sf-pointer-x', `${x * 100}%`)
+      element.style.setProperty('--sf-pointer-y', `${y * 100}%`)
       queue()
     }
 
@@ -82,15 +83,12 @@ export interface RevealProps {
   style?: React.CSSProperties
 }
 
-/**
- * Small cinematic reveal. Every instance checks the visitor's motion
- * preference, so only the transform duration changes, never the content.
- */
+/** Restrained cinematic reveal that fully respects reduced motion. */
 export function Reveal({
   children,
   className,
   delay = 0,
-  y = 24,
+  y = 28,
   x = 0,
   once = true,
   style,
@@ -101,10 +99,12 @@ export function Reveal({
     <motion.div
       className={className}
       style={style}
-      initial={reduced ? false : { opacity: 0, y, x }}
-      whileInView={reduced ? undefined : { opacity: 1, y: 0, x: 0 }}
+      initial={reduced ? false : { opacity: 0, y, x, scale: 0.986, filter: 'blur(10px)' }}
+      whileInView={
+        reduced ? undefined : { opacity: 1, y: 0, x: 0, scale: 1, filter: 'blur(0px)' }
+      }
       viewport={{ once, margin: '-70px' }}
-      transition={{ duration: 0.78, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 1.05, delay, ease: cinematicEase }}
     >
       {children}
     </motion.div>
@@ -114,7 +114,6 @@ export function Reveal({
 export interface TiltPanelProps {
   children: ReactNode
   className?: string
-  /** Maximum rotation in degrees. Keep this restrained. */
   intensity?: number
 }
 
@@ -137,7 +136,7 @@ export function TiltPanel({ children, className, intensity = 4 }: TiltPanelProps
 
     const paint = () => {
       frame = 0
-      element.style.transform = `perspective(1400px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`
+      element.style.transform = `perspective(1500px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`
     }
 
     const queue = () => {
@@ -197,10 +196,7 @@ export interface LandingLinkProps {
   ariaLabel?: string
 }
 
-/**
- * One link primitive for anchors, internal routes and external resources.
- * Internal routes use the router so navigation stays instant.
- */
+/** One link primitive for anchors, internal routes and external resources. */
 export function LandingLink({
   href,
   children,
@@ -212,16 +208,15 @@ export function LandingLink({
   ariaLabel,
 }: LandingLinkProps) {
   const magneticRef = useMagnetic<HTMLAnchorElement>()
-  const classes = cx(
-    'sf-btn',
-    `sf-btn--${variant}`,
-    size !== 'md' && `sf-btn--${size}`,
-    className,
-  )
+  const classes = cx('sf-btn', `sf-btn--${variant}`, size !== 'md' && `sf-btn--${size}`, className)
   const content = (
     <>
-      <span>{children}</span>
-      {showArrow && <ArrowRight className="sf-btn__arrow" width={16} height={16} aria-hidden="true" />}
+      <span className="sf-btn__label">{children}</span>
+      {showArrow && (
+        <span className="sf-btn__arrow" aria-hidden="true">
+          <ArrowRight width={15} height={15} />
+        </span>
+      )}
     </>
   )
 
@@ -298,11 +293,7 @@ export function TextLink({ href, children, className, showArrow = true }: TextLi
     )
   }
 
-  return (
-    <a className={classes} href={href.startsWith('#') ? href : `#${href}`}>
-      {content}
-    </a>
-  )
+  return <a className={classes} href={href.startsWith('#') ? href : `#${href}`}>{content}</a>
 }
 
 export interface LandingBrandProps {
@@ -313,9 +304,9 @@ export function LandingBrand({ to = '/' }: LandingBrandProps) {
   return (
     <Link className="sf-brand" to={to} aria-label="Studifree home">
       <span className="sf-brand__mark" aria-hidden="true">
-        <Layers strokeWidth={1.8} />
+        <Layers strokeWidth={1.7} />
       </span>
-      <span>Studifree</span>
+      <span className="sf-brand__text">Studifree</span>
     </Link>
   )
 }
@@ -339,20 +330,116 @@ export function SectionHead({
   id,
   meta,
 }: SectionHeadProps) {
+  const reduced = useReducedMotion() === true
+
+  const group = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 20, filter: 'blur(8px)' },
+    visible: {
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      transition: { duration: 0.95, ease: cinematicEase },
+    },
+  }
+
+  const rule = {
+    hidden: { scaleX: 0, opacity: 0 },
+    visible: {
+      scaleX: 1,
+      opacity: 1,
+      transition: { duration: 1.15, ease: cinematicEase },
+    },
+  }
+
   return (
-    <div
+    <motion.div
       className={cx('sf-section-head', center && 'sf-section-head--center', className)}
+      variants={group}
+      initial={reduced ? false : 'hidden'}
+      whileInView={reduced ? undefined : 'visible'}
+      viewport={{ once: true, margin: '-85px' }}
     >
       {(eyebrow || meta) && (
-        <div className="sf-section-head__meta">
-          {eyebrow && <p className="sf-eyebrow">{eyebrow}</p>}
+        <motion.div className="sf-section-head__meta" variants={item}>
+          {eyebrow && <p className="sf-label">{eyebrow}</p>}
           {meta && <span className="sf-section-head__index">{meta}</span>}
-        </div>
+        </motion.div>
       )}
-      <h2 className="sf-h2" id={id}>
+      <motion.h2 className="sf-h2" id={id} variants={item}>
         {title}
-      </h2>
-      {description && <p className="sf-lead">{description}</p>}
-    </div>
+      </motion.h2>
+      <motion.span className="sf-section-head__rule" variants={rule} aria-hidden="true" />
+      {description && (
+        <motion.p className="sf-lead" variants={item}>
+          {description}
+        </motion.p>
+      )}
+    </motion.div>
+  )
+}
+
+/**
+ * Word-by-word focus reveal driven by scroll progress. Each word fades from
+ * muted to white as the section passes the viewport. The text remains fully
+ * readable when motion is reduced.
+ */
+function FocusWord({
+  word,
+  progress,
+  range,
+  reduced,
+}: {
+  word: string
+  progress: ReturnType<typeof useScroll>['scrollYProgress']
+  range: [number, number]
+  reduced: boolean
+}) {
+  const opacity = useTransform(progress, range, [0.16, 1])
+
+  return (
+    <motion.span className="sf-focus-word" style={reduced ? undefined : { opacity }}>
+      {word}{' '}
+    </motion.span>
+  )
+}
+
+export function ScrollFocusText({
+  text,
+  className,
+  id,
+}: {
+  text: string
+  className?: string
+  id?: string
+}) {
+  const ref = useRef<HTMLParagraphElement>(null)
+  const reduced = useReducedMotion() === true
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start 0.9', 'end 0.35'],
+  })
+  const words = text.split(' ')
+
+  return (
+    <p ref={ref} className={cx('sf-focus-text', className)} id={id}>
+      {words.map((word, index) => {
+        const start = index / Math.max(words.length, 1)
+        const end = Math.min(1, start + 0.34)
+        return (
+          <FocusWord
+            key={`${word}-${index}`}
+            word={word}
+            progress={scrollYProgress}
+            range={[start, end]}
+            reduced={reduced}
+          />
+        )
+      })}
+    </p>
   )
 }

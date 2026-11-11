@@ -41,8 +41,9 @@ function absolute(path: string): string {
  *
  * There is deliberately no Organization, aggregateRating, review, address or
  * contact point: none of those details are verified for this independent
- * project. The free offer describes only the local core tools; AI usage is
- * subject to the learner's own provider key and that provider's limits.
+ * project. The creator is credited as a Person. The free offer describes only
+ * the local core tools; AI usage is subject to the learner's own provider key
+ * and that provider's limits.
  */
 export function buildStructuredData(origin: string) {
   const siteRoot = `${origin}/`
@@ -71,6 +72,10 @@ export function buildStructuredData(origin: string) {
         url: siteRoot,
         isAccessibleForFree: true,
         inLanguage: SITE.language,
+        author: {
+          '@type': 'Person',
+          name: SITE.author,
+        },
         featureList: [
           'AI-assisted explanations',
           'Spaced-repetition flashcards',
@@ -122,7 +127,8 @@ export function useDocumentMeta(): void {
     document.documentElement.lang = SITE.language
 
     setMeta('name', 'description', meta.description)
-    setMeta('name', 'author', SITE.name)
+    setMeta('name', 'author', SITE.author)
+    setMeta('name', 'creator', SITE.author)
     setMeta('name', 'theme-color', SITE.themeColor)
     setMeta('name', 'robots', meta.indexable ? 'index, follow, max-image-preview:large' : 'noindex, nofollow')
     setMeta('name', 'googlebot', meta.indexable ? 'index, follow' : 'noindex, nofollow')

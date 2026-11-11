@@ -18,8 +18,9 @@ export const SITE = {
   socialImageWidth: 1200,
   socialImageHeight: 630,
   socialImageAlt:
-    'Studifree social preview: Learn Anything. Understand Everything. A monochrome learning workspace with flashcards, quizzes and study planning.',
-  themeColor: '#050505',
+    'Studifree social preview: Learn Anything. Understand Everything. A cinematic learning workspace with flashcards, quizzes and study planning.',
+  author: 'Syed Zain-ul Abideen',
+  themeColor: '#000000',
   tagline: 'Learn Anything. Understand Everything.',
   philosophy: 'Learning should be for everyone.',
   language: 'en',

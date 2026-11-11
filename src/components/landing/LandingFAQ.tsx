@@ -1,162 +1,151 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { HelpCircle, Plus, Sparkles } from 'lucide-react'
-import {
-  landingFaqCategories,
-  landingFaqItems,
-  type LandingFaqCategoryId,
-} from '../../data/landing'
-import { LandingLink, Reveal, SectionHead, TextLink, cx } from './shared'
-
-type Filter = 'all' | LandingFaqCategoryId
-
-const featured = landingFaqItems.find((item) => item.id === 'why-own-key') ?? landingFaqItems[0]
+import { ArrowUpRight, X } from 'lucide-react'
+import { landingFaqItems, type LandingFaqItem } from '../../data/landing'
+import { SectionHead } from './shared'
 
 /**
- * The question archive. Filtering and the accordion remain ordinary buttons
- * with explicit ARIA state; only the open/close height is animated.
+ * Experimental FAQ: questions float as glass fragments. Selecting one blurs
+ * the field and opens a focused reading panel with full keyboard support.
  */
 export function LandingFAQ() {
-  const [filter, setFilter] = useState<Filter>('all')
-  const [openId, setOpenId] = useState<string | null>('how-does-it-work')
+  const [selected, setSelected] = useState<LandingFaqItem | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
+  const lastFocused = useRef<HTMLElement | null>(null)
   const reduced = useReducedMotion() === true
 
-  const filtered =
-    filter === 'all'
-      ? landingFaqItems
-      : landingFaqItems.filter((item) => item.category === filter)
-
-  const activeCategory = landingFaqCategories.find((category) => category.id === filter)
-
-  const chooseFilter = (next: Filter) => {
-    setFilter(next)
-    setOpenId(null)
+  const openAnswer = (item: LandingFaqItem, trigger: HTMLElement) => {
+    lastFocused.current = trigger
+    setSelected(item)
   }
 
-  const toggle = (id: string) => {
-    setOpenId((current) => (current === id ? null : id))
-  }
+  useEffect(() => {
+    if (!selected) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const focusTimer = window.setTimeout(() => closeRef.current?.focus(), 40)
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setSelected(null)
+        return
+      }
+      if (event.key !== 'Tab' || !panelRef.current) return
+      const focusable = panelRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      )
+      if (!focusable.length) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      window.clearTimeout(focusTimer)
+      document.body.style.overflow = previousOverflow
+      lastFocused.current?.focus()
+    }
+  }, [selected])
 
   return (
-    <section className="sf-section sf-faq" id="faq" aria-labelledby="faq-title">
+    <section className="sf-faq sf-section" id="faq" aria-labelledby="faq-title">
       <div className="sf-container">
-        <Reveal>
-          <SectionHead
-            eyebrow="Frequently asked"
-            meta="09 / ARCHIVE"
-            title={<span id="faq-title">Questions, answered plainly.</span>}
-            description="Everything from how the app works to where your data goes. If something is still unclear, the Help Centre goes further."
-          />
-        </Reveal>
+        <SectionHead
+          eyebrow="16 / Questions"
+          id="faq-title"
+          title="Everything else, up close."
+          description="Tap a question. The rest of the page will wait."
+          meta="SF / ARCHIVE"
+        />
 
-        <div className="sf-faq__layout">
-          <div className="sf-faq__aside">
-            <Reveal className="sf-faq__featured">
-              <span className="sf-faq__featured-label">
-                <Sparkles width={12} height={12} aria-hidden="true" /> Start here
-              </span>
-              <h3>{featured.question}</h3>
-              <p>{featured.answer}</p>
-              <TextLink href="#api-keys">See the setup guide</TextLink>
-            </Reveal>
-
-            <Reveal className="sf-faq__support" delay={0.08} y={14}>
-              <p className="sf-faq__featured-label">
-                <HelpCircle width={12} height={12} aria-hidden="true" /> Still curious?
-              </p>
-              <p className="sf-faq__category-description">
-                The Help Centre covers the tools one by one and explains what is stored locally and what is
-                sent externally.
-              </p>
-              <TextLink href="/help">Visit the Help Centre</TextLink>
-            </Reveal>
-          </div>
-
-          <div className="sf-faq__main">
-            <div className="sf-faq__filters" role="group" aria-label="Filter questions by topic">
-              <button
-                type="button"
-                className="sf-faq__filter"
-                aria-pressed={filter === 'all'}
-                onClick={() => chooseFilter('all')}
-              >
-                All questions
-              </button>
-              {landingFaqCategories.map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  className="sf-faq__filter"
-                  aria-pressed={filter === category.id}
-                  onClick={() => chooseFilter(category.id)}
-                >
-                  {category.label}
-                </button>
-              ))}
-            </div>
-
-            <p className="sf-faq__category-description sf-faq__summary" aria-live="polite">
-              {activeCategory?.description ?? 'All questions, grouped by topic.'}
-            </p>
-
-            <div className="sf-faq__list">
-              {filtered.map((item, index) => {
-                const isOpen = openId === item.id
-                return (
-                  <div className={cx('sf-faq__item', isOpen && 'is-open')} key={item.id}>
-                    <h3>
-                      <button
-                        type="button"
-                        className="sf-faq__trigger"
-                        id={`faq-trigger-${item.id}`}
-                        aria-expanded={isOpen}
-                        aria-controls={`faq-panel-${item.id}`}
-                        onClick={() => toggle(item.id)}
-                      >
-                        <span className="sf-faq__number">{String(index + 1).padStart(2, '0')}</span>
-                        <span className="sf-faq__question">{item.question}</span>
-                        <span className="sf-faq__icon" aria-hidden="true">
-                          <Plus width={13} height={13} />
-                        </span>
-                      </button>
-                    </h3>
-
-                    <AnimatePresence initial={false}>
-                      {isOpen && (
-                        <motion.div
-                          key="answer"
-                          id={`faq-panel-${item.id}`}
-                          role="region"
-                          aria-labelledby={`faq-trigger-${item.id}`}
-                          className="sf-faq__answer-wrap"
-                          initial={reduced ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                          animate={reduced ? { opacity: 1 } : { height: 'auto', opacity: 1 }}
-                          exit={reduced ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                          transition={{
-                            duration: reduced ? 0 : 0.32,
-                            ease: [0.22, 1, 0.36, 1],
-                          }}
-                        >
-                          <p className="sf-faq__answer">{item.answer}</p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                )
-              })}
-            </div>
-
-            <div className="sf-faq__more">
-              <p className="sf-small">
-                Showing {filtered.length} of {landingFaqItems.length} questions.
-              </p>
-              <LandingLink href="/help" variant="secondary" size="sm" showArrow>
-                Open the Help Centre
-              </LandingLink>
-            </div>
-          </div>
+        <div className={`sf-faq__field${selected ? ' is-dimmed' : ''}`}>
+          {landingFaqItems.map((item, index) => (
+            <button
+              key={item.id}
+              type="button"
+              className="sf-faq__chip"
+              onClick={(event) => openAnswer(item, event.currentTarget)}
+              aria-haspopup="dialog"
+            >
+              <span className="sf-faq__chip-index">{String(index + 1).padStart(2, '0')}</span>
+              <span className="sf-faq__chip-question">{item.question}</span>
+              <ArrowUpRight width={13} height={13} aria-hidden="true" />
+            </button>
+          ))}
         </div>
+
+        <p className="sf-faq__hint">
+          <span aria-hidden="true">●</span> Nine answers. No fine print hidden in a manual.
+        </p>
       </div>
+
+      <AnimatePresence>
+        {selected && (
+          <motion.div
+            className="sf-faq__overlay"
+            initial={reduced ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={reduced ? undefined : { opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setSelected(null)
+            }}
+          >
+            <motion.div
+              className="sf-glass sf-faq__panel"
+              ref={panelRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="faq-panel-title"
+              initial={reduced ? false : { opacity: 0, y: 26, scale: 0.97, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+              exit={reduced ? undefined : { opacity: 0, y: 18, scale: 0.98, filter: 'blur(8px)' }}
+              transition={{ type: 'spring', stiffness: 280, damping: 30 }}
+            >
+              <div className="sf-faq__panel-head">
+                <span>STUDIFREE / ANSWER</span>
+                <button
+                  type="button"
+                  ref={closeRef}
+                  className="sf-faq__close"
+                  onClick={() => setSelected(null)}
+                  aria-label="Close answer"
+                >
+                  <X width={17} height={17} />
+                </button>
+              </div>
+              <div className="sf-faq__panel-body">
+                <p className="sf-faq__panel-index">
+                  {String(landingFaqItems.findIndex((item) => item.id === selected.id) + 1).padStart(
+                    2,
+                    '0',
+                  )}{' '}
+                  / {String(landingFaqItems.length).padStart(2, '0')}
+                </p>
+                <h3 id="faq-panel-title">{selected.question}</h3>
+                <p className="sf-faq__answer">{selected.answer}</p>
+              </div>
+              <div className="sf-faq__panel-foot">
+                <span>Still curious?</span>
+                <Link to="/help">
+                  Visit the Help Centre <ArrowUpRight width={12} height={12} aria-hidden="true" />
+                </Link>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }
