@@ -174,7 +174,6 @@ html.sf-scroll {
   position: relative;
   z-index: 1;
   padding-block: clamp(5.5rem, 11vw, 10.5rem);
-  scroll-margin-top: 110px;
 }
 
 .sf-label {
@@ -934,238 +933,300 @@ html.sf-scroll {
    04. Navigation
    -------------------------------------------------------------------------- */
 
-.sf-nav-wrap {
+/* Floating icon dock. A single glass capsule holds five icons; one shared
+   layout element travels between them to mark the section in view. */
+
+.sf-dock-wrap {
   position: fixed;
-  top: max(0.9rem, env(safe-area-inset-top));
-  left: 0;
-  right: 0;
-  z-index: 60;
+  top: max(24px, env(safe-area-inset-top));
+  left: 50%;
+  translate: -50% 0;
+  z-index: 1000;
   display: flex;
   justify-content: center;
-  padding-inline: 1rem;
+  max-width: calc(100vw - 1.5rem);
   pointer-events: none;
 }
 
-.sf-nav {
+.sf-dock {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  width: min(1060px, 100%);
-  padding: 0.45rem 0.45rem 0.45rem 1rem;
+  padding: 10px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.012)),
-    rgba(8, 8, 10, 0.55);
-  backdrop-filter: blur(24px) saturate(150%);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
+    radial-gradient(125% 160% at 18% 0%, rgba(96, 176, 196, 0.17), transparent 58%),
+    radial-gradient(125% 160% at 86% 100%, rgba(255, 138, 76, 0.09), transparent 62%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.012)),
+    rgba(20, 30, 32, 0.45);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
   box-shadow:
-    0 20px 60px -28px rgba(0, 0, 0, 0.9),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 22px 50px -22px rgba(0, 0, 0, 0.85),
+    0 8px 20px -14px rgba(0, 0, 0, 0.9),
+    0 0 60px -26px rgba(79, 140, 255, 0.45);
   pointer-events: auto;
   transition:
-    width 0.6s var(--sf-ease),
-    background-color 0.5s ease,
-    padding 0.5s var(--sf-ease),
-    backdrop-filter 0.5s ease,
-    box-shadow 0.5s ease;
-  will-change: width;
+    border-color 0.6s var(--sf-ease),
+    box-shadow 0.6s var(--sf-ease),
+    background 0.6s var(--sf-ease),
+    backdrop-filter 0.6s ease;
+  will-change: transform, backdrop-filter;
 }
 
-.sf-nav--scrolled {
-  width: min(930px, 100%);
-  padding-block: 0.32rem;
+.sf-dock__sheen {
+  position: absolute;
+  inset: 1px 14% auto;
+  height: 1px;
+  border-radius: 999px;
+  opacity: 0.75;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  pointer-events: none;
+}
+
+.sf-dock.is-scrolled {
+  border-color: rgba(255, 255, 255, 0.17);
   background:
+    radial-gradient(125% 160% at 18% 0%, rgba(96, 176, 196, 0.14), transparent 58%),
+    radial-gradient(125% 160% at 86% 100%, rgba(255, 138, 76, 0.07), transparent 62%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.008)),
-    rgba(6, 6, 8, 0.78);
-  backdrop-filter: blur(34px) saturate(170%);
-  -webkit-backdrop-filter: blur(34px) saturate(170%);
+    rgba(14, 21, 23, 0.64);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
   box-shadow:
-    0 26px 70px -26px rgba(0, 0, 0, 0.95),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 26px 60px -24px rgba(0, 0, 0, 0.92),
+    0 10px 24px -14px rgba(0, 0, 0, 0.9),
+    0 0 50px -24px rgba(79, 140, 255, 0.4);
 }
 
-.sf-nav__divider {
-  width: 1px;
-  height: 18px;
-  margin-inline: 0.35rem 0.65rem;
-  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.16), transparent);
-}
-
-.sf-nav__links {
-  display: flex;
-  align-items: center;
-  gap: 0.15rem;
-  margin-right: auto;
-}
-
-.sf-nav__link {
+.sf-dock__list {
   position: relative;
-  padding: 0.5rem 0.72rem;
-  border-radius: 999px;
-  font-size: 0.74rem;
-  font-weight: 500;
-  letter-spacing: 0.005em;
-  color: var(--sf-muted);
-  transition:
-    color 0.35s ease,
-    background-color 0.35s ease,
-    transform 0.4s var(--sf-ease);
-}
-
-.sf-nav__link::before {
-  content: '';
-  position: absolute;
-  left: 0.72rem;
-  right: 0.72rem;
-  bottom: 0.32rem;
-  height: 1px;
-  scale: 0 1;
-  transform-origin: left center;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
-  transition: scale 0.5s var(--sf-ease);
-}
-
-.sf-nav__link:hover {
-  color: var(--sf-white);
-  background: rgba(255, 255, 255, 0.05);
-  transform: translateY(-1px);
-}
-
-.sf-nav__link:hover::before,
-.sf-nav__link.is-active::before {
-  scale: 1 1;
-}
-
-.sf-nav__link.is-active {
-  color: var(--sf-white);
-  background: rgba(255, 255, 255, 0.045);
-}
-
-.sf-nav__link.is-active::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: 0.28rem;
-  width: 3px;
-  height: 3px;
-  translate: -50% 0;
-  border-radius: 50%;
-  background: var(--sf-blue);
-  box-shadow: 0 0 8px rgba(79, 140, 255, 0.9);
-}
-
-.sf-nav__cta {
-  flex: 0 0 auto;
-}
-
-.sf-nav__menu {
-  display: none;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  margin-left: auto;
-  border-radius: 50%;
-  border: 1px solid var(--sf-line);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--sf-soft);
-  cursor: pointer;
-  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s var(--sf-ease);
-}
-
-.sf-nav__menu:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: var(--sf-line-strong);
-}
-
-.sf-nav__menu:active {
-  transform: scale(0.94);
-}
-
-.sf-nav__progress {
-  position: absolute;
-  left: 9%;
-  right: 9%;
-  bottom: -1px;
-  height: 1px;
-  transform-origin: 0 50%;
-  background: linear-gradient(90deg, transparent, var(--sf-blue), var(--sf-violet), transparent);
-  opacity: 0.7;
-}
-
-/* iOS-style mobile sheet */
-.sf-nav__mobile {
-  position: absolute;
-  top: calc(100% + 0.55rem);
-  left: 1rem;
-  right: 1rem;
-  max-width: 440px;
-  margin-inline: auto;
-  padding: 0.75rem;
-  border-radius: 28px;
-  pointer-events: auto;
-}
-
-.sf-nav__mobile-head {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.55rem 0.65rem 0.85rem;
-  font-family: var(--sf-mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--sf-faint);
-}
-
-.sf-nav__mobile-link {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  min-height: 48px;
-  padding: 0.7rem 0.75rem;
-  border-radius: 14px;
-  font-size: 0.92rem;
-  font-weight: 500;
-  color: var(--sf-silver);
-  transition: background-color 0.25s ease, color 0.25s ease;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.sf-nav__mobile-link:hover,
-.sf-nav__mobile-link:active {
-  background: rgba(255, 255, 255, 0.06);
+.sf-dock__item {
+  display: flex;
+}
+
+.sf-dock__btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 999px;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.35s ease;
+}
+
+.sf-landing a.sf-dock__btn {
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.sf-landing a.sf-dock__btn:hover,
+.sf-landing a.sf-dock__btn:focus-visible {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.sf-landing a.sf-dock__btn.is-active {
   color: #fff;
 }
 
-.sf-nav__mobile-link svg {
-  margin-left: auto;
-  opacity: 0.4;
+.sf-dock__btn:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.22);
 }
 
-.sf-nav__mobile-index {
-  font-family: var(--sf-mono);
-  font-size: 0.6rem;
-  color: var(--sf-faint);
+/* The indicator is one element shared across anchors, so switching sections
+   makes it travel rather than cross-fade. */
+.sf-dock__active {
+  position: absolute;
+  inset: 3px;
+  z-index: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background:
+    radial-gradient(100% 130% at 50% 0%, rgba(var(--dock-accent), 0.24), transparent 72%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.045));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -8px 16px -10px rgba(0, 0, 0, 0.8),
+    0 8px 18px -10px rgba(0, 0, 0, 0.85),
+    0 0 26px -8px rgba(var(--dock-accent), 0.55);
+  pointer-events: none;
 }
 
-.sf-nav__mobile-actions {
+.sf-dock__mag {
+  position: relative;
+  z-index: 1;
   display: grid;
-  padding: 0.5rem 0.4rem 0.35rem;
+  place-items: center;
+  transform: translate3d(var(--mag-x, 0px), var(--mag-y, 0px), 0);
+  transition: transform 0.5s var(--sf-ease-out);
+  will-change: transform;
 }
 
-.sf-nav__mobile-actions .sf-btn {
-  width: 100%;
-  min-height: 48px;
+.sf-dock__btn:hover .sf-dock__mag {
+  transition-duration: 0.14s;
 }
 
-.sf-nav__mobile-note {
-  padding: 0.6rem 0.65rem 0.5rem;
-  font-family: var(--sf-mono);
-  font-size: 0.55rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--sf-faint);
-  text-align: center;
+.sf-dock__glyph {
+  display: grid;
+  place-items: center;
+  transform: scale(var(--glyph-scale, 1));
+  transition:
+    transform 0.55s var(--sf-spring),
+    filter 0.4s ease;
+}
+
+.sf-dock__btn:hover .sf-dock__glyph,
+.sf-dock__btn:focus-visible .sf-dock__glyph {
+  --glyph-scale: 1.1;
+}
+
+.sf-dock__btn.is-active .sf-dock__glyph {
+  --glyph-scale: 1.06;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+.sf-dock__btn.is-active:hover .sf-dock__glyph {
+  --glyph-scale: 1.12;
+}
+
+.sf-dock__btn:active .sf-dock__glyph,
+.sf-dock__btn.is-active:active .sf-dock__glyph {
+  --glyph-scale: 0.84;
+  transition-duration: 0.1s;
+}
+
+.sf-dock__ripple {
+  position: absolute;
+  inset: 4px;
+  z-index: 2;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 50%, rgba(var(--dock-accent), 0.5), transparent 68%);
+  animation: sf-dock-ripple 0.72s var(--sf-ease-out) forwards;
+  pointer-events: none;
+}
+
+@keyframes sf-dock-ripple {
+  0% {
+    opacity: 0;
+    scale: 0.5;
+  }
+  22% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    scale: 2.15;
+  }
+}
+
+.sf-dock__tip {
+  position: absolute;
+  top: calc(100% + 13px);
+  left: 50%;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.68rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(14, 18, 20, 0.72);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  box-shadow:
+    0 12px 30px -14px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  opacity: 0;
+  translate: -50% 6px;
+  scale: 0.94;
+  pointer-events: none;
+  transition:
+    opacity 0.26s ease,
+    translate 0.4s var(--sf-spring),
+    scale 0.4s var(--sf-spring);
+}
+
+.sf-dock__tip-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgb(var(--dock-accent));
+  box-shadow: 0 0 8px rgba(var(--dock-accent), 0.8);
+}
+
+.sf-dock__btn:focus-visible .sf-dock__tip {
+  opacity: 1;
+  translate: -50% 0;
+  scale: 1;
+}
+
+@media (hover: hover) {
+  .sf-dock__btn:hover .sf-dock__tip {
+    opacity: 1;
+    translate: -50% 0;
+    scale: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .sf-dock-wrap {
+    top: max(16px, env(safe-area-inset-top));
+  }
+
+  .sf-dock {
+    padding: 8px;
+  }
+
+  .sf-dock__list {
+    gap: 4px;
+  }
+
+  .sf-dock__btn {
+    width: 46px;
+    height: 46px;
+  }
+
+  .sf-dock__glyph svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .sf-dock__tip {
+    top: calc(100% + 10px);
+    font-size: 0.64rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sf-dock__ripple {
+    display: none;
+  }
+
+  .sf-dock__mag {
+    transform: none;
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -5009,27 +5070,6 @@ html.sf-scroll {
     width: min(1240px, calc(100% - 2.5rem));
   }
 
-  .sf-nav__links,
-  .sf-nav__divider,
-  .sf-nav__cta {
-    display: none;
-  }
-
-  .sf-nav {
-    width: 100%;
-    padding: 0.4rem 0.4rem 0.4rem 0.9rem;
-    justify-content: space-between;
-  }
-
-  .sf-nav--scrolled {
-    width: 100%;
-    padding-block: 0.34rem;
-  }
-
-  .sf-nav__menu {
-    display: grid;
-  }
-
   .sf-hero {
     flex-direction: column;
     align-items: stretch;
@@ -5728,7 +5768,7 @@ html.sf-scroll {
 }
 
 @media print {
-  .sf-nav-wrap,
+  .sf-dock-wrap,
   .sf-atmosphere,
   .sf-datarain,
   .sf-aura,

@@ -4,17 +4,24 @@ import { aiLinks } from './aiLinks'
 /* Navigation and hero                                                        */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * The floating dock is icon-only, so each item carries the icon key, the
+ * accessible label and the tooltip copy separately from the anchor target.
+ * `accent` only tints the active pill and tooltip dot very slightly.
+ */
 export interface LandingNavItem {
+  id: 'home' | 'features' | 'how-it-works' | 'about' | 'faq'
   label: string
   href: string
+  accent: 'blue' | 'violet' | 'orange' | 'red'
 }
 
 export const landingNavItems: LandingNavItem[] = [
-  { label: 'Features', href: '#features' },
-  { label: 'How it works', href: '#how-it-works' },
-  { label: 'Why free', href: '#why-free' },
-  { label: 'Privacy', href: '#privacy' },
-  { label: 'FAQ', href: '#faq' },
+  { id: 'home', label: 'Home', href: '#top', accent: 'blue' },
+  { id: 'features', label: 'Features', href: '#features', accent: 'violet' },
+  { id: 'how-it-works', label: 'How It Works', href: '#how-it-works', accent: 'orange' },
+  { id: 'about', label: 'About Studifree', href: '#why-free', accent: 'red' },
+  { id: 'faq', label: 'Help & FAQ', href: '#faq', accent: 'blue' },
 ]
 
 export interface HeroStat {
