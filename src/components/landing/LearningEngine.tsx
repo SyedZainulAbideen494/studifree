@@ -101,7 +101,6 @@ export function LearningEngine() {
           id="engine-title"
           title={engineCopy.title}
           description={engineCopy.lead}
-          meta="SF / ENGINE"
         />
 
         <div className="sf-engine__grid">
@@ -118,7 +117,6 @@ export function LearningEngine() {
                     <span className="sf-engine__icon" aria-hidden="true">
                       <Icon width={17} height={17} />
                     </span>
-                    <span className="sf-engine__index">{card.index}</span>
                   </div>
 
                   <CardVisual card={card} />
@@ -126,7 +124,6 @@ export function LearningEngine() {
                   <div className="sf-engine__copy">
                     <h3>{card.title}</h3>
                     <p>{card.body}</p>
-                    <span className="sf-engine__meta">{card.meta}</span>
                   </div>
                 </TiltPanel>
               </Reveal>

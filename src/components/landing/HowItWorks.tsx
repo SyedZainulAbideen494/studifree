@@ -2,7 +2,7 @@ import React, { useRef } from 'react'
 import { motion, useReducedMotion, useScroll, useSpring } from 'framer-motion'
 import { ArrowUpRight, Check, FileText, RotateCcw, Sparkles } from 'lucide-react'
 import { howItWorksCopy, howItWorksSteps } from '../../data/landing'
-import { Reveal, SectionHead } from './shared'
+import { SectionHead } from './shared'
 
 function StepVisual({ step }: { step: (typeof howItWorksSteps)[number] }) {
   if (step.number === '01') {
@@ -104,11 +104,7 @@ export function HowItWorks() {
               id="how-title"
               title={howItWorksCopy.title}
               description={howItWorksCopy.lead}
-              meta="SF / LOOP"
             />
-            <span className="sf-how__counter" aria-hidden="true">
-              04 STEPS / ONE LOOP
-            </span>
           </div>
 
           <div className="sf-how__viewport">
@@ -124,7 +120,6 @@ export function HowItWorks() {
                 <article className="sf-how__step" key={step.number}>
                   <div className="sf-how__step-top">
                     <span className="sf-how__step-number">{step.number}</span>
-                    <span className="sf-how__step-kicker">{step.kicker}</span>
                   </div>
 
                   <StepVisual step={step} />
@@ -145,15 +140,9 @@ export function HowItWorks() {
             <span className="sf-how__rail-line">
               <motion.span style={{ scaleX: reduced ? 1 : progress }} />
             </span>
-            <span>START → REMEMBER</span>
           </div>
         </div>
       </div>
-
-      <Reveal className="sf-container sf-how__mobile-note">
-        <span aria-hidden="true">↳</span>
-        Four steps, one continuous loop. Each tool feeds the next.
-      </Reveal>
     </section>
   )
 }

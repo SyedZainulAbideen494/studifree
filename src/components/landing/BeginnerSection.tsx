@@ -20,7 +20,6 @@ export function BeginnerSection() {
               id="beginner-title"
               title={beginnerCopy.title}
               description={beginnerCopy.lead}
-              meta="SF / CLARITY"
             />
 
             <div className="sf-beginner__points">
@@ -45,11 +44,6 @@ export function BeginnerSection() {
 
           <Reveal className="sf-beginner__visual" y={20}>
             <div className="sf-beginner__panel">
-              <div className="sf-beginner__panel-head">
-                <span>UNDERSTANDING / CHECK</span>
-                <span>SF / GUIDE</span>
-              </div>
-
               <div className="sf-beginner__transform" aria-hidden="true">
                 <motion.span
                   className="sf-beginner__question"
@@ -79,12 +73,6 @@ export function BeginnerSection() {
                 <span>What is an API key?</span>
                 <span>Why does it matter?</span>
                 <span>How do I use it?</span>
-              </div>
-
-              <div className="sf-beginner__footer">
-                <span>PLAIN LANGUAGE</span>
-                <span>NO ASSUMED KNOWLEDGE</span>
-                <span>GUIDED PATH</span>
               </div>
             </div>
           </Reveal>

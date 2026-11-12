@@ -10,33 +10,22 @@ export function ModelFallback() {
   return (
     <section className="sf-fallback sf-section" id="fallback" aria-labelledby="fallback-title">
       <div className="sf-container">
-        <div className="sf-fallback__head">
-          <SectionHead
-            eyebrow={fallbackCopy.eyebrow}
-            id="fallback-title"
-            title={
-              <>
-                {fallbackCopy.title.map((line) => (
-                  <span key={line} className="sf-fallback__title-line">
-                    {line}
-                  </span>
-                ))}
-              </>
-            }
-            description={fallbackCopy.lead}
-            meta="SF / RESILIENCE"
-          />
-          <span className="sf-fallback__status">
-            <span aria-hidden="true" /> FALLBACK READY
-          </span>
-        </div>
+        <SectionHead
+          eyebrow={fallbackCopy.eyebrow}
+          id="fallback-title"
+          title={
+            <>
+              {fallbackCopy.title.map((line) => (
+                <span key={line} className="sf-fallback__title-line">
+                  {line}
+                </span>
+              ))}
+            </>
+          }
+          description={fallbackCopy.lead}
+        />
 
         <div className="sf-fallback__console">
-          <div className="sf-fallback__console-bar">
-            <span>MODEL ROUTER / LIVE</span>
-            <span className="sf-fallback__console-path">SF-01 → POLICY → NEXT</span>
-          </div>
-
           <div className="sf-fallback__pipeline">
             <span className="sf-fallback__rail" aria-hidden="true">
               <span className="sf-fallback__pulse" />
@@ -62,18 +51,12 @@ export function ModelFallback() {
                   <p>{step.detail}</p>
                   {index < fallbackSteps.length - 1 && (
                     <span className="sf-fallback__arrow" aria-hidden="true">
-                      {index === 3 ? <ArrowDown width={12} height={12} /> : <ArrowDown width={12} height={12} />}
+                      <ArrowDown width={12} height={12} />
                     </span>
                   )}
                 </Reveal>
               )
             })}
-          </div>
-
-          <div className="sf-fallback__console-footer">
-            <span>CONFIGURED CHAIN</span>
-            <span>MODEL A → MODEL B → MODEL C</span>
-            <span>USER CONTROL</span>
           </div>
         </div>
 

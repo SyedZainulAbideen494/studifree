@@ -1,6 +1,5 @@
 import React from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { PenLine } from 'lucide-react'
 import { founderCopy } from '../../data/landing'
 import { Reveal } from './shared'
 
@@ -48,10 +47,6 @@ export function FounderSection() {
                 <span key={line}>{line}</span>
               ))}
             </h2>
-            <span className="sf-founder__mark" aria-hidden="true">
-              <PenLine width={16} height={16} />
-              HUMAN NOTE
-            </span>
           </div>
 
           <div className="sf-founder__body">

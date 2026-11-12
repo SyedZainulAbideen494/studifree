@@ -1,14 +1,12 @@
 import React from 'react'
 import { brainCopy, learningPrinciples } from '../../data/landing'
 import { Reveal, SectionHead } from './shared'
-import { DataRain, NeuralField } from './visuals'
+import { NeuralField } from './visuals'
 
 /** Research-interface section: a neural field paired with honest study principles. */
 export function BrainSection() {
   return (
     <section className="sf-brain sf-section" id="brain" aria-labelledby="brain-title">
-      <DataRain className="sf-brain__rain" />
-
       <div className="sf-container">
         <div className="sf-brain__layout">
           <div className="sf-brain__copy">
@@ -17,7 +15,6 @@ export function BrainSection() {
               id="brain-title"
               title={brainCopy.title}
               description={brainCopy.lead}
-              meta="SF / CORTEX"
             />
             <p className="sf-brain__note">{brainCopy.note}</p>
           </div>

@@ -101,7 +101,6 @@ export function StudyModes() {
           id="modes-title"
           title={studyModesCopy.title}
           description={studyModesCopy.lead}
-          meta="SF / MODES"
         />
 
         <div className="sf-modes__tabs" role="tablist" aria-label="Study modes">
@@ -113,6 +112,7 @@ export function StudyModes() {
                 key={mode.id}
                 type="button"
                 role="tab"
+                id={`mode-tab-${mode.id}`}
                 aria-selected={selected}
                 aria-controls="mode-panel"
                 className={cx('sf-modes__tab', selected && 'is-active')}
@@ -137,11 +137,9 @@ export function StudyModes() {
           className={cx('sf-modes__panel', `is-${active.accent}`)}
           id="mode-panel"
           role="tabpanel"
+          aria-labelledby={`mode-tab-${active.id}`}
         >
           <div className="sf-modes__copy">
-            <span className="sf-modes__index" aria-hidden="true">
-              {String(studyModes.findIndex((mode) => mode.id === active.id) + 1).padStart(2, '0')}
-            </span>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={active.id}
@@ -167,7 +165,6 @@ export function StudyModes() {
               <span>
                 <span aria-hidden="true" /> {active.label.toUpperCase()} / PREVIEW
               </span>
-              <span>SF / 2026</span>
             </div>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
@@ -181,10 +178,6 @@ export function StudyModes() {
                 <ModeVisual mode={active} />
               </motion.div>
             </AnimatePresence>
-            <div className="sf-modes__visual-foot">
-              <span>LOCAL STUDY SPACE</span>
-              <span>AI OPTIONAL</span>
-            </div>
           </div>
         </div>
 

@@ -318,7 +318,6 @@ export interface SectionHeadProps {
   center?: boolean
   className?: string
   id?: string
-  meta?: string
 }
 
 export function SectionHead({
@@ -328,7 +327,6 @@ export function SectionHead({
   center = false,
   className,
   id,
-  meta,
 }: SectionHeadProps) {
   const reduced = useReducedMotion() === true
 
@@ -364,10 +362,9 @@ export function SectionHead({
       whileInView={reduced ? undefined : 'visible'}
       viewport={{ once: true, margin: '-85px' }}
     >
-      {(eyebrow || meta) && (
+      {eyebrow && (
         <motion.div className="sf-section-head__meta" variants={item}>
-          {eyebrow && <p className="sf-label">{eyebrow}</p>}
-          {meta && <span className="sf-section-head__index">{meta}</span>}
+          <p className="sf-label">{eyebrow}</p>
         </motion.div>
       )}
       <motion.h2 className="sf-h2" id={id} variants={item}>

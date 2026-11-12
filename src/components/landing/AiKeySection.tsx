@@ -28,7 +28,6 @@ export function AiKeySection() {
                 </>
               }
               description={aiKeyCopy.lead}
-              meta="SF / BYOK"
             />
 
             <div className="sf-key__benefits">

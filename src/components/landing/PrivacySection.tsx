@@ -1,10 +1,7 @@
 import React from 'react'
-import { HardDrive, KeyRound, MonitorSmartphone, ShieldCheck } from 'lucide-react'
 import { privacyCopy, privacyLimits } from '../../data/landing'
 import { Reveal } from './shared'
 import { Aura } from './visuals'
-
-const labelIcons = [HardDrive, ShieldCheck, KeyRound, MonitorSmartphone] as const
 
 /** Local-first privacy, including the honest limits. */
 export function PrivacySection() {
@@ -28,22 +25,9 @@ export function PrivacySection() {
           <p>{privacyCopy.lead}</p>
         </Reveal>
 
-        <div className="sf-privacy__labels">
-          {privacyCopy.labels.map((label, index) => {
-            const Icon = labelIcons[index]
-            return (
-              <Reveal key={label} className="sf-privacy__label" delay={index * 0.06}>
-                <Icon width={14} height={14} aria-hidden="true" />
-                <span>{label}</span>
-              </Reveal>
-            )
-          })}
-        </div>
-
         <div className="sf-privacy__limits">
           {privacyLimits.map((limit, index) => (
             <Reveal key={limit.title} className="sf-privacy__limit" delay={index * 0.06}>
-              <span className="sf-privacy__limit-index">{String(index + 1).padStart(2, '0')}</span>
               <h3>{limit.title}</h3>
               <p>{limit.body}</p>
             </Reveal>

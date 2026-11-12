@@ -84,29 +84,6 @@ export function Aura({
       <span className="sf-aura__spark sf-aura__spark--a" />
       <span className="sf-aura__spark sf-aura__spark--b" />
       <span className="sf-aura__spark sf-aura__spark--c" />
-      <span className="sf-aura__coordinates">SF / NEURAL FIELD</span>
-    </div>
-  )
-}
-
-/** Faint information stream. Purely decorative and extremely low contrast. */
-export function DataRain({ className }: { className?: string }) {
-  const columns = [
-    '01001110 01001111 01000100 01000101',
-    'LEARN · RECALL · CONNECT · REPEAT',
-    '10110101 11001010 00101101 10110010',
-    'UNDERSTAND · PRACTISE · REMEMBER',
-    '01101100 01100101 01100001 01110010',
-    'SYNAPSE 001 110 010 101 000',
-  ]
-
-  return (
-    <div className={cx('sf-datarain', className)} aria-hidden="true">
-      {columns.map((column, index) => (
-        <span key={column} style={{ animationDelay: `${index * -4.4}s` }}>
-          {column}
-        </span>
-      ))}
     </div>
   )
 }

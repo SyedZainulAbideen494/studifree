@@ -9,7 +9,6 @@ export function StatementSection() {
       <div className="sf-container">
         <div className="sf-statement__meta">
           <p className="sf-label">{statementCopy.eyebrow}</p>
-          <span className="sf-statement__hint">{statementCopy.footnote}</span>
         </div>
 
         <ScrollFocusText

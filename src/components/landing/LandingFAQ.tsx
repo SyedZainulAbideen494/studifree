@@ -66,7 +66,6 @@ export function LandingFAQ() {
           id="faq-title"
           title="Everything else, up close."
           description="Tap a question. The rest of the page will wait."
-          meta="SF / ARCHIVE"
         />
 
         <div className={`sf-faq__field${selected ? ' is-dimmed' : ''}`}>

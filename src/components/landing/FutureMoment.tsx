@@ -1,13 +1,11 @@
 import React from 'react'
 import { futureMomentCopy } from '../../data/landing'
 import { Reveal } from './shared'
-import { DataRain } from './visuals'
 
 /** A quiet signal between the personal note and the FAQ. */
 export function FutureMoment() {
   return (
     <section className="sf-future" aria-label="Information becomes knowledge">
-      <DataRain className="sf-future__rain" />
       <div className="sf-future__line" aria-hidden="true">
         <span />
       </div>

@@ -95,14 +95,6 @@ export function HeroSection() {
 
   return (
     <section ref={heroRef} className="sf-hero" id="top" aria-labelledby="hero-title">
-      <div className="sf-hero__topbar">
-        <span className="sf-status">
-          <span className="sf-status__dot" aria-hidden="true" />
-          {heroCopy.status}
-        </span>
-        <span className="sf-coordinate">{heroCopy.coordinates}</span>
-      </div>
-
       <motion.div
         className="sf-hero__aura"
         style={{ y: auraY, scale: auraScale, rotateX, rotateY }}
@@ -196,7 +188,6 @@ export function HeroSection() {
       </motion.div>
 
       <a className="sf-hero__scroll" href="#what" aria-label="Continue to the introduction">
-        <span>Scroll to enter</span>
         <span className="sf-hero__scroll-track" aria-hidden="true">
           <span />
         </span>

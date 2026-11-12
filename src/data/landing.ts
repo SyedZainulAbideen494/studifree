@@ -37,8 +37,6 @@ export const heroCopy = {
     'One focused space where difficult topics become clear, your notes become memory, and every session moves you forward.',
   primaryCta: 'Start learning free',
   secondaryCta: 'See how it works',
-  status: 'SYSTEM ONLINE',
-  coordinates: 'SF — 01 / 2026',
   note: 'No subscription wall · Your own AI key · Local-first by design',
   stats: [
     { value: '+∞', label: 'Ways to learn', className: 'sf-hero__stat--a' },
@@ -57,7 +55,6 @@ export const statementCopy = {
   title: 'Studying was never supposed to feel this hard.',
   support:
     'Too many tabs. Too many subscriptions. Too much time spent organising instead of understanding. Studifree turns your material into one interactive learning space.',
-  footnote: 'Scroll to focus the sentence',
 }
 
 /* -------------------------------------------------------------------------- */
@@ -71,52 +68,15 @@ export const productCopy = {
   caption: 'A real learning workspace, not a chat window with extra buttons.',
 }
 
-export const productLayers = [
-  {
-    id: 'teacher',
-    label: 'AI teacher',
-    meta: 'LIVE EXPLANATION',
-    title: 'Photosynthesis, in plain words',
-    body: 'A plant uses light to turn carbon dioxide and water into glucose. Oxygen is released along the way.',
-    accent: 'blue',
-  },
-  {
-    id: 'flashcard',
-    label: 'Flashcard',
-    meta: 'ACTIVE RECALL',
-    title: 'What is the difference between mitosis and meiosis?',
-    body: 'Tap to reveal the answer.',
-    accent: 'violet',
-  },
-  {
-    id: 'quiz',
-    label: 'Quiz',
-    meta: 'CHECKING UNDERSTANDING',
-    title: 'What happens to population growth as resources become limited?',
-    body: 'The rate slows and levels off near the carrying capacity.',
-    accent: 'orange',
-  },
-  {
-    id: 'notes',
-    label: 'Notes',
-    meta: 'STRUCTURED MATERIAL',
-    title: 'Cell division — key points',
-    body: 'Definitions, common misconceptions, memory hooks and a knowledge check.',
-    accent: 'white',
-  },
-] as const
-
 /* -------------------------------------------------------------------------- */
 /* Learning engine                                                            */
 /* -------------------------------------------------------------------------- */
 
 export interface EngineCard {
   id: string
-  index: string
   size: 'large' | 'wide' | 'small'
   title: string
   body: string
-  meta: string
   accent: 'blue' | 'violet' | 'orange' | 'red' | 'white'
 }
 
@@ -129,56 +89,44 @@ export const engineCopy = {
 export const engineCards: EngineCard[] = [
   {
     id: 'recall',
-    index: '01',
     size: 'large',
     title: 'Active recall',
     body: 'Test yourself instead of rereading. Retrieving an answer is harder than recognising one — and far more useful.',
-    meta: 'PRACTICE',
     accent: 'blue',
   },
   {
     id: 'flashcards',
-    index: '02',
     size: 'small',
     title: 'Flashcards',
     body: 'Turn information into memory training with cards you can create or generate.',
-    meta: 'MEMORY',
     accent: 'violet',
   },
   {
     id: 'explanations',
-    index: '03',
     size: 'small',
     title: 'AI explanations',
     body: 'Ask questions until a concept actually makes sense, at the level you need.',
-    meta: 'UNDERSTANDING',
     accent: 'orange',
   },
   {
     id: 'adaptive',
-    index: '04',
     size: 'small',
     title: 'Adaptive focus',
     body: 'See where your results and reviews suggest spending more attention next.',
-    meta: 'ATTENTION',
     accent: 'red',
   },
   {
     id: 'quiz',
-    index: '05',
     size: 'small',
     title: 'Quiz mode',
     body: 'Practise retrieval with generated questions, then read the explanation for every answer.',
-    meta: 'RETRIEVAL',
     accent: 'white',
   },
   {
     id: 'material',
-    index: '06',
     size: 'wide',
     title: 'Study material intelligence',
     body: 'Upload a PDF or bring your own source text. Turn the material you already have into explanations, cards, quizzes and notes.',
-    meta: 'UPLOAD → LEARN',
     accent: 'blue',
   },
 ]
@@ -240,28 +188,24 @@ export const howItWorksCopy = {
 export const howItWorksSteps = [
   {
     number: '01',
-    kicker: 'MATERIAL',
     title: 'Add your study material',
     body: 'Upload a PDF, paste your notes or start with a topic you want to understand.',
     detail: 'Learn · PDF text · Your own source',
   },
   {
     number: '02',
-    kicker: 'TRANSFORM',
     title: 'AI transforms it',
     body: 'Turn the same material into explanations, flashcards, quizzes and structured notes.',
     detail: 'Explanations · Cards · Quizzes · Notes',
   },
   {
     number: '03',
-    kicker: 'PRACTISE',
     title: 'Actually study',
     body: 'Use the interactive tools instead of passively reading. Test, flip, answer and ask.',
     detail: 'Recall · Practice · Feedback',
   },
   {
     number: '04',
-    kicker: 'REMEMBER',
     title: 'Remember more',
     body: 'Revisit what needs attention and build a routine that compounds over time.',
     detail: 'Reviews · Progress · Next step',
@@ -363,7 +307,6 @@ export const privacyCopy = {
   eyebrow: '08 / Privacy',
   title: ['YOUR DATA.', 'YOUR DEVICE.'],
   lead: 'Studifree is designed with a local-first approach. Supported study data lives in your browser on your device, rather than being uploaded to a central study database by default.',
-  labels: ['LOCAL-FIRST', 'NO REQUIRED ACCOUNT', 'YOU CONTROL YOUR KEY', 'YOUR STUDY SPACE'],
   note: 'Local-first is a design choice, not an absolute security guarantee. Browser storage can be cleared, and data does not automatically sync across devices unless a future sync option is enabled.',
 }
 

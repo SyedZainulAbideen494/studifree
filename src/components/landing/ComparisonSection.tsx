@@ -13,7 +13,6 @@ export function ComparisonSection() {
           id="compare-title"
           title={comparisonCopy.title}
           description={comparisonCopy.lead}
-          meta="SF / CONTEXT"
         />
 
         <Reveal className="sf-compare__table" y={20}>

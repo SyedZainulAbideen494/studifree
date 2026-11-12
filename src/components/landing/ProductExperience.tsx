@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
-import { ArrowUpRight, Check, FileText, Layers, Sparkles } from 'lucide-react'
+import { Check, FileText, Layers, Sparkles } from 'lucide-react'
 import { productCopy } from '../../data/landing'
 import { Reveal, SectionHead } from './shared'
 
@@ -158,11 +158,9 @@ export function ProductExperience() {
           id="product-title"
           title={productCopy.title}
           description={productCopy.lead}
-          meta="SF / WORKSPACE"
         />
 
         <div className="sf-product__stage" ref={stageRef}>
-          <div className="sf-product__grid" aria-hidden="true" />
           <div className="sf-product__beam" aria-hidden="true" />
 
           <motion.div className="sf-product__main" style={{ y: mainY, rotate }}>
@@ -180,17 +178,9 @@ export function ProductExperience() {
           <motion.div className="sf-product__card sf-product__card--notes" style={{ y: notesY }}>
             <NotesLayer />
           </motion.div>
-
-          <span className="sf-product__hud sf-product__hud--a">
-            <ArrowUpRight width={12} height={12} aria-hidden="true" /> ONE SESSION / FOUR OUTPUTS
-          </span>
-          <span className="sf-product__hud sf-product__hud--b">LOCAL-FIRST / AI OPTIONAL</span>
         </div>
 
-        <Reveal className="sf-product__caption">
-          <span aria-hidden="true">●</span>
-          {productCopy.caption}
-        </Reveal>
+        <Reveal className="sf-product__caption">{productCopy.caption}</Reveal>
       </div>
     </section>
   )
