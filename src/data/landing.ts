@@ -31,13 +31,11 @@ export interface HeroStat {
 }
 
 export const heroCopy = {
-  eyebrow: 'Studifree — the learning operating system',
   titleLines: ['LEARN', 'DIFFERENTLY.'],
   description:
     'One focused space where difficult topics become clear, your notes become memory, and every session moves you forward.',
   primaryCta: 'Start learning free',
   secondaryCta: 'See how it works',
-  note: 'No subscription wall · Your own AI key · Local-first by design',
   stats: [
     { value: '+∞', label: 'Ways to learn', className: 'sf-hero__stat--a' },
     { value: 'AI', label: 'Optional intelligence', className: 'sf-hero__stat--b' },

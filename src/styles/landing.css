@@ -1228,10 +1228,6 @@ html.sf-scroll {
   max-width: min(100%, 82vw);
 }
 
-.sf-hero__eyebrow {
-  margin-bottom: clamp(1.1rem, 2.2vw, 1.8rem);
-}
-
 .sf-hero__title {
   font-size: clamp(3.7rem, 10.8vw, 11rem);
   font-weight: 600;
@@ -1302,15 +1298,6 @@ html.sf-scroll {
   flex-wrap: wrap;
   gap: 0.7rem;
   margin-top: clamp(1.3rem, 2.4vw, 1.9rem);
-}
-
-.sf-hero__note {
-  margin-top: 1.15rem;
-  font-family: var(--sf-mono);
-  font-size: 0.57rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--sf-faint);
 }
 
 .sf-hero__stats {
@@ -5275,11 +5262,6 @@ html.sf-scroll {
     font-size: clamp(3rem, 15vw, 5.4rem);
   }
 
-  .sf-hero__eyebrow {
-    font-size: 0.56rem;
-    letter-spacing: 0.12em;
-  }
-
   .sf-hero__description {
     font-size: 0.9rem;
   }
@@ -5292,11 +5274,6 @@ html.sf-scroll {
   .sf-hero__actions .sf-btn {
     width: 100%;
     min-height: 50px;
-  }
-
-  .sf-hero__note {
-    font-size: 0.5rem;
-    line-height: 1.6;
   }
 
   .sf-hero__stats {

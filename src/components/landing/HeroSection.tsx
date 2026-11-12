@@ -104,8 +104,6 @@ export function HeroSection() {
 
       <div className="sf-container sf-hero__inner">
         <motion.div className="sf-hero__copy" style={{ y: titleY, opacity: titleOpacity }}>
-          <p className="sf-label sf-hero__eyebrow">{heroCopy.eyebrow}</p>
-
           <motion.h1
             className="sf-hero__title"
             id="hero-title"
@@ -159,15 +157,6 @@ export function HeroSection() {
               {heroCopy.secondaryCta}
             </LandingLink>
           </motion.div>
-
-          <motion.p
-            className="sf-hero__note"
-            initial={reduced ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.2, delay: 1.5 }}
-          >
-            {heroCopy.note}
-          </motion.p>
         </motion.div>
       </div>
 
