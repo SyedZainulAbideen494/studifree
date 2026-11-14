@@ -41,14 +41,16 @@ function absolute(path: string): string {
  *
  * There is deliberately no Organization, aggregateRating, review, address or
  * contact point: none of those details are verified for this independent
- * project. The creator is credited as a Person. The free offer describes only
- * the local core tools; AI usage is subject to the learner's own provider key
- * and that provider's limits.
+ * project. The founder is modelled as a Person and referenced as the author,
+ * creator and publisher. The free offer describes only the local core tools;
+ * AI usage is subject to the learner's own provider key and that provider's
+ * limits.
  */
 export function buildStructuredData(origin: string) {
   const siteRoot = `${origin}/`
   const appId = `${origin}/#software`
   const websiteId = `${origin}/#website`
+  const founderId = `${origin}/#founder`
 
   return {
     '@context': 'https://schema.org',
@@ -60,37 +62,46 @@ export function buildStructuredData(origin: string) {
         name: SITE.name,
         description: SITE.description,
         inLanguage: SITE.language,
+        publisher: { '@id': founderId },
       },
       {
         '@type': 'SoftwareApplication',
         '@id': appId,
         name: SITE.name,
         applicationCategory: 'EducationalApplication',
-        operatingSystem: 'Web browser',
+        operatingSystem: 'Web',
         description:
-          'A learning platform with AI-assisted explanations, flashcards, quizzes, study planning and progress tracking.',
+          'A modern AI-powered study companion for notes, flashcards, quizzes and revision, with optional AI features that use your own supported API key.',
         url: siteRoot,
         isAccessibleForFree: true,
         inLanguage: SITE.language,
-        author: {
-          '@type': 'Person',
-          name: SITE.author,
-        },
+        author: { '@id': founderId },
+        creator: { '@id': founderId },
         featureList: [
           'AI-assisted explanations',
-          'Spaced-repetition flashcards',
-          'Generated practice quizzes',
-          'Study planner and focus timer',
-          'Local progress tracking',
-          'Bring-your-own Gemini API key',
+          'AI-generated notes and flashcards',
+          'Quiz generation and practice',
+          'Flashcard study mode',
+          'Study and revision tools',
+          'Local-first study data',
+          'Bring-your-own AI API key',
+          'Automatic AI model fallback when supported',
         ],
         offers: {
           '@type': 'Offer',
           price: '0',
           priceCurrency: 'USD',
           description:
-            'Core manual study tools are free to use. AI features require your own Google Gemini API key and may be subject to separate provider quotas or charges.',
+            'The core study tools are free to use. AI features require your own supported AI API key; usage, quotas and pricing depend on your AI provider and account.',
         },
+      },
+      {
+        '@type': 'Person',
+        '@id': founderId,
+        name: SITE.author,
+        jobTitle: 'Founder',
+        description: 'Founder of Studifree.',
+        url: `${origin}/about`,
       },
     ],
   }

@@ -7,7 +7,7 @@ function Signature() {
   const reduced = useReducedMotion() === true
 
   return (
-    <svg className="sf-founder__signature" viewBox="0 0 220 64" role="img" aria-label="Signature of Syed Zain-ul Abideen">
+    <svg className="sf-founder__signature" viewBox="0 0 220 64" role="img" aria-label="Signature of Syed Zain-ul-Abideen">
       <motion.path
         d="M8 47c14-9 20-22 24-33 4 17 3 29-4 38 14-12 26-20 34-19 9 1 4 15-2 19 12-13 21-18 29-16 10 3 3 13-4 17 17-10 29-14 38-11 10 3 7 11-2 12 20-10 34-14 45-10 9 3 10 10 2 11"
         fill="none"

@@ -56,21 +56,41 @@ export function Atmosphere() {
  */
 export function Aura({
   variant = 'hero',
+  stage,
   className,
 }: {
   variant?: 'hero' | 'privacy' | 'final'
+  stage?: number
   className?: string
 }) {
   const reduced = useReducedMotion() === true
 
   return (
     <div
-      className={cx('sf-aura', `sf-aura--${variant}`, reduced && 'sf-aura--still', className)}
+      className={cx(
+        'sf-aura',
+        `sf-aura--${variant}`,
+        stage !== undefined && `sf-aura--s${Math.max(0, Math.min(3, stage))}`,
+        reduced && 'sf-aura--still',
+        className,
+      )}
       aria-hidden="true"
     >
+      <span className="sf-aura__stage-glow" />
       <span className="sf-aura__halo" />
       <span className="sf-aura__ring sf-aura__ring--one" />
       <span className="sf-aura__ring sf-aura__ring--two" />
+      <span className="sf-aura__orbits">
+        <span className="sf-aura__orbit sf-aura__orbit--a">
+          <i />
+        </span>
+        <span className="sf-aura__orbit sf-aura__orbit--b">
+          <i />
+        </span>
+        <span className="sf-aura__orbit sf-aura__orbit--c">
+          <i />
+        </span>
+      </span>
       <span className="sf-aura__core">
         <span className="sf-aura__blob sf-aura__blob--blue" />
         <span className="sf-aura__blob sf-aura__blob--violet" />
@@ -81,6 +101,39 @@ export function Aura({
         <span className="sf-aura__vein sf-aura__vein--b" />
         <span className="sf-aura__sheen" />
       </span>
+      <span className="sf-aura__particles">
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+      </span>
+      <svg
+        className="sf-aura__network"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="xMidYMid meet"
+        focusable="false"
+      >
+        <g stroke="rgba(143, 180, 255, 0.42)" strokeWidth="0.18" fill="none">
+          <path d="M50 24 L30 38 L38 60 L58 70 L74 54 L64 34 Z" />
+          <path d="M50 24 L58 70" opacity="0.5" />
+          <path d="M30 38 L74 54" opacity="0.5" />
+          <path d="M38 60 L64 34" opacity="0.4" />
+          <path d="M30 38 L22 62 L38 60" opacity="0.55" />
+          <path d="M74 54 L80 30 L64 34" opacity="0.55" />
+        </g>
+        <g fill="rgba(196, 219, 255, 0.9)">
+          <circle cx="50" cy="24" r="0.9" />
+          <circle cx="30" cy="38" r="0.75" />
+          <circle cx="38" cy="60" r="0.8" />
+          <circle cx="58" cy="70" r="0.7" />
+          <circle cx="74" cy="54" r="0.85" />
+          <circle cx="64" cy="34" r="0.65" />
+          <circle cx="22" cy="62" r="0.55" />
+          <circle cx="80" cy="30" r="0.55" />
+        </g>
+      </svg>
       <span className="sf-aura__spark sf-aura__spark--a" />
       <span className="sf-aura__spark sf-aura__spark--b" />
       <span className="sf-aura__spark sf-aura__spark--c" />

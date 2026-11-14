@@ -17,24 +17,32 @@ function pngSize(path: string): { width: number; height: number } {
 describe('social and search metadata', () => {
   it('uses the exact public title and description in index.html', () => {
     const html = read('index.html').toString()
-    expect(html).toContain('<title>Studifree — Learn Anything. Understand Everything.</title>')
-    expect(html).toContain(
-      'Studifree is a free-to-start learning platform with AI-powered explanations, flashcards, quizzes, study planning and progress tracking. Learn at your own pace with your own AI key.',
-    )
-    expect(html).toContain('name="author" content="Syed Zain-ul Abideen"')
-    expect(html).toContain('name="creator" content="Syed Zain-ul Abideen"')
+    const escapedTitle = SITE.title.replace(/&/g, '&amp;')
+    expect(html).toContain(`<title>${escapedTitle}</title>`)
+    expect(html).toContain(SITE.description)
+    expect(html).toContain(`name="author" content="${SITE.author}"`)
+    expect(html).toContain(`name="creator" content="${SITE.author}"`)
     expect(html).toContain('name="robots" content="index, follow, max-image-preview:large"')
   })
 
   it('uses the exact social preview copy and image dimensions', () => {
     const html = read('index.html').toString()
-    expect(html).toContain('Studifree — Learning Should Be for Everyone')
-    expect(html).toContain(
-      'Learn any subject, understand difficult concepts, create flashcards, practise with quizzes and organise your learning. Your learning space starts here.',
-    )
+    expect(html).toContain(SITE.socialTitle)
+    expect(html).toContain(SITE.socialDescription)
     expect(html).toContain('property="og:image:width" content="1200"')
     expect(html).toContain('property="og:image:height" content="630"')
     expect(html).toContain('name="twitter:card" content="summary_large_image"')
+    expect(html).toContain('rel="canonical" href="__SITE_ORIGIN__/"')
+  })
+
+  it('ships a semantic no-JavaScript fallback', () => {
+    const html = read('index.html').toString()
+    expect(html).toContain('<noscript>')
+    expect(html).toContain('Studifree – Learn Differently')
+    expect(html).toContain('What is Studifree?')
+    expect(html).toContain('Use Your Own AI Key')
+    expect(html).toContain('Founded by Syed Zain-ul-Abideen')
+    expect(html).toContain('Frequently Asked Questions')
   })
 
   it('ships real preview and icon assets at the declared dimensions', () => {
@@ -74,22 +82,28 @@ describe('structured data', () => {
   const data = buildStructuredData('https://studifree.example') as any
   const graph = data['@graph'] as any[]
 
-  it('attributes the software to its author without inventing an organisation', () => {
+  it('attributes the software to its founder without inventing an organisation', () => {
     expect(() => JSON.parse(JSON.stringify(data))).not.toThrow()
     expect(data['@context']).toBe('https://schema.org')
-    expect(graph.map((node) => node['@type'])).toEqual(['WebSite', 'SoftwareApplication'])
+    expect(graph.map((node) => node['@type'])).toEqual(['WebSite', 'SoftwareApplication', 'Person'])
     const app = graph.find((node) => node['@type'] === 'SoftwareApplication')
-    expect(app.author).toEqual({ '@type': 'Person', name: SITE.author })
+    const person = graph.find((node) => node['@type'] === 'Person')
+    expect(person.name).toBe(SITE.author)
+    expect(person.jobTitle).toBe('Founder')
+    expect(person.description).toMatch(/founder of studifree/i)
+    expect(app.author).toEqual({ '@id': person['@id'] })
+    expect(app.creator).toEqual({ '@id': person['@id'] })
     expect(graph.some((node) => node['@type'] === 'Organization')).toBe(false)
   })
 
-  it('does not invent ratings, reviews, offers or contact details', () => {
+  it('does not invent ratings, reviews, contact details or provider costs', () => {
     const serialised = JSON.stringify(data)
     expect(serialised).not.toMatch(/aggregateRating|reviewCount|ratingValue|telephone|streetAddress|postalCode/i)
     expect(serialised).not.toMatch(/AIza[0-9A-Za-z_-]+/)
     const app = graph.find((node) => node['@type'] === 'SoftwareApplication')
     expect(app.offers.price).toBe('0')
-    expect(app.offers.description).toContain('AI features require your own Google Gemini API key')
+    expect(app.offers.description).toMatch(/your own supported AI API key/i)
+    expect(serialised).not.toMatch(/unlimited/i)
   })
 })
 

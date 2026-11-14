@@ -3,17 +3,17 @@
   <!-- Set VITE_SITE_URL at build time to emit fully qualified URLs. -->
   <url>
     <loc>/</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-14</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>/about</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-14</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>/help</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-14</lastmod>
     <changefreq>monthly</changefreq>
   </url>
 </urlset>

@@ -24,24 +24,75 @@ export const landingNavItems: LandingNavItem[] = [
   { id: 'faq', label: 'Help & FAQ', href: '#faq', accent: 'blue' },
 ]
 
-export interface HeroStat {
+export interface HeroCard {
   value: string
   label: string
-  className: string
+  accent: 'blue' | 'violet' | 'orange'
 }
 
-export const heroCopy = {
-  titleLines: ['LEARN', 'DIFFERENTLY.'],
-  description:
-    'One focused space where difficult topics become clear, your notes become memory, and every session moves you forward.',
-  primaryCta: 'Start learning free',
-  secondaryCta: 'See how it works',
-  stats: [
-    { value: '+∞', label: 'Ways to learn', className: 'sf-hero__stat--a' },
-    { value: 'AI', label: 'Optional intelligence', className: 'sf-hero__stat--b' },
-    { value: 'LOCAL', label: 'Your study space', className: 'sf-hero__stat--c' },
-    { value: 'FREE', label: 'No subscription wall', className: 'sf-hero__stat--d' },
-  ] satisfies HeroStat[],
+export interface HeroStage {
+  id: 'learn' | 'study' | 'remember' | 'stick'
+  titleLines: [string, string]
+  description: string
+  cards: [HeroCard, HeroCard, HeroCard]
+}
+
+/**
+ * The hero is a four-beat story. Each beat changes the headline, the
+ * supporting line and the three floating readouts while the calls to action
+ * and the orb composition stay anchored. Keeping the beats as data lets the
+ * component render one state instead of duplicating four markup trees.
+ */
+export const heroStages: HeroStage[] = [
+  {
+    id: 'learn',
+    titleLines: ['LEARN', 'DIFFERENTLY.'],
+    description:
+      'One focused space where difficult topics become clear, your notes become memory, and every session moves you forward.',
+    cards: [
+      { value: 'AI', label: 'Optional intelligence', accent: 'blue' },
+      { value: 'LOCAL', label: 'Your study space', accent: 'violet' },
+      { value: 'FREE', label: 'No subscription wall', accent: 'orange' },
+    ],
+  },
+  {
+    id: 'study',
+    titleLines: ['STUDY', 'SMARTER.'],
+    description:
+      'Turn difficult material into explanations, questions, flashcards and practice built around how you learn.',
+    cards: [
+      { value: 'ADAPT', label: 'To your learning', accent: 'blue' },
+      { value: 'GENERATE', label: 'What you need', accent: 'violet' },
+      { value: 'FOCUS', label: 'On what matters', accent: 'orange' },
+    ],
+  },
+  {
+    id: 'remember',
+    titleLines: ['REMEMBER', 'MORE.'],
+    description:
+      'Active recall, spaced repetition and focused practice help turn information into something that actually stays.',
+    cards: [
+      { value: 'RECALL', label: 'Test your memory', accent: 'blue' },
+      { value: 'REPEAT', label: 'At the right time', accent: 'violet' },
+      { value: 'RETAIN', label: 'What you learn', accent: 'orange' },
+    ],
+  },
+  {
+    id: 'stick',
+    titleLines: ['MAKE IT', 'STICK.'],
+    description:
+      'Less mindless scrolling. More understanding. More remembering. More progress.',
+    cards: [
+      { value: 'READY', label: 'Keep moving', accent: 'blue' },
+      { value: 'PROGRESS', label: 'Built daily', accent: 'violet' },
+      { value: 'FREE', label: 'For everyone', accent: 'orange' },
+    ],
+  },
+]
+
+export const heroCtas = {
+  primary: 'Start learning free',
+  secondary: 'See how it works',
 }
 
 /* -------------------------------------------------------------------------- */
@@ -481,7 +532,7 @@ export const beginnerPoints = [
 export const founderCopy = {
   eyebrow: '13 / Why I built this',
   title: ['WHY I BUILT', 'STUDIFREE.'],
-  name: 'Syed Zain-ul Abideen',
+  name: 'Syed Zain-ul-Abideen',
   role: 'Founder / Builder',
   paragraphs: [
     'Studying often feels unnecessarily complicated. Students are surrounded by subscriptions, multiple apps, distractions and tools that do not actually help them learn.',
@@ -606,6 +657,6 @@ export const footerColumns = [
 
 export const footerCopy = {
   statement: 'Built to make learning feel simpler.',
-  credit: 'Created by Syed Zain-ul Abideen',
+  credit: 'Created by Syed Zain-ul-Abideen',
   note: 'Studifree is an independent learning project.',
 }

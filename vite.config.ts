@@ -72,6 +72,9 @@ export default defineConfig(({ mode }) => {
     env.VITE_SITE_URL ||
     process.env.VITE_SITE_URL ||
     process.env.URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : '') ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
     ''
   ).replace(/\/+$/, '')
@@ -86,9 +89,9 @@ export default defineConfig(({ mode }) => {
           name: 'Studifree',
           short_name: 'Studifree',
           description:
-            'A free-to-start learning workspace with AI-assisted explanations, flashcards, quizzes and study planning.',
-          theme_color: '#050505',
-          background_color: '#050505',
+            'A modern AI-powered study companion for notes, flashcards and quizzes, with optional AI features that use your own supported API key.',
+          theme_color: '#000000',
+          background_color: '#000000',
           display: 'standalone',
           orientation: 'any',
           start_url: '/',

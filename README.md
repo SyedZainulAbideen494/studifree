@@ -35,6 +35,11 @@ VITE_SITE_URL=https://your-domain.example npm run build
 Without it the build emits relative URLs, which still work at runtime but are
 not ideal for social crawlers that do not execute JavaScript.
 
+On Vercel, the production domain is detected automatically from
+`VERCEL_PROJECT_PRODUCTION_URL` (falling back to `VERCEL_URL`). Other hosts can
+provide `URL`, or you can set `VITE_SITE_URL` explicitly to override every
+automatic value.
+
 ## Hosting
 
 The app is a single-page application. Configure the host to rewrite unknown
